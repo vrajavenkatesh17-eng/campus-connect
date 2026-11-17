@@ -1,21 +1,20 @@
-# Authors & Inventors
+# Architects & Inventors
 
-### Project Lead & System Architect
-* **Name**: Krishna Raja V (Krish)
-* **Email**: [v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com)
-* **Role**: Chief Architect, Full-Stack Engineer, and Database Designer
-* **Institution**: Francis Xavier Engineering College (Autonomous), Tirunelveli, Tamil Nadu, India
-* **Patent & IP Token**: `KRISH-FXEC-PATENT-2026-CC-AUTH`
+### Core Engineering Team
+* **Krish (Krishna Raja V)** — Lead System Architect & Database Engineer
+  * Email: [v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com)
+* **Ihsan** — Co-Architect & Systems Engineer
+* **Institution**: Francis Xavier Engineering College (Autonomous), Tirunelveli
+* **Patent Token**: `KRISH-IHSAN-FXEC-PATENT-2026-CC`
 
-### Project Description
-Campus Connect is an end-to-end guest lecture and campus event management platform featuring:
-- Role-based institutional access control (Student, Faculty Coordinator, Administrator)
-- 30-Second Dynamic Rotating HMAC QR Attendance Engine (Server-validated)
-- Multi-criteria feedback & automated credit hour tracking
-- Append-only reward points ledger with privacy-preserving leaderboards
-- Institutional A4 Landscape e-certificate generation with instant public QR verification
-- Student Achievement Passport transcript
-- Automated reminder workflows and database keep-alive crons
-- Venue booking overlap exclusion guards and capacity enforcement
+### System Capabilities
+Campus Connect is an institutional guest lecture and event platform featuring:
+- Role-based institutional access control (Student, Faculty Coordinator, Admin)
+- 30s rotating HMAC QR attendance with server-validated anti-proxy protection
+- Append-only reward points ledger and privacy-preserving leaderboards
+- A4 landscape e-credentials with public QR verification (`/verify/:code`)
+- Co-curricular Student Achievement Passport
+- Automated background reminders and free-tier database keep-alive engine
+- Venue booking exclusion guards preventing scheduling overlaps
 
-All source code, schemas, security policies, and designs were engineered and patented by **Krishna Raja V (Krish)**.
+*Patented and engineered by **Krish & Ihsan**. All rights reserved.*

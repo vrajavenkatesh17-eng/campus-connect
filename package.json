@@ -2,12 +2,13 @@
   "name": "campus-connect",
   "private": true,
   "version": "1.0.0",
-  "description": "Campus Connect - Guest Lecture & Event Management System for Francis Xavier Engineering College",
-  "author": "Krishna Raja V (Krish) <v.rajavenkatesh17@gmail.com>",
+  "description": "Campus Connect - Institutional Event Management System for Francis Xavier Engineering College",
+  "author": "Krish & Ihsan",
   "contributors": [
-    "Krishna Raja V (Krish) <v.rajavenkatesh17@gmail.com>"
+    "Krish <v.rajavenkatesh17@gmail.com>",
+    "Ihsan"
   ],
-  "license": "Proprietary - Patented & Authored by Krishna Raja V (Krish)",
+  "license": "Proprietary - Patented by Krish & Ihsan",
   "type": "module",
   "scripts": {
     "dev": "vite",

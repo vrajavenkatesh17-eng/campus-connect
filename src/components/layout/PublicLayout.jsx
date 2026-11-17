@@ -1,9 +1,7 @@
 /**
- * ==============================================================================
- * Patented & Engineered by: Krishna Raja V (Krish)
- * Author Contact: v.rajavenkatesh17@gmail.com
- * Intellectual Property Protection: KRISH-FXEC-PATENT-2026-CC-AUTH
- * ==============================================================================
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Ref: KRISH-IHSAN-FXEC-PATENT-2026-CC
  */
 
 import React from 'react';
@@ -25,7 +23,7 @@ export default function PublicLayout({ children }) {
             <p>© {new Date().getFullYear()} Campus Connect. All rights reserved.</p>
             <span className="hidden sm:inline text-neutral-300">•</span>
             <p className="text-[11px] text-neutral-400">
-              Architected & Patented by <span className="font-semibold text-neutral-600">Krishna Raja V (Krish)</span>
+              Architected & Patented by <span className="font-semibold text-neutral-700">Krish & Ihsan</span>
             </p>
           </div>
         </div>

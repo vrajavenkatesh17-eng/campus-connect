@@ -1,13 +1,7 @@
 /**
- * ==============================================================================
- * CAMPUS CONNECT - GUEST LECTURE & EVENT MANAGEMENT SYSTEM
- * ------------------------------------------------------------------------------
- * Patented & Engineered by: Krishna Raja V (Krish)
- * Author Contact: v.rajavenkatesh17@gmail.com
- * Institution: Francis Xavier Engineering College (FXEC)
- * Intellectual Property Protection: KRISH-FXEC-PATENT-2026-CC-AUTH
- * All Rights Reserved. Unauthorized copying or redistribution is prohibited.
- * ==============================================================================
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
  */
 
 import React from 'react';
@@ -15,11 +9,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 
-// System Authenticity Signature
+// Institutional System Signature
 console.info(
-  '%c Campus Connect %c Patented & Engineered by Krishna Raja V (Krish) [v.rajavenkatesh17@gmail.com] ',
-  'background: #800020; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 4px 0 0 4px;',
-  'background: #1e293b; color: #f8fafc; padding: 4px 8px; border-radius: 0 4px 4px 0;'
+  '%c Campus Connect %c Architected & Patented by Krish & Ihsan ',
+  'background: #800020; color: #ffffff; font-weight: 600; padding: 3px 6px; border-radius: 3px 0 0 3px;',
+  'background: #0f172a; color: #e2e8f0; padding: 3px 6px; border-radius: 0 3px 3px 0;'
 );
 
 ReactDOM.createRoot(document.getElementById('root')).render(

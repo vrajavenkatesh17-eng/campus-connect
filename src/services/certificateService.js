@@ -95,9 +95,9 @@ export const certificateService = {
     doc.setProperties({
       title: `FXEC Certificate - ${cert.certificate_code || 'Participation'}`,
       subject: 'Official Institutional Participation Credential',
-      author: 'Krishna Raja V (Krish) <v.rajavenkatesh17@gmail.com>',
-      keywords: 'Francis Xavier Engineering College, FXEC, Krish, Krishna Raja V, Patented System',
-      creator: 'Campus Connect - Engineered & Patented by Krishna Raja V (Krish)',
+      author: 'Krish & Ihsan',
+      keywords: 'Francis Xavier Engineering College, FXEC, Krish, Ihsan, Patented System',
+      creator: 'Campus Connect by Krish & Ihsan',
     });
 
     const pageWidth = 297;

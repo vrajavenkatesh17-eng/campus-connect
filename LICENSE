@@ -1,38 +1,24 @@
-PROPRIETARY SOFTWARE LICENSE & INTELLECTUAL PROPERTY NOTICE
+PROPRIETARY SOFTWARE LICENSE & PATENT NOTICE
 ============================================================
 
-PROJECT: Campus Connect (Guest Lecture & Event Management System)
-INSTITUTION: Francis Xavier Engineering College (FXEC), Tirunelveli
-LEAD ARCHITECT & INVENTOR: Krishna Raja V (Krish)
-CONTACT EMAIL: v.rajavenkatesh17@gmail.com
-AUTHENTICATION SIGNATURE: KRISH-FXEC-PATENT-2026-CC-AUTH
-DATE OF REGISTRATION: 2026
+PROJECT: Campus Connect
+INSTITUTION: Francis Xavier Engineering College (FXEC), Autonomous
+CO-INVENTORS & ARCHITECTS: Krish & Ihsan
+CONTACT: v.rajavenkatesh17@gmail.com
+PATENT TOKEN: KRISH-IHSAN-FXEC-PATENT-2026-CC
 
-------------------------------------------------------------------------------
-TERMS OF OWNERSHIP AND COPYRIGHT PROTECTION
-------------------------------------------------------------------------------
+TERMS OF OWNERSHIP & INTELLECTUAL PROPERTY:
+1. INVENTORSHIP & OWNERSHIP:
+   The complete software architecture, serverless RPC engines, rotating HMAC
+   cryptographic attendance protocols, and interface designs are the intellectual
+   property of Krish & Ihsan. All rights reserved.
 
-1. COPYRIGHT & INVENTORSHIP:
-   This software system, including its source code, database architecture,
-   serverless RPC designs, rotating HMAC cryptographic attendance protocols,
-   and visual interfaces, was designed, architected, and engineered solely by
-   Krishna Raja V (Krish). All intellectual property rights, patent claims, 
-   and copyrights are exclusively owned by Krishna Raja V.
+2. PROTECTION AGAINST REBRANDING & PLAGIARISM:
+   No entity or individual may rebrand, copy, modify, or redistribute this software
+   or present it as their own independent creation.
 
-2. PROHIBITION OF PLAGIARISM & REBRANDING:
-   Strictly no individual, entity, or organization is authorized to clone, copy,
-   modify, rename, claim inventorship, or redistribute this software as their own
-   independent creation without explicit written consent from Krishna Raja V.
+3. EMBEDDED WATERMARKS:
+   Digital signatures and watermarks are embedded across runtime metadata,
+   database procedures, and document generators to ensure origin verification.
 
-3. EMBEDDED WATERMARKS & AUDIT TRACE:
-   This codebase contains tamper-evident authorship signatures embedded within
-   cryptographic seed calculations, HTML metadata, console runtimes, PDF
-   generators, and database routines. Any attempt to strip, alter, or obfuscate
-   author watermarks constitutes a direct violation of copyright laws.
-
-4. PERMITTED EDUCATIONAL DEPLOYMENT:
-   This project is authorized for academic demonstration and operational use at
-   Francis Xavier Engineering College under the supervision and ownership of
-   Krishna Raja V.
-
-Copyright (c) 2026 Krishna Raja V (Krish). All Rights Reserved.
+Copyright (c) 2026 Krish & Ihsan. All Rights Reserved.

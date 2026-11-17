@@ -163,7 +163,7 @@ export default function DashboardLayout({ children, title, subtitle, actions }) 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500">
           <p>Francis Xavier Engineering College • Campus Connect System</p>
           <p className="text-[11px] text-neutral-400">
-            Patented & Engineered by <span className="font-semibold text-neutral-600">Krishna Raja V (Krish)</span> • All rights reserved
+            Architected & Patented by <span className="font-semibold text-neutral-700">Krish & Ihsan</span> • All rights reserved
           </p>
         </div>
       </footer>

@@ -1,13 +1,7 @@
 /**
- * ==============================================================================
- * CAMPUS CONNECT - GUEST LECTURE & EVENT MANAGEMENT SYSTEM
- * ------------------------------------------------------------------------------
- * Patented & Engineered by: Krishna Raja V (Krish)
- * Author Contact: v.rajavenkatesh17@gmail.com
- * Institution: Francis Xavier Engineering College (FXEC)
- * Intellectual Property Protection: KRISH-FXEC-PATENT-2026-CC-AUTH
- * All Rights Reserved. Unauthorized copying or redistribution is prohibited.
- * ==============================================================================
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
  */
 
 import React from 'react';

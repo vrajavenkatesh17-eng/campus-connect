@@ -1,16 +1,16 @@
 # Campus Connect — Francis Xavier Engineering College
 ### Institutional Guest Lecture & Event Management System
 
-[![Architect & Inventor](https://img.shields.io/badge/Architect%20%26%20Inventor-Krishna%20Raja%20V%20(Krish)-800020.svg)](mailto:v.rajavenkatesh17@gmail.com)
+[![Architects & Inventors](https://img.shields.io/badge/Architects%20%26%20Inventors-Krish%20%26%20Ihsan-800020.svg)](mailto:v.rajavenkatesh17@gmail.com)
 [![Institution](https://img.shields.io/badge/Institution-Francis%20Xavier%20Engineering%20College-blue.svg)](https://francisxavier.ac.in)
 [![License](https://img.shields.io/badge/License-Proprietary%20%2F%20Patented-red.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(Vite%205)-success.svg)]()
 
 > **INTELLECTUAL PROPERTY & PATENT NOTICE**  
-> **Patented & Designed by:** Krishna Raja V (Krish)  
-> **Author Email:** [v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com)  
-> **Patent Token:** `KRISH-FXEC-PATENT-2026-CC-AUTH`  
-> *All architectural designs, cryptographic rotating HMAC attendance algorithms, database RPCs, and UI layouts are proprietary to Krishna Raja V (Krish). Unauthorized rebranding, copying, or claiming inventorship is strictly prohibited.*
+> **Patented & Designed by:** Krish & Ihsan  
+> **Contact:** [v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com)  
+> **Patent Token:** `KRISH-IHSAN-FXEC-PATENT-2026-CC`  
+> *All architectural designs, cryptographic rotating HMAC attendance algorithms, database RPCs, and UI layouts are proprietary to Krish & Ihsan. Unauthorized rebranding, copying, or claiming inventorship is strictly prohibited.*
 
 ---
 
@@ -93,11 +93,11 @@ All numbered SQL migration scripts are located in [`supabase/migrations/`](./sup
 
 ---
 
-## 👤 Author & Patent Rights
+## 👤 Architects & Patent Rights
 
-**Krishna Raja V (Krish)**  
-Email: [v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com)  
+* **Krish (Krishna Raja V)** ([v.rajavenkatesh17@gmail.com](mailto:v.rajavenkatesh17@gmail.com))
+* **Ihsan**  
 Department of Computer Science & Engineering  
 Francis Xavier Engineering College (Autonomous), Tirunelveli, Tamil Nadu, India  
 
-*© 2026 Krishna Raja V (Krish). Patented and All Rights Reserved.*
+*© 2026 Krish & Ihsan. Patented and All Rights Reserved.*
