@@ -17,6 +17,9 @@ import {
   LayoutDashboard,
   Sparkles,
   MessageSquare,
+  MapPin,
+  History,
+  Sliders,
 } from 'lucide-react';
 
 export default function DashboardLayout({ children, title, subtitle, actions }) {
@@ -26,11 +29,13 @@ export default function DashboardLayout({ children, title, subtitle, actions }) 
   const getNavLinks = () => {
     if (role === 'admin') {
       return [
-        { label: 'Overview', path: '/admin', icon: LayoutDashboard },
-        { label: 'Manage Users & Roles', path: '/admin/users', icon: Users },
-        { label: 'All Events', path: '/admin/events', icon: Calendar },
+        { label: 'Analytics & KPIs', path: '/admin/analytics', icon: BarChart3 },
+        { label: 'User Management', path: '/admin/users', icon: Users },
+        { label: 'Event Proposals', path: '/admin/events', icon: Calendar },
         { label: 'Venues & Capacity', path: '/admin/venues', icon: MapPin },
-        { label: 'Analytics & Reports', path: '/admin/analytics', icon: BarChart3 },
+        { label: 'Feedback Reports', path: '/admin/feedback', icon: MessageSquare },
+        { label: 'Activity Logs', path: '/admin/logs', icon: History },
+        { label: 'Platform Settings', path: '/admin/settings', icon: Sliders },
       ];
     }
     if (role === 'coordinator') {

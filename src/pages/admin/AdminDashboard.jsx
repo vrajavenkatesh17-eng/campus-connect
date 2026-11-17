@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 import { eventService } from '../../services/eventService';
+import { adminService } from '../../services/adminService';
 import { useToast } from '../../context/ToastContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card, { CardContent, CardHeader, CardTitle, CardDescription } from '../../components/common/Card';
@@ -13,12 +14,18 @@ import Modal from '../../components/common/Modal';
 import Select from '../../components/common/Select';
 import Textarea from '../../components/common/Textarea';
 import EmptyState from '../../components/common/EmptyState';
+import AnalyticsTab from '../../components/admin/AnalyticsTab';
+import FeedbackReportsTab from '../../components/admin/FeedbackReportsTab';
+import AuditLogsTab from '../../components/admin/AuditLogsTab';
+import SettingsTab from '../../components/admin/SettingsTab';
+import AllowlistPanel from '../../components/admin/AllowlistPanel';
 import {
   Users,
   Shield,
   GraduationCap,
   UserCheck,
   ShieldAlert,
+  ShieldCheck,
   RefreshCw,
   Clock,
   CheckCircle2,
@@ -32,7 +39,11 @@ import {
   TrendingUp,
   FileSpreadsheet,
   Award,
-  Sparkles
+  Sparkles,
+  MessageSquare,
+  History,
+  Sliders,
+  UserX
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -43,12 +54,15 @@ export default function AdminDashboard() {
 
   // Synchronize active tab with current URL route
   const getTabFromPath = useCallback(() => {
+    if (location.pathname.startsWith('/admin/analytics')) return 'analytics';
     if (location.pathname.startsWith('/admin/users')) return 'users';
     if (location.pathname.startsWith('/admin/requests')) return 'coordinator_requests';
     if (location.pathname.startsWith('/admin/events')) return 'events';
     if (location.pathname.startsWith('/admin/venues')) return 'venues';
-    if (location.pathname.startsWith('/admin/analytics')) return 'analytics';
-    return 'users'; // default
+    if (location.pathname.startsWith('/admin/feedback')) return 'feedback';
+    if (location.pathname.startsWith('/admin/logs')) return 'logs';
+    if (location.pathname.startsWith('/admin/settings')) return 'settings';
+    return 'analytics'; // default
   }, [location.pathname]);
 
   const [activeTab, setActiveTab] = useState(getTabFromPath());
@@ -119,16 +133,34 @@ export default function AdminDashboard() {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    if (tab === 'users') navigate('/admin/users');
+    if (tab === 'analytics') navigate('/admin/analytics');
+    else if (tab === 'users') navigate('/admin/users');
     else if (tab === 'coordinator_requests') navigate('/admin/requests');
     else if (tab === 'events') navigate('/admin/events');
     else if (tab === 'venues') navigate('/admin/venues');
-    else if (tab === 'analytics') navigate('/admin/analytics');
+    else if (tab === 'feedback') navigate('/admin/feedback');
+    else if (tab === 'logs') navigate('/admin/logs');
+    else if (tab === 'settings') navigate('/admin/settings');
   };
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     fetchData();
+  };
+
+  // Toggle user activation status (Deactivate / Reactivate)
+  const handleToggleUserStatus = async (userId, targetStatus) => {
+    try {
+      await adminService.toggleUserStatus(userId, targetStatus);
+      showToast(
+        `User account successfully ${targetStatus ? 'reactivated' : 'deactivated'}!`,
+        'success'
+      );
+      fetchData();
+    } catch (err) {
+      console.error('Error toggling user status:', err);
+      showToast(err.message || 'Failed to update user status.', 'error');
+    }
   };
 
   // Direct Role Update
@@ -423,19 +455,48 @@ export default function AdminDashboard() {
       ),
     },
     {
+      header: 'Status',
+      key: 'is_active',
+      render: (row) => (
+        <Badge
+          variant={row.is_active !== false ? 'success' : 'danger'}
+          size="sm"
+          className="text-[10px] font-semibold"
+        >
+          {row.is_active !== false ? 'Active' : 'Deactivated'}
+        </Badge>
+      ),
+    },
+    {
       header: 'Actions',
       key: 'actions',
       className: 'text-right',
       cellClassName: 'text-right',
-      render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleOpenRoleModal(row)}
-        >
-          Change Role
-        </Button>
-      ),
+      render: (row) => {
+        const isSelf = row.id === currentUser?.id;
+        const isActive = row.is_active !== false;
+        return (
+          <div className="flex items-center justify-end gap-1.5">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => handleOpenRoleModal(row)}
+            >
+              Role
+            </Button>
+            <Button
+              variant={isActive ? 'ghost' : 'secondary'}
+              size="xs"
+              className={isActive ? 'text-red-600 hover:text-red-700 hover:bg-red-50' : 'text-emerald-700 hover:bg-emerald-50'}
+              disabled={isSelf}
+              title={isSelf ? 'Cannot deactivate your own administrator account' : undefined}
+              onClick={() => handleToggleUserStatus(row.id, !isActive)}
+            >
+              {isActive ? 'Deactivate' : 'Reactivate'}
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -523,6 +584,19 @@ export default function AdminDashboard() {
         <div className="flex border-b border-neutral-200 gap-4 overflow-x-auto">
           <button
             type="button"
+            onClick={() => handleTabChange('analytics')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'analytics'
+                ? 'border-burgundy text-burgundy'
+                : 'border-transparent text-neutral-500 hover:text-neutral-800'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Analytics & Reports</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => handleTabChange('users')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
               activeTab === 'users'
@@ -531,7 +605,7 @@ export default function AdminDashboard() {
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Manage Users ({totalUsers})</span>
+            <span>User Management ({totalUsers})</span>
           </button>
 
           <button
@@ -562,7 +636,7 @@ export default function AdminDashboard() {
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>All Events ({allEvents.length})</span>
+            <span>Event Proposals ({allEvents.length})</span>
             {pendingEventsCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-xs bg-burgundy-100 text-burgundy font-bold">
                 {pendingEventsCount} pending
@@ -580,39 +654,72 @@ export default function AdminDashboard() {
             }`}
           >
             <MapPin className="w-4 h-4" />
-            <span>Venues & Capacity ({venues.length})</span>
+            <span>Venues ({venues.length})</span>
           </button>
 
           <button
             type="button"
-            onClick={() => handleTabChange('analytics')}
+            onClick={() => handleTabChange('feedback')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'analytics'
+              activeTab === 'feedback'
                 ? 'border-burgundy text-burgundy'
                 : 'border-transparent text-neutral-500 hover:text-neutral-800'
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
-            <span>Analytics & Reports</span>
+            <MessageSquare className="w-4 h-4" />
+            <span>Feedback Reports</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange('logs')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'logs'
+                ? 'border-burgundy text-burgundy'
+                : 'border-transparent text-neutral-500 hover:text-neutral-800'
+            }`}
+          >
+            <History className="w-4 h-4" />
+            <span>Activity Logs</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange('settings')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'settings'
+                ? 'border-burgundy text-burgundy'
+                : 'border-transparent text-neutral-500 hover:text-neutral-800'
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            <span>Platform Settings</span>
           </button>
         </div>
 
         {/* Tab 1: Users & Roles Management */}
         {activeTab === 'users' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-neutral-900">Registered Institutional Accounts</h3>
-                <p className="text-xs text-neutral-500">View and update user authorization roles across the campus portal</p>
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-neutral-900">Registered Institutional Accounts</h3>
+                  <p className="text-xs text-neutral-500">
+                    View user roles and manage account activation status (deactivated accounts lose database access immediately)
+                  </p>
+                </div>
               </div>
+              <Table
+                columns={usersTableColumns}
+                data={profiles}
+                isLoading={isLoading}
+                emptyTitle="No registered accounts"
+                emptyDescription="No users have registered into Francis Xavier Campus Connect yet."
+              />
             </div>
-            <Table
-              columns={usersTableColumns}
-              data={profiles}
-              isLoading={isLoading}
-              emptyTitle="No registered accounts"
-              emptyDescription="No users have registered into Francis Xavier Campus Connect yet."
-            />
+
+            {/* Pre-Authorized Allowlists Panel */}
+            <AllowlistPanel />
           </div>
         )}
 
@@ -855,126 +962,16 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab 4: Analytics & Institutional Reports */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200">
-              <div>
-                <h3 className="text-lg font-bold text-neutral-900">Institutional Event Performance Analytics</h3>
-                <p className="text-xs text-neutral-500">Live metrics derived from actual event registrations, attendance records, and student distribution</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                icon={Download}
-                onClick={handleExportAnalyticsCSV}
-                className="text-xs gap-1.5 self-start sm:self-auto"
-              >
-                Export CSV Report
-              </Button>
-            </div>
+        {activeTab === 'analytics' && <AnalyticsTab />}
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-neutral-500 font-medium">Total Sessions</p>
-                    <p className="text-2xl font-bold text-neutral-900 mt-1">{totalEvents}</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-burgundy/10 text-burgundy flex items-center justify-center">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                </div>
-                <p className="text-[11px] text-neutral-400 mt-2">
-                  {approvedEventsCount} Approved • {completedEventsCount} Concluded
-                </p>
-              </Card>
+        {/* Tab 6: Anonymous Student Feedback Reports */}
+        {activeTab === 'feedback' && <FeedbackReportsTab />}
 
-              <Card className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-neutral-500 font-medium">Total Registrations</p>
-                    <p className="text-2xl font-bold text-emerald-600 mt-1">{totalRegistrationsAll}</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <Users className="w-5 h-5" />
-                  </div>
-                </div>
-                <p className="text-[11px] text-neutral-400 mt-2">
-                  Across all department sessions
-                </p>
-              </Card>
+        {/* Tab 7: Institutional Activity & Audit Logs */}
+        {activeTab === 'logs' && <AuditLogsTab />}
 
-              <Card className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-neutral-500 font-medium">Avg Occupancy Rate</p>
-                    <p className="text-2xl font-bold text-indigo-600 mt-1">{overallOccupancyRate}%</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5" />
-                  </div>
-                </div>
-                <p className="text-[11px] text-neutral-400 mt-2">
-                  {totalRegistrationsAll} filled of {totalSeatsOffered} total seats
-                </p>
-              </Card>
-
-              <Card className="p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-neutral-500 font-medium">Active Coordinators</p>
-                    <p className="text-2xl font-bold text-purple-600 mt-1">{coordinatorCount}</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                    <UserCheck className="w-5 h-5" />
-                  </div>
-                </div>
-                <p className="text-[11px] text-neutral-400 mt-2">
-                  Faculty authorized to propose events
-                </p>
-              </Card>
-            </div>
-
-            {/* Department Breakdown Matrix */}
-            <Card>
-              <CardHeader className="border-b border-neutral-100">
-                <CardTitle>Department Distribution Matrix</CardTitle>
-                <CardDescription>
-                  Participation metrics across all Francis Xavier Engineering College engineering and management departments
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-neutral-50 text-neutral-500 border-b border-neutral-200 uppercase text-[11px] font-semibold tracking-wider">
-                      <tr>
-                        <th className="py-3 px-4">Department</th>
-                        <th className="py-3 px-4">Enrolled Students</th>
-                        <th className="py-3 px-4">Faculty Coordinators</th>
-                        <th className="py-3 px-4">Targeted Sessions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-100 text-neutral-800">
-                      {departmentStats.map((d) => (
-                        <tr key={d.code} className="hover:bg-neutral-50/50 transition-colors">
-                          <td className="py-3 px-4 font-bold text-neutral-900">{d.code}</td>
-                          <td className="py-3 px-4 font-semibold text-emerald-700">{d.students}</td>
-                          <td className="py-3 px-4 text-indigo-700 font-medium">{d.coordinators}</td>
-                          <td className="py-3 px-4">
-                            <span className="font-mono text-xs bg-neutral-100 px-2.5 py-0.5 rounded font-semibold text-neutral-800">
-                              {d.eventsHosted} sessions
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {/* Tab 8: Institutional Platform Settings */}
+        {activeTab === 'settings' && <SettingsTab />}
 
         {/* Tab 5: Venues & Capacity Management (Phase 5) */}
         {activeTab === 'venues' && (
