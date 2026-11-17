@@ -21,7 +21,7 @@ CREATE INDEX IF NOT EXISTS idx_registrations_event_status ON public.registration
 CREATE INDEX IF NOT EXISTS idx_attendance_event_verified ON public.attendance(event_id, verified_at);
 CREATE INDEX IF NOT EXISTS idx_attendance_student_event ON public.attendance(student_id, event_id);
 CREATE INDEX IF NOT EXISTS idx_feedback_sub_event_student ON public.feedback_submissions(event_id, student_id);
-CREATE INDEX IF NOT EXISTS idx_feedback_resp_event_rating ON public.feedback_responses(event_id, rating);
+CREATE INDEX IF NOT EXISTS idx_feedback_resp_event_ratings ON public.feedback_responses(event_id, rating_content, rating_speaker, rating_organization);
 CREATE INDEX IF NOT EXISTS idx_points_ledger_student_cat ON public.points_ledger(student_id, category);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_action_created ON public.activity_logs(action, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_actor ON public.activity_logs(actor_id);
@@ -431,18 +431,21 @@ BEGIN
         ORDER BY month_sort ASC
     ) month_data;
 
-    -- 5. Feedback Ratings Summary
+    -- 5. Feedback Ratings Summary (Average across Content, Speaker & Organization)
     SELECT jsonb_build_object(
-        'average_rating', COALESCE((SELECT ROUND(AVG(rating)::numeric, 2) FROM public.feedback_responses), 0),
+        'average_rating', COALESCE((
+            SELECT ROUND(AVG((rating_content + rating_speaker + rating_organization)::numeric / 3.0), 2)
+            FROM public.feedback_responses
+        ), 0),
         'total_responses', (SELECT COUNT(*) FROM public.feedback_responses),
         'distribution', COALESCE((
             SELECT jsonb_agg(jsonb_build_object('rating', star_val, 'count', COALESCE(counts.cnt, 0)))
             FROM generate_series(1, 5) AS star_val
             LEFT JOIN (
-                SELECT rating, COUNT(*) as cnt 
+                SELECT ROUND((rating_content + rating_speaker + rating_organization)::numeric / 3.0) as rounded_star, COUNT(*) as cnt 
                 FROM public.feedback_responses 
-                GROUP BY rating
-            ) counts ON counts.rating = star_val
+                GROUP BY ROUND((rating_content + rating_speaker + rating_organization)::numeric / 3.0)
+            ) counts ON counts.rounded_star = star_val
         ), '[]'::jsonb)
     ) INTO v_feedback_summary;
 
@@ -499,28 +502,32 @@ BEGIN
         RAISE EXCEPTION 'Access Denied: Administrator role required.';
     END IF;
 
-    -- Average Rating
+    -- Average Rating across Content, Speaker, and Organization
     SELECT 
-        COALESCE(ROUND(AVG(fr.rating)::numeric, 2), 0),
-        COUNT(DISTINCT fs.id)
+        COALESCE(ROUND(AVG((fr.rating_content + fr.rating_speaker + fr.rating_organization)::numeric / 3.0), 2), 0),
+        COUNT(DISTINCT fr.id)
     INTO v_avg_rating, v_total_submissions
-    FROM public.feedback_submissions fs
-    JOIN public.feedback_responses fr ON fr.event_id = fs.event_id
-    WHERE (p_event_id IS NULL OR fs.event_id = p_event_id);
+    FROM public.feedback_responses fr
+    WHERE (p_event_id IS NULL OR fr.event_id = p_event_id);
 
-    -- Question Criteria Breakdown
-    SELECT COALESCE(jsonb_agg(crit_data), '[]'::jsonb)
-    INTO v_criteria_breakdown
-    FROM (
-        SELECT 
-            fr.question_key,
-            ROUND(AVG(fr.rating)::numeric, 2) as avg_score,
-            COUNT(*) as total_responses
-        FROM public.feedback_responses fr
-        WHERE (p_event_id IS NULL OR fr.event_id = p_event_id)
-        GROUP BY fr.question_key
-        ORDER BY avg_score DESC
-    ) crit_data;
+    -- Question Criteria Breakdown (Content Quality, Keynote Speaker, Event Organization)
+    SELECT jsonb_build_array(
+        jsonb_build_object(
+            'question_key', 'content_quality',
+            'avg_score', COALESCE((SELECT ROUND(AVG(rating_content)::numeric, 2) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id), 0),
+            'total_responses', (SELECT COUNT(*) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id)
+        ),
+        jsonb_build_object(
+            'question_key', 'speaker_delivery',
+            'avg_score', COALESCE((SELECT ROUND(AVG(rating_speaker)::numeric, 2) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id), 0),
+            'total_responses', (SELECT COUNT(*) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id)
+        ),
+        jsonb_build_object(
+            'question_key', 'event_organization',
+            'avg_score', COALESCE((SELECT ROUND(AVG(rating_organization)::numeric, 2) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id), 0),
+            'total_responses', (SELECT COUNT(*) FROM public.feedback_responses WHERE p_event_id IS NULL OR event_id = p_event_id)
+        )
+    ) INTO v_criteria_breakdown;
 
     -- Anonymous Comments (strictly NO student IDs or names)
     SELECT COALESCE(jsonb_agg(comm_data), '[]'::jsonb)
@@ -529,7 +536,7 @@ BEGIN
         SELECT 
             e.title as event_title,
             fr.comments as comment,
-            fr.rating,
+            ROUND((fr.rating_content + fr.rating_speaker + fr.rating_organization)::numeric / 3.0, 1) as rating,
             fr.created_at
         FROM public.feedback_responses fr
         JOIN public.events e ON e.id = fr.event_id
