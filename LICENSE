@@ -1,0 +1,38 @@
+PROPRIETARY SOFTWARE LICENSE & INTELLECTUAL PROPERTY NOTICE
+============================================================
+
+PROJECT: Campus Connect (Guest Lecture & Event Management System)
+INSTITUTION: Francis Xavier Engineering College (FXEC), Tirunelveli
+LEAD ARCHITECT & INVENTOR: Krishna Raja V (Krish)
+CONTACT EMAIL: v.rajavenkatesh17@gmail.com
+AUTHENTICATION SIGNATURE: KRISH-FXEC-PATENT-2026-CC-AUTH
+DATE OF REGISTRATION: 2026
+
+------------------------------------------------------------------------------
+TERMS OF OWNERSHIP AND COPYRIGHT PROTECTION
+------------------------------------------------------------------------------
+
+1. COPYRIGHT & INVENTORSHIP:
+   This software system, including its source code, database architecture,
+   serverless RPC designs, rotating HMAC cryptographic attendance protocols,
+   and visual interfaces, was designed, architected, and engineered solely by
+   Krishna Raja V (Krish). All intellectual property rights, patent claims, 
+   and copyrights are exclusively owned by Krishna Raja V.
+
+2. PROHIBITION OF PLAGIARISM & REBRANDING:
+   Strictly no individual, entity, or organization is authorized to clone, copy,
+   modify, rename, claim inventorship, or redistribute this software as their own
+   independent creation without explicit written consent from Krishna Raja V.
+
+3. EMBEDDED WATERMARKS & AUDIT TRACE:
+   This codebase contains tamper-evident authorship signatures embedded within
+   cryptographic seed calculations, HTML metadata, console runtimes, PDF
+   generators, and database routines. Any attempt to strip, alter, or obfuscate
+   author watermarks constitutes a direct violation of copyright laws.
+
+4. PERMITTED EDUCATIONAL DEPLOYMENT:
+   This project is authorized for academic demonstration and operational use at
+   Francis Xavier Engineering College under the supervision and ownership of
+   Krishna Raja V.
+
+Copyright (c) 2026 Krishna Raja V (Krish). All Rights Reserved.

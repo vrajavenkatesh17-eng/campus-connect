@@ -1,0 +1,63 @@
+name: Event Reminders & Free Tier Database Keep-Alive
+
+on:
+  schedule:
+    # Runs every hour at minute 0 to check 24h & 1h event reminders and ping free database
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  reminders-and-keepalive:
+    name: Execute Reminders & Ping DB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Supabase Free-Tier DB (Prevent Auto-Pause)
+        run: |
+          echo "Pinging Supabase Database to maintain active free-tier status..."
+          HTTP_STATUS=$(curl -s -o db_ping_response.json -w "%{http_code}" \
+            -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/app_settings?select=key&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          
+          echo "Database Ping Response Code: $HTTP_STATUS"
+          cat db_ping_response.json
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Warning: Database ping returned HTTP status $HTTP_STATUS"
+          else
+            echo "Supabase database is active and awake."
+          fi
+
+      - name: Call send-reminders Supabase Edge Function
+        run: |
+          echo "Invoking send-reminders Edge Function..."
+          FUNCTION_URL="${{ secrets.REMINDERS_FUNCTION_URL }}"
+          if [ -z "$FUNCTION_URL" ]; then
+            FUNCTION_URL="${{ secrets.SUPABASE_URL }}/functions/v1/send-reminders"
+          fi
+
+          echo "Target Function URL: $FUNCTION_URL"
+
+          RESP_CODE=$(curl -s -o reminders_output.json -w "%{http_code}" \
+            -X POST "$FUNCTION_URL" \
+            -H "Content-Type: application/json" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
+
+          echo "Edge Function HTTP Code: $RESP_CODE"
+          cat reminders_output.json
+
+          if [ "$RESP_CODE" -ge 200 ] && [ "$RESP_CODE" -lt 300 ]; then
+            echo "Reminders processed and database kept alive successfully!"
+          else
+            echo "Edge Function did not return 2xx (HTTP $RESP_CODE), falling back to direct RPC invocation..."
+            # Resilient fallback: call process_event_reminders RPC directly via Supabase REST
+            RPC_STATUS=$(curl -s -o rpc_output.json -w "%{http_code}" \
+              -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/process_event_reminders" \
+              -H "Content-Type: application/json" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
+            echo "Direct RPC HTTP Code: $RPC_STATUS"
+            cat rpc_output.json
+          fi
