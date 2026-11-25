@@ -15,7 +15,6 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      REMINDERS_FUNCTION_URL: ${{ secrets['REMINDERS_FUNCTION_URL'] || vars['REMINDERS_FUNCTION_URL'] || '' }}
 
     steps:
       - name: Validate Required Secrets & URL Format
@@ -36,11 +35,6 @@ jobs:
 
           if [[ ! "$SUPABASE_URL" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$ ]]; then
             echo "::error::SUPABASE_URL must be a valid HTTPS URL (e.g. https://<project-ref>.supabase.co)."
-            exit 1
-          fi
-
-          if [ -n "${REMINDERS_FUNCTION_URL:-}" ] && [[ ! "$REMINDERS_FUNCTION_URL" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$ ]]; then
-            echo "::error::REMINDERS_FUNCTION_URL must be a valid HTTPS URL when provided."
             exit 1
           fi
 
@@ -80,10 +74,7 @@ jobs:
           set -euo pipefail
           BASE_URL="${SUPABASE_URL%/}"
           BASE_URL="${BASE_URL%/rest/v1}"
-          FUNCTION_URL="${REMINDERS_FUNCTION_URL:-}"
-          if [ -z "$FUNCTION_URL" ]; then
-            FUNCTION_URL="${BASE_URL}/functions/v1/send-reminders"
-          fi
+          FUNCTION_URL="${BASE_URL}/functions/v1/send-reminders"
 
           echo "Invoking send-reminders Edge Function..."
           RESP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
