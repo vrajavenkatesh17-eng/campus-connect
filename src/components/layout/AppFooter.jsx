@@ -4,7 +4,14 @@ export default function AppFooter() {
   return (
     <footer className="bg-surface border-t border-line py-6 mt-auto select-none transition-colors duration-200">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <img
+            src="/fxec-logo.png"
+            alt="FXEC"
+            className="w-5 h-5 rounded-full object-contain shrink-0"
+            width="20"
+            height="20"
+          />
           <span className="font-semibold text-ink">Francis Xavier Engineering College</span>
           <span>•</span>
           <span>Autonomous Institution | Tirunelveli</span>

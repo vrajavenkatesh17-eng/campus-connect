@@ -43,7 +43,6 @@ import BlurText from '../../components/ui/BlurText/BlurText';
 
 // Icons
 import {
-  GraduationCap,
   Calendar,
   MapPin,
   Users,
@@ -306,8 +305,14 @@ export default function HomePage() {
         {/* Hero Content */}
         <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
           {/* Institution Header Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface/90 backdrop-blur-md border border-line text-ink text-xs font-semibold tracking-wide uppercase shadow-xs mb-6 select-none">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface/90 backdrop-blur-md border border-line text-ink text-xs font-semibold tracking-wide uppercase shadow-xs mb-6 select-none">
+            <img
+              src="/fxec-logo.png"
+              alt="FXEC Emblem"
+              className="w-4 h-4 rounded-full object-contain shrink-0"
+              width="16"
+              height="16"
+            />
             <span>Francis Xavier Engineering College • Autonomous</span>
           </div>
 
@@ -703,7 +708,13 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-[24px] bg-primary text-on-primary p-8 sm:p-14 text-center shadow-md">
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface border border-line text-xs font-semibold uppercase tracking-wider text-ink select-none shadow-xs">
-                <GraduationCap className="w-4 h-4 text-primary" />
+                <img
+                  src="/fxec-logo.png"
+                  alt="FXEC Emblem"
+                  className="w-4 h-4 rounded-full object-contain shrink-0"
+                  width="16"
+                  height="16"
+                />
                 <span>Francis Xavier Engineering College</span>
               </div>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-on-primary">

@@ -24,7 +24,6 @@ import ThemeToggle from '../common/ThemeToggle';
 import GooeyNav from '../ui/GooeyNav';
 import AppNotificationList from '../app/AppNotificationList';
 import {
-  GraduationCap,
   Menu,
   X,
   Bell,
@@ -359,8 +358,14 @@ export default function Navbar() {
             className="flex items-center gap-3 group shrink-0 select-none"
             aria-label="Campus Connect Home"
           >
-            <div className="w-9 h-9 rounded-[10px] bg-primary flex items-center justify-center text-on-primary shadow-xs transition-transform group-hover:scale-105">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-full bg-white dark:bg-surface-2 p-0.5 border border-line shadow-xs transition-transform duration-200 group-hover:scale-105 shrink-0 overflow-hidden flex items-center justify-center">
+              <img
+                src="/fxec-logo.png"
+                alt="Francis Xavier Engineering College Logo"
+                className="w-full h-full object-contain"
+                width="40"
+                height="40"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-serif font-bold text-lg leading-tight text-ink group-hover:text-primary transition-colors">

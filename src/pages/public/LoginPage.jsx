@@ -249,7 +249,27 @@ export default function LoginPage() {
           {/* Left Column: Brand & Sign-in Panel (Col 1 to 7 on lg) */}
           <div className="lg:col-span-7 xl:col-span-6 flex flex-col space-y-6">
             {/* Institutional Brand Header */}
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-full bg-white dark:bg-surface-2 p-1 border border-line shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
+                  <img
+                    src="/fxec-logo.png"
+                    alt="Francis Xavier Engineering College Official Seal"
+                    className="w-full h-full object-contain"
+                    width="56"
+                    height="56"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-serif font-bold text-xl sm:text-2xl text-ink leading-tight">
+                    Campus Connect
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+                    FXEC Autonomous
+                  </span>
+                </div>
+              </div>
+
               {/* Title with BlurText */}
               <BlurText
                 text="Francis Xavier Engineering College"
