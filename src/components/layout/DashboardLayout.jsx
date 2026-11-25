@@ -1,81 +1,302 @@
-import React from 'react';
+/**
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
+ *
+ * DashboardLayout: Role-aware layout with sidebar conforming to DESIGN_SPEC sections 2 & 4.
+ * - Students: NO sidebar (full width container).
+ * - Coordinator & Admin: 264px sticky sidebar below top bar (top 88px), surface card radius 20, padding 12.
+ * - Active: primary-soft background + primary text + 3px primary bar on left.
+ * - Strictly NO user card inside sidebar.
+ * - Strictly NO profile link inside sidebar.
+ * - Group labels 12px uppercase muted.
+ * - Off-canvas mobile drawer on smaller viewports (<1024px).
+ */
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Navbar from './Navbar';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../services/supabase';
 import Badge from '../common/Badge';
+import Button from '../common/Button';
+import PageContainer from '../common/PageContainer';
+import PageHeader from '../common/PageHeader';
+import PageEnter from '../motion/PageEnter';
 import {
   Calendar,
   Award,
   BookOpen,
   Users,
   QrCode,
-  CheckCircle,
-  FileText,
   BarChart3,
-  Settings,
-  AlertCircle,
-  LayoutDashboard,
-  Sparkles,
   MessageSquare,
   MapPin,
   History,
   Sliders,
+  LayoutDashboard,
+  AlertCircle,
+  Menu,
+  X,
+  ChevronRight,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export default function DashboardLayout({ children, title, subtitle, actions }) {
-  const { user, profile, role, isProfileComplete } = useAuth();
+  const { user, role, isProfileComplete } = useAuth();
   const location = useLocation();
 
-  const getNavLinks = () => {
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const [pendingEventsCount, setPendingEventsCount] = useState(0);
+  const [pendingPhotosCount, setPendingPhotosCount] = useState(0);
+
+  // Fetch pending counts for admin sidebar badges
+  useEffect(() => {
+    if (role !== 'admin') return;
+    let isMounted = true;
+
+    Promise.all([
+      supabase
+        .from('coordinator_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      supabase
+        .from('events')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      supabase
+        .from('event_photos')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+    ])
+      .then(([reqRes, evtRes, photoRes]) => {
+        if (isMounted) {
+          setPendingRequestsCount(reqRes.count || 0);
+          setPendingEventsCount(evtRes.count || 0);
+          setPendingPhotosCount(photoRes?.count || 0);
+        }
+      })
+      .catch((err) => {
+        console.warn('Sidebar badge count fetch warning:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [role]);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
+
+  /**
+   * Sidebar navigation groups definition strictly per DESIGN_SPEC sections 2 & 4:
+   * - Students: none
+   * - Coordinator: OVERVIEW (Overview), EVENTS (My Events, QR Attendance), ENGAGE (Reward Points, Learning Materials, Volunteers)
+   * - Admin: OVERVIEW (Analytics & KPIs), MANAGE (User Management, Event Proposals, Venues & Capacity),
+   *   INSIGHTS (Feedback Reports, Activity Logs), SYSTEM (Platform Settings)
+   */
+  const sidebarGroups = useMemo(() => {
     if (role === 'admin') {
       return [
-        { label: 'Analytics & KPIs', path: '/admin/analytics', icon: BarChart3 },
-        { label: 'User Management', path: '/admin/users', icon: Users },
-        { label: 'Event Proposals', path: '/admin/events', icon: Calendar },
-        { label: 'Venues & Capacity', path: '/admin/venues', icon: MapPin },
-        { label: 'Feedback Reports', path: '/admin/feedback', icon: MessageSquare },
-        { label: 'Activity Logs', path: '/admin/logs', icon: History },
-        { label: 'Platform Settings', path: '/admin/settings', icon: Sliders },
+        {
+          title: 'Overview',
+          items: [
+            {
+              label: 'Analytics & KPIs',
+              path: '/admin/analytics',
+              aliases: ['/admin'],
+              icon: BarChart3,
+            },
+          ],
+        },
+        {
+          title: 'Manage',
+          items: [
+            {
+              label: 'User Management',
+              path: '/admin/users',
+              icon: Users,
+              badge: pendingRequestsCount,
+            },
+            {
+              label: 'Event Proposals',
+              path: '/admin/events',
+              icon: Calendar,
+              badge: pendingEventsCount,
+            },
+            {
+              label: 'Venues & Capacity',
+              path: '/admin/venues',
+              icon: MapPin,
+            },
+            {
+              label: 'Public Gallery',
+              path: '/admin/gallery',
+              icon: ImageIcon,
+              badge: pendingPhotosCount,
+            },
+          ],
+        },
+        {
+          title: 'Insights',
+          items: [
+            {
+              label: 'Feedback Reports',
+              path: '/admin/feedback',
+              icon: MessageSquare,
+            },
+            {
+              label: 'Activity Logs',
+              path: '/admin/logs',
+              icon: History,
+            },
+          ],
+        },
+        {
+          title: 'System',
+          items: [
+            {
+              label: 'Platform Settings',
+              path: '/admin/settings',
+              icon: Sliders,
+            },
+          ],
+        },
       ];
     }
+
     if (role === 'coordinator') {
       return [
-        { label: 'Coordinator Hub', path: '/coordinator', icon: LayoutDashboard },
-        { label: 'My Sessions', path: '/coordinator/sessions', icon: Calendar },
-        { label: 'QR Attendance', path: '/coordinator/attendance', icon: QrCode },
-        { label: 'Reward Points', path: '/coordinator/rewards', icon: Award },
-        { label: 'Learning Materials', path: '/coordinator/materials', icon: BookOpen },
+        {
+          title: 'Overview',
+          items: [
+            {
+              label: 'Overview',
+              path: '/coordinator',
+              icon: LayoutDashboard,
+            },
+          ],
+        },
+        {
+          title: 'Events',
+          items: [
+            {
+              label: 'My Events',
+              path: '/coordinator/sessions',
+              aliases: ['/coordinator/events'],
+              icon: Calendar,
+            },
+            {
+              label: 'QR Attendance',
+              path: '/coordinator/attendance',
+              icon: QrCode,
+            },
+          ],
+        },
+        {
+          title: 'Engage',
+          items: [
+            {
+              label: 'Reward Points',
+              path: '/coordinator/rewards',
+              icon: Award,
+            },
+            {
+              label: 'Learning Materials',
+              path: '/coordinator/materials',
+              icon: BookOpen,
+            },
+            {
+              label: 'Volunteers',
+              path: '/coordinator/volunteers',
+              icon: Users,
+            },
+          ],
+        },
       ];
     }
-    // Default student
-    return [
-      { label: 'Student Home', path: '/student', icon: LayoutDashboard },
-      { label: 'Explore Events', path: '/events', icon: Calendar },
-      { label: 'My Attendance', path: '/student/attendance', icon: CheckCircle },
-      { label: 'My Feedback', path: '/student/feedback', icon: MessageSquare },
-      { label: 'Reward Points', path: '/student/points', icon: Award },
-      { label: 'Certificates', path: '/student/certificates', icon: FileText },
-      { label: 'Achievement Passport', path: '/student/passport', icon: Sparkles },
-    ];
+
+    // Students have NO sidebar per DESIGN_SPEC Section 2
+    return [];
+  }, [role, pendingRequestsCount, pendingEventsCount]);
+
+  const hasSidebar = user && (role === 'coordinator' || role === 'admin');
+
+  const isItemActive = (item) => {
+    const current = location.pathname;
+    if (current === item.path) return true;
+    if (item.aliases && item.aliases.includes(current)) return true;
+    if (item.path !== '/' && item.path !== '/admin' && current.startsWith(item.path + '/')) {
+      return true;
+    }
+    return false;
   };
 
-  const navLinks = getNavLinks();
+  // Render the core navigation item list
+  const renderNavList = () => (
+    <div className="space-y-4">
+      {sidebarGroups.map((group) => (
+        <div key={group.title} className="space-y-1">
+          <p className="text-xs uppercase tracking-wider text-muted font-semibold px-3 py-1">
+            {group.title}
+          </p>
+          <div className="space-y-0.5">
+            {group.items.map((item) => {
+              const active = isItemActive(item);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`group relative flex items-center justify-between h-11 px-3 rounded-[12px] text-sm font-medium transition-colors select-none ${
+                    active
+                      ? 'bg-primary-soft text-primary font-semibold'
+                      : 'text-muted hover:text-ink hover:bg-surface-2'
+                  }`}
+                >
+                  {/* Active 3px primary bar on left */}
+                  {active && (
+                    <span
+                      className="absolute left-0 top-2 bottom-2 w-[3px] bg-primary rounded-r-full"
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon className="w-5 h-5 shrink-0 transition-colors" />
+                    <span className="truncate">{item.label}</span>
+                  </div>
+
+                  {/* Count badge on the right (pending items) */}
+                  {item.badge > 0 && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-primary text-on-primary shrink-0 shadow-2xs">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50 text-neutral-900">
-      <Navbar />
-
+    <div className="w-full flex-1 flex flex-col">
       {/* Profile Incomplete Banner - Students Only */}
       {user && role === 'student' && !isProfileComplete && location.pathname !== '/profile' && location.pathname !== '/profile/complete' && (
-        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 sm:px-6">
-          <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-sm text-amber-800 font-medium">
-              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+        <div className="bg-warning-soft border-b border-warning/25 px-4 py-3 sm:px-6">
+          <div className="max-w-[1280px] mx-auto flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-sm text-warning font-medium">
+              <AlertCircle className="w-4 h-4 text-warning shrink-0" />
               <span>Please complete your profile details (Department & Register Number) to enable event registrations.</span>
             </div>
             <Link
               to="/profile/complete"
-              className="text-xs font-semibold uppercase tracking-wider text-burgundy hover:underline"
+              className="text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
             >
               Complete Profile →
             </Link>
@@ -83,95 +304,60 @@ export default function DashboardLayout({ children, title, subtitle, actions }) 
         </div>
       )}
 
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="w-full md:w-64 shrink-0">
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 shadow-xs sticky top-24">
-              {/* User mini summary */}
-              <div className="pb-4 mb-4 border-b border-neutral-100 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-burgundy-50 border border-burgundy-200 flex items-center justify-center text-burgundy font-bold text-sm">
-                  {profile?.name ? profile.name[0].toUpperCase() : 'U'}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="text-sm font-semibold text-neutral-900 truncate">
-                    {profile?.name || 'Logged In User'}
-                  </p>
-                  <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
-                </div>
+      <PageContainer className="flex-1 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Desktop Sidebar (Rendered only for coordinator and admin, 264px width, sticky top 88px) */}
+          {hasSidebar && (
+            <aside className="hidden lg:block w-[264px] shrink-0 sticky top-[88px]">
+              <div className="bg-surface border border-line rounded-[20px] p-3 shadow-xs dark:shadow-none">
+                {renderNavList()}
               </div>
+            </aside>
+          )}
 
-              {/* Navigation links */}
-              <nav className="space-y-1">
-                {navLinks.map((item) => {
-                  const isActive = location.pathname === item.path;
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                        isActive
-                          ? 'bg-burgundy text-white shadow-xs'
-                          : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-
-              <div className="pt-4 mt-4 border-t border-neutral-100">
-                <Link
-                  to="/profile"
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/profile'
-                      ? 'bg-burgundy text-white shadow-xs'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                  }`}
-                >
-                  <Settings className="w-4 h-4 shrink-0" />
-                  <span>Profile Settings</span>
-                </Link>
+          {/* Mobile/Tablet Sidebar Drawer Trigger (<1024px for Coordinator & Admin) */}
+          {hasSidebar && (
+            <div className="lg:hidden w-full flex items-center justify-between bg-surface border border-line rounded-[14px] p-3 shadow-xs">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted">
+                <span>{role} Navigation</span>
               </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                className="flex items-center gap-1.5 text-xs font-semibold"
+                aria-label="Toggle Dashboard Menu"
+                aria-expanded={isMobileSidebarOpen}
+              >
+                {isMobileSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                <span>{isMobileSidebarOpen ? 'Close Menu' : 'Menu'}</span>
+              </Button>
             </div>
-          </aside>
+          )}
+
+          {/* Off-canvas Drawer for Mobile/Tablet (<1024px) */}
+          {hasSidebar && isMobileSidebarOpen && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Dashboard Section Navigation"
+              className="lg:hidden w-full bg-surface border border-line rounded-[20px] p-4 shadow-md animate-in slide-in-from-top-2 space-y-4"
+            >
+              {renderNavList()}
+            </div>
+          )}
 
           {/* Main Content Area */}
-          <main className="flex-1 min-w-0">
-            {/* Header / Title block */}
-            {(title || actions) && (
-              <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  {title && (
-                    <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-                      {title}
-                    </h1>
-                  )}
-                  {subtitle && (
-                    <p className="text-sm text-neutral-500 mt-1">{subtitle}</p>
-                  )}
-                </div>
-                {actions && <div className="flex items-center gap-2">{actions}</div>}
-              </div>
+          <main className="flex-1 min-w-0 w-full space-y-6">
+            {title && (
+              <PageHeader title={title} subtitle={subtitle} actions={actions} />
             )}
-
-            {children}
+            <PageEnter key={location.pathname}>
+              {children}
+            </PageEnter>
           </main>
         </div>
-      </div>
-
-      {/* Institutional Footer Watermark */}
-      <footer className="mt-auto border-t border-neutral-200 bg-white py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500">
-          <p>Francis Xavier Engineering College • Campus Connect System</p>
-          <p className="text-[11px] text-neutral-400">
-            Architected & Patented by <span className="font-semibold text-neutral-700">Krish & Ihsan</span> • All rights reserved
-          </p>
-        </div>
-      </footer>
+      </PageContainer>
     </div>
   );
 }

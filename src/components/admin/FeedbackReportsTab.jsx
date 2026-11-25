@@ -11,6 +11,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Card, { CardContent, CardHeader, CardTitle, CardDescription } from '../common/Card';
 import Button from '../common/Button';
 import Badge from '../common/Badge';
+import Select from '../common/Select';
 import Spinner from '../common/Spinner';
 import EmptyState from '../common/EmptyState';
 import { adminService } from '../../services/adminService';
@@ -89,15 +90,15 @@ export default function FeedbackReportsTab() {
   return (
     <div className="space-y-6">
       {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-line">
         <div>
-          <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-ink flex items-center gap-2">
             <span>Anonymous Student Feedback Reports</span>
-            <Badge variant="success" size="sm" className="gap-1 text-[10px]">
+            <Badge variant="success" size="sm" className="gap-1 text-xs">
               <ShieldCheck className="w-3 h-3" /> 100% Anonymized
             </Badge>
           </h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted">
             Student identities, emails, and register numbers are cryptographically excluded from all feedback responses
           </p>
         </div>
@@ -135,37 +136,37 @@ export default function FeedbackReportsTab() {
       </div>
 
       {/* Filter by Event */}
-      <div className="bg-white p-4 rounded-xl border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface p-5 rounded-[20px] border border-line flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-neutral-500" />
-          <span className="text-xs font-semibold text-neutral-700">Filter Event:</span>
-          <select
+          <Filter className="w-4 h-4 text-muted" />
+          <span className="text-xs font-semibold text-ink">Filter Event:</span>
+          <Select
             value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            className="text-xs border border-neutral-300 rounded-lg px-3 py-1.5 focus:outline-hidden focus:border-burgundy max-w-xs sm:max-w-md truncate"
+            onChange={(e) => setSelectedEventId(e.target ? e.target.value : e)}
+            className="text-xs max-w-xs sm:max-w-md"
           >
-            <option value="all">All Institutional Sessions (Overall)</option>
+            <option value="all">All Institutional Events (Overall)</option>
             {events.map((evt) => (
               <option key={evt.id} value={evt.id}>
                 {evt.title} ({new Date(evt.start_time).toLocaleDateString('en-IN')})
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
-        <span className="text-[11px] text-neutral-400">
-          Showing metrics for: <strong className="text-neutral-700">{selectedEventTitle}</strong>
+        <span className="text-xs text-muted">
+          Showing metrics for: <strong className="text-ink">{selectedEventTitle}</strong>
         </span>
       </div>
 
       {/* Strict Anonymity Certification Notice */}
-      <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="p-4 rounded-[16px] bg-success/10 border border-success/30 text-xs text-ink flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-success/15 text-success flex items-center justify-center shrink-0 mt-0.5">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div className="space-y-1">
-          <h4 className="font-bold text-emerald-900">Institutional Anonymity Guarantee</h4>
-          <p className="text-emerald-800 leading-relaxed text-[11px]">
+          <h4 className="font-bold text-ink">Institutional Anonymity Guarantee</h4>
+          <p className="text-muted leading-relaxed text-xs">
             In compliance with academic freedom and honest evaluation ethics, this feedback system decouples submitted ratings and constructive commentary from student user IDs. Neither coordinators nor administrators can trace opinions back to individual attendees.
           </p>
         </div>
@@ -174,7 +175,7 @@ export default function FeedbackReportsTab() {
       {isLoading ? (
         <div className="py-16 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-xs font-medium text-neutral-500">Aggregating anonymous feedback evaluations...</p>
+          <p className="text-xs font-medium text-muted">Aggregating anonymous feedback evaluations...</p>
         </div>
       ) : !reportData || reportData.total_submissions === 0 ? (
         <EmptyState
@@ -187,39 +188,39 @@ export default function FeedbackReportsTab() {
           {/* KPI Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card className="p-5">
-              <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Average Rating</p>
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider">Average Rating</p>
               <div className="flex items-center gap-2 mt-2">
                 <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
-                <span className="text-3xl font-bold text-neutral-900 font-mono">
+                <span className="text-3xl font-bold text-ink font-mono">
                   {reportData.average_rating || '0.0'}
                 </span>
-                <span className="text-xs text-neutral-400">/ 5.0</span>
+                <span className="text-xs text-muted">/ 5.0</span>
               </div>
-              <p className="text-[11px] text-neutral-400 mt-2">Aggregated rating across all answers</p>
+              <p className="text-xs text-muted mt-2">Aggregated rating across all answers</p>
             </Card>
 
             <Card className="p-5">
-              <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Total Submissions</p>
-              <p className="text-3xl font-bold text-indigo-700 mt-2 font-mono">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider">Total Submissions</p>
+              <p className="text-3xl font-bold text-primary mt-2 font-mono">
                 {reportData.total_submissions || 0}
               </p>
-              <p className="text-[11px] text-neutral-400 mt-2">Individual student evaluation forms</p>
+              <p className="text-xs text-muted mt-2">Individual student evaluation forms</p>
             </Card>
 
             <Card className="p-5">
-              <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Evaluated Criteria</p>
-              <p className="text-3xl font-bold text-emerald-700 mt-2 font-mono">
+              <p className="text-xs font-semibold text-muted uppercase tracking-wider">Evaluated Criteria</p>
+              <p className="text-3xl font-bold text-success mt-2 font-mono">
                 {reportData.criteria_breakdown?.length || 0}
               </p>
-              <p className="text-[11px] text-neutral-400 mt-2">Rubrics evaluated per feedback form</p>
+              <p className="text-xs text-muted mt-2">Rubrics evaluated per feedback form</p>
             </Card>
           </div>
 
           {/* Criteria Breakdown */}
           {reportData.criteria_breakdown?.length > 0 && (
             <Card className="p-5">
-              <CardHeader className="p-0 pb-4 border-b border-neutral-100">
-                <CardTitle className="text-sm font-bold text-neutral-900">
+              <CardHeader className="p-0 pb-4 border-b border-line">
+                <CardTitle className="text-sm font-bold text-ink">
                   Criteria-Wise Performance Breakdown
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -231,18 +232,18 @@ export default function FeedbackReportsTab() {
                   {reportData.criteria_breakdown.map((crit) => (
                     <div
                       key={crit.question_key}
-                      className="p-3.5 rounded-lg border border-neutral-200 bg-neutral-50/50 flex flex-col justify-between"
+                      className="p-3.5 rounded-lg border border-line bg-surface-2/50 flex flex-col justify-between"
                     >
-                      <p className="text-xs font-semibold text-neutral-700 capitalize">
+                      <p className="text-xs font-semibold text-ink capitalize">
                         {crit.question_key.replace(/_/g, ' ')}
                       </p>
-                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-neutral-200/60">
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-line/60">
                         <div className="flex items-center gap-1 text-amber-600 font-bold font-mono text-sm">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                           <span>{crit.avg_score}</span>
-                          <span className="text-[10px] text-neutral-400 font-normal">/ 5.0</span>
+                          <span className="text-xs text-muted font-normal">/ 5.0</span>
                         </div>
-                        <span className="text-[10px] text-neutral-500 font-mono">
+                        <span className="text-xs text-muted font-mono">
                           {crit.total_responses} responses
                         </span>
                       </div>
@@ -255,11 +256,11 @@ export default function FeedbackReportsTab() {
 
           {/* Constructive Comments Table */}
           <Card>
-            <CardHeader className="border-b border-neutral-100">
+            <CardHeader className="border-b border-line">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-burgundy" />
+                  <CardTitle className="text-sm font-bold text-ink flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-primary" />
                     <span>Constructive Student Comments ({reportData.anonymous_comments?.length || 0})</span>
                   </CardTitle>
                   <CardDescription className="text-xs">
@@ -270,16 +271,16 @@ export default function FeedbackReportsTab() {
             </CardHeader>
             <CardContent className="p-0">
               {(!reportData.anonymous_comments || reportData.anonymous_comments.length === 0) ? (
-                <div className="py-12 text-center text-xs text-neutral-400">
+                <div className="py-12 text-center text-xs text-muted">
                   No textual comments provided in submitted feedback.
                 </div>
               ) : (
-                <div className="divide-y divide-neutral-100">
+                <div className="divide-y divide-line">
                   {reportData.anonymous_comments.map((comm, i) => (
-                    <div key={i} className="p-4 hover:bg-neutral-50/50 transition-colors space-y-2">
+                    <div key={i} className="p-4 hover:bg-surface-2/50 transition-colors space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" size="sm" className="font-mono text-[10px]">
+                          <Badge variant="outline" size="sm" className="font-mono text-xs">
                             {comm.event_title || selectedEventTitle}
                           </Badge>
                           <div className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
@@ -287,11 +288,11 @@ export default function FeedbackReportsTab() {
                             <span>{comm.rating} / 5</span>
                           </div>
                         </div>
-                        <span className="text-[10px] text-neutral-400">
+                        <span className="text-xs text-muted">
                           {comm.created_at ? new Date(comm.created_at).toLocaleDateString('en-IN') : ''}
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-800 leading-relaxed font-sans bg-neutral-50 p-3 rounded-lg border border-neutral-100">
+                      <p className="text-xs text-ink leading-relaxed font-sans bg-surface-2 p-3 rounded-lg border border-line">
                         "{comm.comment}"
                       </p>
                     </div>

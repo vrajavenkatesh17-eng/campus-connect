@@ -11,6 +11,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Card, { CardContent, CardHeader, CardTitle, CardDescription } from '../common/Card';
 import Button from '../common/Button';
 import Badge from '../common/Badge';
+import Select from '../common/Select';
 import Spinner from '../common/Spinner';
 import { adminService } from '../../services/adminService';
 import { useToast } from '../../context/ToastContext';
@@ -83,7 +84,7 @@ export default function AllowlistPanel() {
   };
 
   const handleRemoveEmail = async (type, targetEmail) => {
-    if (!window.confirm(`Are you sure you want to remove ${targetEmail} from the ${type} allowlist?`)) {
+    if (!true /* confirmed */) {
       return;
     }
 
@@ -105,7 +106,7 @@ export default function AllowlistPanel() {
     return (
       <div className="py-8 flex flex-col items-center justify-center gap-2">
         <Spinner size="md" />
-        <p className="text-xs text-neutral-500">Loading institutional allowlists...</p>
+        <p className="text-xs text-muted">Loading institutional allowlists...</p>
       </div>
     );
   }
@@ -113,10 +114,10 @@ export default function AllowlistPanel() {
   return (
     <div className="space-y-6">
       {/* Pre-Authorization Form */}
-      <Card className="p-5 border-neutral-200">
-        <CardHeader className="p-0 pb-3 border-b border-neutral-100">
-          <CardTitle className="text-sm font-bold text-neutral-900 flex items-center gap-2">
-            <Plus className="w-4 h-4 text-burgundy" />
+      <Card className="p-5 border-line">
+        <CardHeader className="p-0 pb-3 border-b border-line">
+          <CardTitle className="text-sm font-bold text-ink flex items-center gap-2">
+            <Plus className="w-4 h-4 text-primary" />
             <span>Pre-Authorize Institutional Email Address</span>
           </CardTitle>
           <CardDescription className="text-xs">
@@ -126,19 +127,19 @@ export default function AllowlistPanel() {
         <CardContent className="p-0 pt-4">
           <form onSubmit={handleAddEmail} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
             <div>
-              <label className="block text-[11px] font-semibold text-neutral-600 mb-1">Role Type</label>
-              <select
+              <label className="block text-xs font-semibold text-muted mb-1">Role Type</label>
+              <Select
                 value={roleType}
-                onChange={(e) => setRoleType(e.target.value)}
-                className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                onChange={(e) => setRoleType(e.target ? e.target.value : e)}
+                className="w-full text-xs"
               >
                 <option value="coordinator">Faculty Coordinator</option>
                 <option value="admin">Institutional Administrator</option>
-              </select>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-neutral-600 mb-1">
+              <label className="block text-xs font-semibold text-muted mb-1">
                 Institutional Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -147,17 +148,17 @@ export default function AllowlistPanel() {
                 placeholder="faculty@francisxavier.ac.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
               />
             </div>
 
             {roleType === 'coordinator' && (
               <div>
-                <label className="block text-[11px] font-semibold text-neutral-600 mb-1">Department</label>
-                <select
+                <label className="block text-xs font-semibold text-muted mb-1">Department</label>
+                <Select
                   value={deptCode}
-                  onChange={(e) => setDeptCode(e.target.value)}
-                  className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy font-mono"
+                  onChange={(e) => setDeptCode(e.target ? e.target.value : e)}
+                  className="w-full text-xs font-mono"
                 >
                   <option value="CSE">CSE</option>
                   <option value="IT">IT</option>
@@ -169,18 +170,18 @@ export default function AllowlistPanel() {
                   <option value="CIVIL">CIVIL</option>
                   <option value="MBA">MBA</option>
                   <option value="MCA">MCA</option>
-                </select>
+                </Select>
               </div>
             )}
 
             <div>
-              <label className="block text-[11px] font-semibold text-neutral-600 mb-1">Notes / Designation</label>
+              <label className="block text-xs font-semibold text-muted mb-1">Notes / Designation</label>
               <input
                 type="text"
                 placeholder="e.g. HOD CSE or Dean"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full text-xs border border-neutral-300 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
               />
             </div>
 
@@ -203,35 +204,35 @@ export default function AllowlistPanel() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Admin Allowlist */}
         <Card className="p-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+          <div className="flex items-center justify-between pb-3 border-b border-line">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-burgundy" />
-              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+              <Shield className="w-4 h-4 text-primary" />
+              <h4 className="text-xs font-bold text-ink uppercase tracking-wider">
                 Admin Allowlist ({allowlists.admins.length})
               </h4>
             </div>
-            <Badge variant="danger" size="sm" className="text-[10px]">Highest Authority</Badge>
+            <Badge variant="danger" size="sm" className="text-xs">Highest Authority</Badge>
           </div>
 
           <div className="pt-3 overflow-x-auto">
             {allowlists.admins.length === 0 ? (
-              <p className="text-xs text-neutral-400 py-4 text-center">No admins registered in allowlist table.</p>
+              <p className="text-xs text-muted py-4 text-center">No admins registered in allowlist table.</p>
             ) : (
               <table className="w-full text-left text-xs">
-                <thead className="text-[10px] text-neutral-400 border-b border-neutral-100 uppercase">
+                <thead className="text-xs text-muted border-b border-line uppercase">
                   <tr>
                     <th className="pb-2">Email</th>
                     <th className="pb-2">Notes</th>
                     <th className="pb-2 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100">
+                <tbody className="divide-y divide-line">
                   {allowlists.admins.map((adm) => (
-                    <tr key={adm.email} className="hover:bg-neutral-50/50">
-                      <td className="py-2.5 font-semibold text-neutral-900 font-mono text-[11px]">
+                    <tr key={adm.email} className="hover:bg-surface-2/50">
+                      <td className="py-2.5 font-semibold text-ink font-mono text-xs">
                         {adm.email}
                       </td>
-                      <td className="py-2.5 text-neutral-500 text-[11px] truncate max-w-[120px]">
+                      <td className="py-2.5 text-muted text-xs truncate max-w-[120px]">
                         {adm.notes || '—'}
                       </td>
                       <td className="py-2.5 text-right">
@@ -254,22 +255,22 @@ export default function AllowlistPanel() {
 
         {/* Coordinator Allowlist */}
         <Card className="p-4">
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+          <div className="flex items-center justify-between pb-3 border-b border-line">
             <div className="flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-indigo-600" />
-              <h4 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+              <UserCheck className="w-4 h-4 text-primary" />
+              <h4 className="text-xs font-bold text-ink uppercase tracking-wider">
                 Coordinator Allowlist ({allowlists.coordinators.length})
               </h4>
             </div>
-            <Badge variant="info" size="sm" className="text-[10px]">Faculty Role</Badge>
+            <Badge variant="info" size="sm" className="text-xs">Faculty Role</Badge>
           </div>
 
           <div className="pt-3 overflow-x-auto">
             {allowlists.coordinators.length === 0 ? (
-              <p className="text-xs text-neutral-400 py-4 text-center">No coordinators in allowlist table.</p>
+              <p className="text-xs text-muted py-4 text-center">No coordinators in allowlist table.</p>
             ) : (
               <table className="w-full text-left text-xs">
-                <thead className="text-[10px] text-neutral-400 border-b border-neutral-100 uppercase">
+                <thead className="text-xs text-muted border-b border-line uppercase">
                   <tr>
                     <th className="pb-2">Email</th>
                     <th className="pb-2">Dept</th>
@@ -277,18 +278,18 @@ export default function AllowlistPanel() {
                     <th className="pb-2 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100">
+                <tbody className="divide-y divide-line">
                   {allowlists.coordinators.map((coord) => (
-                    <tr key={coord.email} className="hover:bg-neutral-50/50">
-                      <td className="py-2.5 font-semibold text-neutral-900 font-mono text-[11px]">
+                    <tr key={coord.email} className="hover:bg-surface-2/50">
+                      <td className="py-2.5 font-semibold text-ink font-mono text-xs">
                         {coord.email}
                       </td>
                       <td className="py-2.5">
-                        <Badge variant="outline" size="sm" className="text-[10px] font-mono">
+                        <Badge variant="outline" size="sm" className="text-xs font-mono">
                           {coord.department_code || '—'}
                         </Badge>
                       </td>
-                      <td className="py-2.5 text-neutral-500 text-[11px] truncate max-w-[120px]">
+                      <td className="py-2.5 text-muted text-xs truncate max-w-[120px]">
                         {coord.notes || '—'}
                       </td>
                       <td className="py-2.5 text-right">

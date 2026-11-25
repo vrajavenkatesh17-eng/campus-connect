@@ -48,7 +48,7 @@ export default function EventAttendeesPage() {
       <DashboardLayout>
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Loading attendee list from database...</p>
+          <p className="text-sm text-muted font-medium">Loading attendee list from database...</p>
         </div>
       </DashboardLayout>
     );
@@ -60,8 +60,8 @@ export default function EventAttendeesPage() {
       key: 'student',
       render: (row) => (
         <div>
-          <p className="font-semibold text-neutral-900">{row.student?.name}</p>
-          <p className="text-xs text-neutral-500">{row.student?.email}</p>
+          <p className="font-semibold text-ink">{row.student?.name}</p>
+          <p className="text-xs text-muted">{row.student?.email}</p>
         </div>
       ),
     },
@@ -69,7 +69,7 @@ export default function EventAttendeesPage() {
       header: 'Department',
       key: 'department',
       render: (row) => (
-        <span className="text-xs text-neutral-700">
+        <span className="text-xs text-ink">
           {row.student?.departments ? `${row.student.departments.code}` : '—'}
         </span>
       ),
@@ -78,7 +78,7 @@ export default function EventAttendeesPage() {
       header: 'Register No.',
       key: 'register_number',
       render: (row) => (
-        <span className="text-xs font-mono font-semibold text-neutral-800">
+        <span className="text-xs font-mono font-semibold text-ink">
           {row.student?.register_number || '—'}
         </span>
       ),
@@ -87,14 +87,14 @@ export default function EventAttendeesPage() {
       header: 'Contact',
       key: 'phone',
       render: (row) => (
-        <span className="text-xs text-neutral-600">{row.student?.phone || '—'}</span>
+        <span className="text-xs text-muted">{row.student?.phone || '—'}</span>
       ),
     },
     {
       header: 'Registered At',
       key: 'registered_at',
       render: (row) => (
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-muted">
           {new Date(row.registered_at).toLocaleString('en-IN', {
             day: 'numeric',
             month: 'short',
@@ -130,8 +130,8 @@ export default function EventAttendeesPage() {
       key: 'student',
       render: (row) => (
         <div>
-          <p className="font-semibold text-neutral-900">{row.student?.name}</p>
-          <p className="text-xs text-neutral-500">{row.student?.email}</p>
+          <p className="font-semibold text-ink">{row.student?.name}</p>
+          <p className="text-xs text-muted">{row.student?.email}</p>
         </div>
       ),
     },
@@ -139,7 +139,7 @@ export default function EventAttendeesPage() {
       header: 'Department',
       key: 'department',
       render: (row) => (
-        <span className="text-xs text-neutral-700">
+        <span className="text-xs text-ink">
           {row.student?.departments ? `${row.student.departments.code}` : '—'}
         </span>
       ),
@@ -148,7 +148,7 @@ export default function EventAttendeesPage() {
       header: 'Register No.',
       key: 'register_number',
       render: (row) => (
-        <span className="text-xs font-mono font-semibold text-neutral-800">
+        <span className="text-xs font-mono font-semibold text-ink">
           {row.student?.register_number || '—'}
         </span>
       ),
@@ -157,7 +157,7 @@ export default function EventAttendeesPage() {
       header: 'Joined Waitlist',
       key: 'registered_at',
       render: (row) => (
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-muted">
           {new Date(row.registered_at).toLocaleString('en-IN', {
             day: 'numeric',
             month: 'short',
@@ -201,32 +201,32 @@ export default function EventAttendeesPage() {
         <Card className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+              <span className="text-xs font-bold text-muted uppercase tracking-wider">
                 Seat Capacity Allocation
               </span>
-              <p className="text-2xl font-extrabold text-neutral-900">
+              <p className="text-2xl font-extrabold text-ink">
                 {event?.registered_count} / {event?.seat_capacity}{' '}
-                <span className="text-sm font-semibold text-neutral-500">seats filled</span>
+                <span className="text-sm font-semibold text-muted">seats filled</span>
               </p>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                <span className="text-xs font-bold text-muted uppercase tracking-wider">
                   Waiting List
                 </span>
                 <p className="text-2xl font-extrabold text-amber-700">
                   {event?.waiting_count}{' '}
-                  <span className="text-sm font-semibold text-neutral-500">waiting</span>
+                  <span className="text-sm font-semibold text-muted">waiting</span>
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="w-full bg-neutral-100 rounded-full h-2.5 mt-4 overflow-hidden">
+          <div className="w-full bg-surface-2 rounded-full h-2.5 mt-4 overflow-hidden">
             <div
               className={`h-full transition-all duration-300 ${
-                event?.registered_count >= event?.seat_capacity ? 'bg-amber-500' : 'bg-burgundy'
+                event?.registered_count >= event?.seat_capacity ? 'bg-amber-500' : 'bg-primary'
               }`}
               style={{ width: `${capacityPct}%` }}
             />
@@ -234,32 +234,34 @@ export default function EventAttendeesPage() {
         </Card>
 
         {/* Tab Selection */}
-        <div className="flex border-b border-neutral-200 gap-4">
-          <button
-            type="button"
+        <div className="flex border-b border-line gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab('registered')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === 'registered'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
+                ? 'border-burgundy text-primary'
+                : 'border-transparent text-muted hover:text-ink'
             }`}
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Confirmed Attendees ({attendees.registered.length})</span>
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setActiveTab('waitlisted')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === 'waitlisted'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
+                ? 'border-burgundy text-primary'
+                : 'border-transparent text-muted hover:text-ink'
             }`}
           >
             <Clock className="w-4 h-4" />
             <span>Waiting List Queue ({attendees.waitlisted.length})</span>
-          </button>
+          </Button>
         </div>
 
         {/* Tables */}

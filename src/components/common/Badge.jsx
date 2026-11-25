@@ -13,15 +13,23 @@ export default function Badge({
   };
 
   const variantMap = {
-    neutral: 'bg-neutral-100 text-neutral-700 border border-neutral-200',
-    primary: 'bg-burgundy-50 text-burgundy-900 border border-burgundy-200 font-medium',
-    success: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
-    warning: 'bg-amber-50 text-amber-800 border border-amber-200',
-    danger: 'bg-red-50 text-red-800 border border-red-200',
-    info: 'bg-blue-50 text-blue-800 border border-blue-200',
-    admin: 'bg-purple-50 text-purple-900 border border-purple-200 font-semibold',
-    coordinator: 'bg-indigo-50 text-indigo-900 border border-indigo-200 font-medium',
-    student: 'bg-emerald-50 text-emerald-900 border border-emerald-200 font-medium',
+    neutral: 'bg-surface-2 text-ink border border-line',
+    primary:
+      'bg-primary-soft text-primary dark:text-ink border border-primary/25 font-semibold',
+    success:
+      'bg-success-soft text-success dark:text-ink border border-success/25 font-semibold',
+    warning:
+      'bg-warning-soft text-warning dark:text-ink border border-warning/25 font-semibold',
+    danger:
+      'bg-danger-soft text-danger dark:text-ink border border-danger/25 font-semibold',
+    info:
+      'bg-info-soft text-info dark:text-ink border border-info/25 font-semibold',
+    admin:
+      'bg-primary-soft text-primary dark:text-ink border border-primary/35 font-semibold',
+    coordinator:
+      'bg-info-soft text-info dark:text-ink border border-info/35 font-semibold',
+    student:
+      'bg-success-soft text-success dark:text-ink border border-success/35 font-semibold',
   };
 
   return (

@@ -1,10 +1,21 @@
+/**
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
+ *
+ * FeedbackModal: Conforms strictly to DESIGN_SPEC v2 Section 4:
+ * Uses Peek Rating (AppRating) and Squish Switch (AppSwitch) for anonymous review.
+ */
+
 import React, { useState } from 'react';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import Textarea from '../common/Textarea';
+import AppRating from '../app/AppRating';
+import AppSwitch from '../app/AppSwitch';
 import { useToast } from '../../context/ToastContext';
 import { attendanceService } from '../../services/attendanceService';
-import { Star, ShieldCheck, MessageSquare, CheckCircle2, Info } from 'lucide-react';
+import { ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function FeedbackModal({ isOpen, onClose, event, onSuccess }) {
   const { showToast } = useToast();
@@ -43,121 +54,112 @@ export default function FeedbackModal({ isOpen, onClose, event, onSuccess }) {
 
   if (!event) return null;
 
-  // Star selector subcomponent
-  const StarRating = ({ label, value, onChange, description }) => (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-neutral-800">{label}</span>
-        <span className="text-xs font-bold text-burgundy">{value} / 5</span>
-      </div>
-      {description && <p className="text-[11px] text-neutral-400">{description}</p>}
-      <div className="flex items-center gap-1.5 pt-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onChange(star)}
-            className="p-1 rounded-md hover:bg-neutral-100 transition-transform active:scale-95"
-          >
-            <Star
-              className={`w-6 h-6 transition-colors ${
-                star <= value
-                  ? 'fill-amber-400 text-amber-400'
-                  : 'text-neutral-300 hover:text-amber-200'
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Session Feedback"
+      title="Session Evaluation & Feedback"
       maxWidth="max-w-lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="rounded-lg bg-burgundy/5 border border-burgundy/15 p-3 space-y-1">
-          <p className="text-xs font-bold text-burgundy truncate">{event.title}</p>
-          <p className="text-[11px] text-neutral-500">
-            {event.speaker_name ? `Speaker: ${event.speaker_name}` : 'Francis Xavier Engineering College'}
+        <div className="rounded-xl bg-surface-2 border border-line p-3.5 space-y-1">
+          <p className="text-xs font-bold text-primary truncate">{event.title}</p>
+          <p className="text-xs text-muted">
+            {event.speaker_name ? `Keynote Speaker: ${event.speaker_name}` : 'Francis Xavier Engineering College'}
           </p>
         </div>
 
-        {/* 3 Rating Categories */}
-        <div className="space-y-3.5 bg-neutral-50/70 p-3.5 rounded-xl border border-neutral-200">
-          <StarRating
-            label="1. Content Quality & Relevance"
-            description="Topic depth, learning takeaways, and industrial applicability"
-            value={ratingContent}
-            onChange={setRatingContent}
-          />
+        {/* 3 Rating Categories using AppRating (PeekRating) */}
+        <div className="space-y-4 bg-surface-2/60 p-4 rounded-xl border border-line">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-ink">1. Content Relevance & Technical Depth</span>
+              <span className="text-xs font-mono font-bold text-primary">{ratingContent} / 5</span>
+            </div>
+            <p className="text-xs text-muted">Industry applicability and academic learning takeaways</p>
+            <div className="pt-1">
+              <AppRating
+                value={ratingContent}
+                onChange={setRatingContent}
+                size={22}
+              />
+            </div>
+          </div>
 
-          <StarRating
-            label="2. Speaker Delivery & Engagement"
-            description="Clarity, presentation style, and Q&A responsiveness"
-            value={ratingSpeaker}
-            onChange={setRatingSpeaker}
-          />
+          <div className="space-y-1.5 pt-2 border-t border-line/60">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-ink">2. Keynote Speaker Delivery</span>
+              <span className="text-xs font-mono font-bold text-primary">{ratingSpeaker} / 5</span>
+            </div>
+            <p className="text-xs text-muted">Clarity, engagement, and Q&A interaction effectiveness</p>
+            <div className="pt-1">
+              <AppRating
+                value={ratingSpeaker}
+                onChange={setRatingSpeaker}
+                size={22}
+              />
+            </div>
+          </div>
 
-          <StarRating
-            label="3. Session Organization & Venue"
-            description="Audio/video clarity, punctuality, and hall arrangement"
-            value={ratingOrg}
-            onChange={setRatingOrg}
-          />
+          <div className="space-y-1.5 pt-2 border-t border-line/60">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-ink">3. Overall Venue & Session Organization</span>
+              <span className="text-xs font-mono font-bold text-primary">{ratingOrg} / 5</span>
+            </div>
+            <p className="text-xs text-muted">Punctuality, AV quality, and seat coordination</p>
+            <div className="pt-1">
+              <AppRating
+                value={ratingOrg}
+                onChange={setRatingOrg}
+                size={22}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Written Comments */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5 text-neutral-500" />
-            <span>Comments & Constructive Suggestions</span>
+        {/* Written Review */}
+        <div>
+          <label className="block text-xs font-semibold text-ink mb-1.5">
+            Key Learning Takeaways or Improvement Notes (Optional)
           </label>
           <Textarea
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            placeholder="Share specific insights, topics you enjoyed most, or areas of improvement..."
+            placeholder="Share specific insights, topics you enjoyed most, or suggestions for future topics..."
             rows={3}
             className="text-xs"
           />
         </div>
 
-        {/* Anonymous Privacy Toggle */}
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 space-y-2">
+        {/* Anonymous Privacy Toggle via AppSwitch (SquishSwitch) */}
+        <div className="rounded-xl border border-line bg-surface-2 p-3.5 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShieldCheck className={`w-4 h-4 ${isAnonymous ? 'text-emerald-600' : 'text-neutral-400'}`} />
-              <label htmlFor="anon-toggle" className="text-xs font-semibold text-neutral-900 cursor-pointer">
+              <ShieldCheck className={`w-4 h-4 ${isAnonymous ? 'text-success' : 'text-muted'}`} />
+              <span className="text-xs font-semibold text-ink select-none">
                 Submit Anonymously
-              </label>
+              </span>
             </div>
-            <input
-              id="anon-toggle"
-              type="checkbox"
+            <AppSwitch
               checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="w-4 h-4 rounded text-burgundy focus:ring-burgundy border-neutral-300 cursor-pointer"
+              onChange={setIsAnonymous}
             />
           </div>
 
-          <p className="text-[11px] text-neutral-500 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             {isAnonymous ? (
-              <span className="text-emerald-700 font-medium flex items-center gap-1">
+              <span className="text-success font-medium flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                Identity Protected: Your feedback will be saved completely decoupled from your profile. Coordinators cannot see who wrote it.
+                Identity Protected: Your feedback will be saved completely decoupled from your profile.
               </span>
             ) : (
-              'When off, your name will be visible to event organizers on the feedback review panel.'
+              'When off, your name will be verified by the coordinator for interactive recognition points.'
             )}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
           <Button
             type="button"
             variant="outline"
@@ -173,7 +175,7 @@ export default function FeedbackModal({ isOpen, onClose, event, onSuccess }) {
             size="sm"
             isLoading={isSubmitting}
           >
-            Submit Review
+            Submit Feedback
           </Button>
         </div>
       </form>

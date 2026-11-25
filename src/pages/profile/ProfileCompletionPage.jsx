@@ -4,11 +4,11 @@ import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 import { useToast } from '../../context/ToastContext';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/common/Card';
-import Button from '../../components/common/Button';
+import AppButton from '../../components/app/AppButton';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
 import Spinner from '../../components/common/Spinner';
-import { GraduationCap, Hash, Building2, Calendar, Phone, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Hash, Building2, Calendar, Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function ProfileCompletionPage() {
   const { user, profile, refreshProfile } = useAuth();
@@ -21,6 +21,7 @@ export default function ProfileCompletionPage() {
   const [registerNumber, setRegisterNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
+  const [detectedConfirmation, setDetectedConfirmation] = useState(null);
   const [isLoadingDepts, setIsLoadingDepts] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -43,12 +44,35 @@ export default function ProfileCompletionPage() {
   }, []);
 
   useEffect(() => {
+    const rawName = user?.user_metadata?.full_name || profile?.name || '';
+    // Detect a trailing ID token like 25CSR101 in Google Name (do NOT auto-split silently, confirm with user)
+    const idMatch = rawName.match(/[\s\-_(]+([0-9]{2}[A-Z]{2,4}[0-9]{2,4})\)?$/i);
+
+    let cleanInitialName = rawName.trim();
+    let detectedId = '';
+
+    if (idMatch) {
+      detectedId = idMatch[1].toUpperCase();
+      cleanInitialName = rawName.slice(0, idMatch.index).trim();
+      setDetectedConfirmation({
+        name: cleanInitialName,
+        regNo: detectedId,
+      });
+    }
+
     if (profile) {
-      setName(profile.name || user?.email?.split('@')[0] || '');
+      setName(profile.name || cleanInitialName || user?.email?.split('@')[0] || '');
       if (profile.department_id) setDepartmentId(profile.department_id);
       if (profile.year) setYear(profile.year.toString());
-      if (profile.register_number) setRegisterNumber(profile.register_number);
+      if (profile.register_number) {
+        setRegisterNumber(profile.register_number);
+      } else if (detectedId) {
+        setRegisterNumber(detectedId);
+      }
       if (profile.phone) setPhone(profile.phone);
+    } else {
+      if (cleanInitialName) setName(cleanInitialName);
+      if (detectedId) setRegisterNumber(detectedId);
     }
   }, [profile, user]);
 
@@ -73,7 +97,7 @@ export default function ProfileCompletionPage() {
         name: name.trim(),
         department_id: departmentId,
         year: parseInt(year, 10),
-        register_number: registerNumber.trim(),
+        register_number: registerNumber.trim().toUpperCase(),
         phone: phone.trim() || null,
       });
 
@@ -92,38 +116,62 @@ export default function ProfileCompletionPage() {
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-xl w-full space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-burgundy text-white flex items-center justify-center mx-auto shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center mx-auto shadow-md">
             <GraduationCap className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
             Complete Student Profile
           </h1>
-          <p className="text-sm text-neutral-500 max-w-md mx-auto">
-            Please provide your official college details. These will be verified on certificates and event attendance logs.
+          <p className="text-sm text-muted max-w-md mx-auto">
+            Please verify your official college details. Clean display name is used across the system; your register number appears only on your ID card, profile, and rosters.
           </p>
         </div>
+
+        {/* Identity Confirmation Banner */}
+        {detectedConfirmation && (
+          <div className="p-4 rounded-[16px] bg-primary-soft border border-primary/20 text-xs text-ink space-y-1.5 shadow-xs">
+            <div className="flex items-center gap-2 font-bold text-primary dark:text-ink">
+              <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+              <span>Identity Confirmation Step</span>
+            </div>
+            <p className="text-muted leading-relaxed">
+              Name: <strong className="text-ink">{name}</strong> / Register no:{' '}
+              <strong className="text-ink font-mono">{registerNumber || detectedConfirmation.regNo}</strong> — correct? Please review and edit below if needed.
+            </p>
+          </div>
+        )}
 
         <Card>
           <form onSubmit={handleSubmit}>
             <CardHeader>
               <CardTitle>Academic Information</CardTitle>
               <CardDescription>
-                Linked to your official account: <span className="font-semibold text-neutral-800">{user?.email}</span>
+                Linked to your official account: <span className="font-semibold text-ink">{user?.email}</span>
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4">
               <Input
-                label="Full Name"
+                label="Full Display Name"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your official student name"
+                placeholder="e.g., Krishna Raja V"
                 error={formErrors.name}
               />
 
+              <Input
+                label="Register Number"
+                required
+                value={registerNumber}
+                onChange={(e) => setRegisterNumber(e.target.value.toUpperCase())}
+                placeholder="e.g., 25CSR101"
+                error={formErrors.registerNumber}
+                className="font-mono uppercase"
+              />
+
               {isLoadingDepts ? (
-                <div className="flex items-center gap-2 text-sm text-neutral-500 py-2">
+                <div className="flex items-center gap-2 text-sm text-muted py-2">
                   <Spinner size="sm" />
                   <span>Loading college departments...</span>
                 </div>
@@ -142,54 +190,46 @@ export default function ProfileCompletionPage() {
                 />
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select
-                  label="Year of Study"
-                  required
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  placeholder="Select year"
-                  options={[
-                    { value: '1', label: '1st Year' },
-                    { value: '2', label: '2nd Year' },
-                    { value: '3', label: '3rd Year' },
-                    { value: '4', label: '4th Year' },
-                    { value: '5', label: '5th Year (Integrated)' },
-                  ]}
-                  error={formErrors.year}
-                />
-
-                <Input
-                  label="Register / Roll Number"
-                  required
-                  value={registerNumber}
-                  onChange={(e) => setRegisterNumber(e.target.value)}
-                  placeholder="e.g. 21IT045"
-                  icon={Hash}
-                  error={formErrors.registerNumber}
-                />
-              </div>
+              <Select
+                label="Year of Study"
+                required
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                placeholder="Select current year"
+                options={[
+                  { value: '1', label: '1st Year (B.E. / B.Tech / MBA / MCA)' },
+                  { value: '2', label: '2nd Year (B.E. / B.Tech / MBA / MCA)' },
+                  { value: '3', label: '3rd Year (B.E. / B.Tech)' },
+                  { value: '4', label: '4th Year (B.E. / B.Tech)' },
+                ]}
+                error={formErrors.year}
+              />
 
               <Input
-                label="Contact Phone Number (Optional)"
+                label="Mobile Phone (Optional)"
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                icon={Phone}
-                helperText="Used for urgent event schedule or venue change updates."
+                placeholder="e.g., +91 98765 43210"
               />
             </CardContent>
 
-            <CardFooter className="flex justify-end gap-2">
-              <Button
+            <CardFooter className="flex justify-end gap-3 pt-4 border-t border-line/60">
+              <AppButton
                 type="submit"
                 variant="primary"
-                isLoading={isSubmitting}
+                disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                Complete Profile & Enter
-              </Button>
+                {isSubmitting ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Saving Profile...
+                  </>
+                ) : (
+                  'Confirm & Complete Profile'
+                )}
+              </AppButton>
             </CardFooter>
           </form>
         </Card>

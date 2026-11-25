@@ -5,6 +5,7 @@ import { useToast } from '../../context/ToastContext';
 import { certificateService } from '../../services/certificateService';
 import { attendanceService } from '../../services/attendanceService';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import CertificateFlipCard from '../../components/certificates/CertificateFlipCard';
 import Card, { CardHeader, CardTitle, CardContent } from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
@@ -126,7 +127,7 @@ export default function StudentCertificatesPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Loading your verified participation certificates...</p>
+          <p className="text-sm text-muted font-medium">Loading your verified participation certificates...</p>
         </div>
       </DashboardLayout>
     );
@@ -157,10 +158,10 @@ export default function StudentCertificatesPage() {
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-600 shrink-0" />
               <div>
-                <h3 className="text-sm font-bold text-neutral-900">
+                <h3 className="text-sm font-bold text-ink">
                   New Certificates Ready to Claim ({unissuedSessions.length})
                 </h3>
-                <p className="text-xs text-neutral-600">
+                <p className="text-xs text-muted">
                   You have attended these concluded sessions. Claim your official autonomous credential.
                 </p>
               </div>
@@ -174,12 +175,12 @@ export default function StudentCertificatesPage() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-lg p-4 border border-amber-200 flex flex-col justify-between gap-3 shadow-xs"
+                    className="bg-surface rounded-lg p-4 border border-amber-200/80 dark:border-amber-700/50 flex flex-col justify-between gap-3 shadow-xs"
                   >
                     <div>
-                      <p className="text-xs font-bold text-neutral-900 line-clamp-1">{ev.title}</p>
-                      <p className="text-[11px] text-neutral-500 flex items-center gap-1 mt-1">
-                        <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                      <p className="text-xs font-bold text-ink line-clamp-1">{ev.title}</p>
+                      <p className="text-xs text-muted flex items-center gap-1 mt-1">
+                        <Calendar className="w-3.5 h-3.5 text-muted" />
                         {new Date(ev.start_time).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
@@ -188,8 +189,8 @@ export default function StudentCertificatesPage() {
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
-                      <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                    <div className="flex items-center justify-between pt-2 border-t border-line">
+                      <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Attendance Verified
                       </span>
                       <Button
@@ -212,7 +213,7 @@ export default function StudentCertificatesPage() {
         {/* Issued Certificates List */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-neutral-900">
+            <h2 className="text-base font-bold text-ink">
               Official Certificates ({issuedCertificates.length})
             </h2>
           </div>
@@ -230,91 +231,17 @@ export default function StudentCertificatesPage() {
               }
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {issuedCertificates.map((cert) => {
-                const ev = cert.event || {};
-                const speaker = ev.speaker || {};
-
-                return (
-                  <Card
-                    key={cert.id}
-                    className="p-5 flex flex-col justify-between hover:border-burgundy/40 transition-colors bg-white shadow-xs"
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono text-[11px] font-bold text-burgundy bg-burgundy/10 px-2 py-0.5 rounded">
-                          {cert.certificate_code}
-                        </span>
-                        <Badge variant="success" size="sm" className="gap-1 text-[11px]">
-                          <ShieldCheck className="w-3.5 h-3.5" /> Verified
-                        </Badge>
-                      </div>
-
-                      <div>
-                        <h3 className="font-bold text-neutral-900 text-sm leading-snug line-clamp-2">
-                          {ev.title || 'Technical Lecture'}
-                        </h3>
-                        {speaker.name && (
-                          <p className="text-xs text-neutral-500 mt-1">
-                            Keynote: <span className="font-semibold text-neutral-700">{speaker.name}</span>
-                            {speaker.company ? ` (${speaker.company})` : ''}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-neutral-500 pt-2 border-t border-neutral-100">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-neutral-400" />
-                          <span>
-                            {ev.start_time
-                              ? new Date(ev.start_time).toLocaleDateString('en-IN', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric',
-                                })
-                              : 'Concluded'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 justify-end">
-                          <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                          <span>
-                            Issued{' '}
-                            {new Date(cert.issued_at).toLocaleDateString('en-IN', {
-                              day: 'numeric',
-                              month: 'short',
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 pt-4 mt-2 border-t border-neutral-100">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        icon={Download}
-                        onClick={() => handleDownloadPDF(cert)}
-                        className="flex-1"
-                      >
-                        Download PDF
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon={Copy}
-                        onClick={() => handleCopyLink(cert.certificate_code)}
-                        title="Copy Verification Link"
-                      >
-                        Copy Link
-                      </Button>
-                      <Link to={`/verify/${cert.certificate_code}`} target="_blank">
-                        <Button variant="ghost" size="sm" icon={ExternalLink} title="Open Verification Registry" />
-                      </Link>
-                    </div>
-                  </Card>
-                );
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {issuedCertificates.map((cert) => (
+                <CertificateFlipCard
+                  key={cert.id}
+                  certificate={cert}
+                  studentName={profile?.name || user?.email?.split('@')[0]}
+                  departmentName={profile?.departments?.name || profile?.department || 'Engineering'}
+                  onDownload={handleDownloadPDF}
+                  onCopyLink={handleCopyLink}
+                />
+              ))}
             </div>
           )}
         </div>

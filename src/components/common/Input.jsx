@@ -22,15 +22,15 @@ const Input = forwardRef(function Input(
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-neutral-700 mb-1.5"
+          className="block text-sm font-medium text-ink mb-1.5"
         >
           {label}
-          {required && <span className="text-red-600 ml-1">*</span>}
+          {required && <span className="text-danger ml-1">*</span>}
         </label>
       )}
-      <div className="relative rounded-lg shadow-sm">
+      <div className="relative rounded-[12px] shadow-xs">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted">
             <Icon className="h-4 w-4" />
           </div>
         )}
@@ -39,16 +39,16 @@ const Input = forwardRef(function Input(
           id={inputId}
           type={type}
           required={required}
-          className={`block w-full rounded-lg text-sm bg-white border transition-colors
-            ${Icon ? 'pl-9' : 'pl-3.5'}
+          className={`block w-full rounded-[12px] text-sm bg-surface border transition-colors
+            ${Icon ? 'pl-10' : 'pl-3.5'}
             ${rightElement ? 'pr-10' : 'pr-3.5'}
             py-2.5
             ${
               error
-                ? 'border-red-400 text-red-900 placeholder-red-300 focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500'
-                : 'border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-burgundy/20 focus:border-burgundy'
+                ? 'border-danger text-danger placeholder:text-danger/60 focus:outline-none focus:ring-2 focus:ring-danger/20 focus:border-danger'
+                : 'border-line text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'
             }
-            disabled:bg-neutral-50 disabled:text-neutral-500 disabled:border-neutral-200 disabled:cursor-not-allowed
+            disabled:bg-surface-2 disabled:text-muted disabled:border-line/60 disabled:cursor-not-allowed
             ${className}`}
           {...props}
         />
@@ -59,9 +59,9 @@ const Input = forwardRef(function Input(
         )}
       </div>
       {error ? (
-        <p className="mt-1 text-xs text-red-600 font-medium">{error}</p>
+        <p className="mt-1 text-xs text-danger font-medium">{error}</p>
       ) : helperText ? (
-        <p className="mt-1 text-xs text-neutral-500">{helperText}</p>
+        <p className="mt-1 text-xs text-muted">{helperText}</p>
       ) : null}
     </div>
   );

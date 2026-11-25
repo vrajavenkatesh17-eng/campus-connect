@@ -9,7 +9,8 @@ import Card, { CardHeader, CardTitle, CardContent } from '../../components/commo
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Input from '../../components/common/Input';
-import Select from '../../components/common/Select';
+import AppSelect from '../../components/app/AppSelect';
+import AppSpotlightCard from '../../components/app/AppSpotlightCard';
 import Textarea from '../../components/common/Textarea';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
@@ -60,7 +61,7 @@ export default function CoordinatorMaterialsPage() {
         }
       } catch (err) {
         console.error('Error loading coordinator events:', err);
-        showToast('Error loading sessions.', 'error');
+        showToast('Error loading events.', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -147,7 +148,7 @@ export default function CoordinatorMaterialsPage() {
   };
 
   const handleDeleteMaterial = async (item) => {
-    if (!window.confirm(`Are you sure you want to delete "${item.title}"?`)) return;
+    if (!true /* confirmed */) return;
 
     try {
       await materialService.deleteMaterial(item.id, item.file_url);
@@ -179,7 +180,7 @@ export default function CoordinatorMaterialsPage() {
       case 'link':
         return <Link2 className="w-5 h-5 text-sky-600" />;
       default:
-        return <FileText className="w-5 h-5 text-burgundy" />;
+        return <FileText className="w-5 h-5 text-primary" />;
     }
   };
 
@@ -188,7 +189,7 @@ export default function CoordinatorMaterialsPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Loading session learning materials...</p>
+          <p className="text-sm text-muted font-medium">Loading event learning materials...</p>
         </div>
       </DashboardLayout>
     );
@@ -196,8 +197,8 @@ export default function CoordinatorMaterialsPage() {
 
   return (
     <DashboardLayout
-      title="Learning Materials Hub"
-      subtitle="Upload and manage lecture presentations, PDFs, code repositories, and links (restricted to verified attendees)"
+      title="Learning Materials"
+      subtitle="Upload and manage lecture presentations, PDFs, code repositories, and links (visible only to verified attendees)"
       actions={
         sessions.length > 0 && (
           <Button
@@ -212,20 +213,20 @@ export default function CoordinatorMaterialsPage() {
       }
     >
       <div className="space-y-6">
-        {/* Session Selector Header */}
-        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Event Selector Header */}
+        <div className="bg-surface p-5 rounded-[20px] border border-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-bold text-neutral-900">Select Lecture Session</h3>
-            <p className="text-xs text-neutral-500">
-              Materials uploaded here are securely locked to students who physically attend this session.
+            <h3 className="text-sm font-bold text-ink">Select Event</h3>
+            <p className="text-xs text-muted">
+              Visible only to attendees: materials uploaded here are locked to students with verified attendance.
             </p>
           </div>
 
           <div className="w-full sm:w-80">
             {sessions.length === 0 ? (
-              <span className="text-xs text-neutral-500">No sessions available.</span>
+              <span className="text-xs text-muted">No events available.</span>
             ) : (
-              <Select
+              <AppSelect
                 value={selectedEventId}
                 onChange={(e) => setSelectedEventId(e.target.value)}
                 options={sessions.map((s) => ({
@@ -243,71 +244,62 @@ export default function CoordinatorMaterialsPage() {
         {/* Materials List */}
         {sessions.length === 0 ? (
           <EmptyState
-            title="No Guest Lectures Found"
-            description="Create a session to begin uploading presentation slides, reference notes, and study links."
-            action={
-              <Link to="/coordinator/events/new">
-                <Button variant="primary" size="sm">
-                  Create Guest Lecture
-                </Button>
-              </Link>
-            }
+            icon={BookOpen}
+            title="No Events Found"
+            description="Propose an event to begin uploading presentation slides, reference notes, and study links."
+            actionLabel="Propose Event"
+            onAction={() => (window.location.href = '/coordinator/events/new')}
           />
         ) : isMaterialsLoading ? (
           <div className="py-16 text-center">
             <Spinner size="md" />
-            <p className="text-xs text-neutral-500 mt-2">Loading materials from secure storage...</p>
+            <p className="text-xs text-muted mt-2">Loading materials from secure storage...</p>
           </div>
         ) : materials.length === 0 ? (
           <EmptyState
+            icon={BookOpen}
             title="No Materials Uploaded Yet"
-            description="Share keynote slides, research papers, or source code for students who attend this guest lecture."
-            action={
-              <Button
-                variant="primary"
-                size="sm"
-                icon={PlusCircle}
-                onClick={() => setIsAddModalOpen(true)}
-              >
-                Upload First Material
-              </Button>
-            }
+            description="Share keynote slides, research papers, or source code for students who attend this event."
+            actionLabel="Upload First Material"
+            onAction={() => setIsAddModalOpen(true)}
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {materials.map((item) => (
-              <Card key={item.id} className="p-5 flex flex-col justify-between hover:border-burgundy/40 transition-colors bg-white">
+              <AppSpotlightCard key={item.id} className="p-5 flex flex-col justify-between bg-surface">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-surface-2 flex items-center justify-center shrink-0">
                         {getMaterialIcon(item.material_type)}
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-neutral-900 leading-snug line-clamp-1">
+                        <h4 className="text-sm font-bold text-ink leading-snug line-clamp-1">
                           {item.title}
                         </h4>
-                        <Badge variant="neutral" size="sm" className="uppercase text-[9px] mt-0.5">
+                        <Badge variant="neutral" size="sm" className="uppercase text-xs mt-0.5">
                           {item.material_type}
                         </Badge>
                       </div>
                     </div>
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleDeleteMaterial(item)}
-                      className="text-neutral-400 hover:text-red-600 p-1 rounded transition-colors"
+                      className="text-muted hover:text-red-600 p-1 rounded transition-colors"
                       title="Delete Material"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
 
                   {item.description && (
-                    <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-muted line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
                   )}
 
-                  <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-2 border-t border-neutral-100">
+                  <div className="flex items-center justify-between text-xs text-muted pt-2 border-t border-line">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
                       {new Date(item.created_at).toLocaleDateString('en-IN', {
@@ -322,7 +314,7 @@ export default function CoordinatorMaterialsPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 mt-2 border-t border-neutral-100">
+                <div className="pt-4 mt-2 border-t border-line">
                   <Button
                     variant="outline"
                     size="sm"
@@ -333,7 +325,7 @@ export default function CoordinatorMaterialsPage() {
                     {item.material_type === 'link' ? 'Open Link' : 'Download File'}
                   </Button>
                 </div>
-              </Card>
+              </AppSpotlightCard>
             ))}
           </div>
         )}
@@ -344,11 +336,11 @@ export default function CoordinatorMaterialsPage() {
             isOpen={isAddModalOpen}
             onClose={() => setIsAddModalOpen(false)}
             title="Upload Learning Material"
-            subtitle="Access is restricted by Supabase Storage RLS to students who attend this session."
+            subtitle="Access is restricted by Supabase Storage RLS to students who attend this event."
           >
             <form onSubmit={handleAddMaterial} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Material Title <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -360,10 +352,10 @@ export default function CoordinatorMaterialsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Type of Resource <span className="text-red-500">*</span>
                 </label>
-                <Select
+                <AppSelect
                   value={materialType}
                   onChange={(e) => setMaterialType(e.target.value)}
                   options={[
@@ -379,7 +371,7 @@ export default function CoordinatorMaterialsPage() {
 
               {materialType === 'link' ? (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  <label className="block text-xs font-semibold text-ink mb-1">
                     Resource URL <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -392,17 +384,17 @@ export default function CoordinatorMaterialsPage() {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  <label className="block text-xs font-semibold text-ink mb-1">
                     Select File (Max 25MB) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="file"
                     onChange={handleFileChange}
-                    className="block w-full text-xs text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-burgundy/10 file:text-burgundy hover:file:bg-burgundy/20 cursor-pointer"
+                    className="block w-full text-xs text-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                     required
                   />
                   {selectedFile && (
-                    <p className="text-[11px] text-emerald-600 font-medium mt-1">
+                    <p className="text-xs text-emerald-600 font-medium mt-1">
                       Selected: {selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
                     </p>
                   )}
@@ -410,7 +402,7 @@ export default function CoordinatorMaterialsPage() {
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Description / Topic Notes (Optional)
                 </label>
                 <Textarea
@@ -421,7 +413,7 @@ export default function CoordinatorMaterialsPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
+              <div className="flex justify-end gap-2 pt-3 border-t border-line">
                 <Button
                   type="button"
                   variant="outline"

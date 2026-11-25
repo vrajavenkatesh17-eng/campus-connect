@@ -1,15 +1,76 @@
+@import '@fontsource-variable/fraunces/opsz.css';
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/jetbrains-mono';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* DESIGN_SPEC v2 Tokens (Light: Wine & Ivory) */
+  --bg: 251 248 245; /* #FBF8F5 */
+  --surface: 255 255 255; /* #FFFFFF */
+  --surface-2: 245 239 234; /* #F5EFEA */
+  --line: 232 223 216; /* #E8DFD8 */
+  --ink: 28 20 23; /* #1C1417 */
+  --muted: 107 94 99; /* #6B5E63 */
+  --primary: 122 18 48; /* #7A1230 */
+  --primary-hover: 95 14 38; /* #5F0E26 */
+  --primary-soft: 246 233 236; /* #F6E9EC */
+  --on-primary: 255 255 255; /* #FFFFFF */
+  --gold: 168 128 63; /* #A8803F (decor only) */
+
+  /* Semantic status colors (Light) */
+  --success: 31 138 91; /* #1F8A5B */
+  --success-soft: 236 253 245; /* #ECFDF5 */
+  --warning: 183 121 31; /* #B7791F */
+  --warning-soft: 255 251 235; /* #FFFBEB */
+  --danger: 192 57 43; /* #C0392B */
+  --danger-soft: 254 242 242; /* #FEF2F2 */
+  --info: 47 111 181; /* #2F6FB5 */
+  --info-soft: 239 246 255; /* #EFF6FF */
+}
+
+.dark {
+  /* DESIGN_SPEC v2 Foundation Tokens (Dark: Muted Wine-Rose & Dark Ivory) */
+  --bg: 13 8 9; /* #0D0809 */
+  --surface: 22 16 18; /* #161012 */
+  --surface-2: 31 23 25; /* #1F1719 */
+  --line: 51 40 44; /* #33282C */
+  --ink: 246 239 234; /* #F6EFEA */
+  --muted: 179 165 170; /* #B3A5AA */
+  --primary: 201 93 120; /* #C95D78 - muted wine-rose, never hot/saturated pink */
+  --primary-hover: 219 122 146; /* #DB7A92 */
+  --primary-soft: 42 21 25; /* #2A1519 */
+  --on-primary: 26 10 15; /* #1A0A0F */
+  --gold: 212 178 122; /* #D4B27A (decor only) */
+
+  /* Semantic status colors (Dark) */
+  --success: 76 195 138; /* #4CC38A */
+  --success-soft: 6 78 59; /* #064E3B */
+  --warning: 224 168 74; /* #E0A84A */
+  --warning-soft: 120 53 15; /* #78350F */
+  --danger: 240 119 106; /* #F0776A */
+  --danger-soft: 127 29 29; /* #7F1D1D */
+  --info: 111 168 232; /* #6FA8E8 */
+  --info-soft: 30 58 138; /* #1E3A8A */
+}
+
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 min-h-screen selection:bg-burgundy-100 selection:text-burgundy-900;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-bg text-ink min-h-screen selection:bg-primary-soft selection:text-primary font-sans;
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight font-semibold text-neutral-900;
+    font-family: 'Fraunces Variable', Fraunces, Georgia, serif;
+    @apply tracking-[-0.01em] font-medium text-ink;
+  }
+
+  /* Nothing below 12px rule */
+  * {
+    min-font-size: 12px;
   }
 }
 
@@ -24,10 +85,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
+  background: rgb(var(--line));
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: rgb(var(--muted) / 0.7);
 }

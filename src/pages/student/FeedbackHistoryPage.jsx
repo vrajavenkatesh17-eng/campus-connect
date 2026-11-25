@@ -47,7 +47,7 @@ export default function FeedbackHistoryPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500">Loading your feedback submissions...</p>
+          <p className="text-sm text-muted">Loading your feedback submissions...</p>
         </div>
       </DashboardLayout>
     );
@@ -97,7 +97,7 @@ export default function FeedbackHistoryPage() {
           {submissions.map((item) => {
             const ev = item.event || {};
             return (
-              <Card key={item.id} className="p-4 flex flex-col justify-between hover:border-neutral-300 transition-colors">
+              <Card key={item.id} className="p-4 flex flex-col justify-between hover:border-line transition-colors">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="burgundy" size="sm" className="capitalize">
@@ -110,40 +110,40 @@ export default function FeedbackHistoryPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-bold text-neutral-900 line-clamp-1">
+                    <h3 className="text-sm font-bold text-ink line-clamp-1">
                       {ev.title || 'Untitled Session'}
                     </h3>
-                    <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
-                      <MapPin className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
+                    <div className="flex items-center gap-2 text-xs text-muted mt-1">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-muted" />
                       <span className="truncate">{ev.venue?.name || ev.custom_venue || 'FXEC Campus'}</span>
                     </div>
                   </div>
 
-                  <div className="rounded-lg bg-neutral-50 border border-neutral-200 p-2.5 text-xs text-neutral-600 space-y-1">
+                  <div className="rounded-lg bg-surface-2 border border-line p-2.5 text-xs text-muted space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-neutral-400">Event Date:</span>
-                      <span className="font-medium text-neutral-800">
+                      <span className="text-xs text-muted">Event Date:</span>
+                      <span className="font-medium text-ink">
                         {ev.start_time ? new Date(ev.start_time).toLocaleDateString() : 'N/A'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-neutral-400">Submitted At:</span>
-                      <span className="font-mono text-[11px] text-neutral-600">
+                      <span className="text-xs text-muted">Submitted At:</span>
+                      <span className="font-mono text-xs text-muted">
                         {new Date(item.submitted_at).toLocaleDateString()} {new Date(item.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-neutral-100 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-700">
+                <div className="pt-3 mt-3 border-t border-line flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-700">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Identity Protected</span>
                   </div>
 
                   <Link
                     to={`/events/${ev.id}`}
-                    className="text-xs font-semibold text-neutral-600 hover:text-burgundy flex items-center gap-1"
+                    className="text-xs font-semibold text-muted hover:text-primary flex items-center gap-1"
                   >
                     <span>View Event</span>
                     <ArrowRight className="w-3 h-3" />

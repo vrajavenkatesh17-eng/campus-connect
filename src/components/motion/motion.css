@@ -1,0 +1,56 @@
+/* Campus Connect — Shared Motion Stylesheet (S-N2)
+ * Only transform & opacity animations; respects prefers-reduced-motion.
+ */
+
+@keyframes cc-empty-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+.cc-empty-float {
+  animation: cc-empty-float 3s ease-in-out infinite;
+}
+
+@keyframes cc-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.cc-scroll-velocity-track {
+  display: flex;
+  width: max-content;
+  animation: cc-marquee 38s linear infinite;
+  will-change: transform;
+}
+
+.cc-scroll-velocity-track:hover {
+  animation-play-state: paused;
+}
+
+/* View Transitions API cross-fade (200ms) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-empty-float,
+  .cc-scroll-velocity-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 120ms;
+  }
+}

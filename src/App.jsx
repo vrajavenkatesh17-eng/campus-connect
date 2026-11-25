@@ -6,9 +6,11 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
-import PublicLayout from './components/layout/PublicLayout';
+import { ThemeProvider } from './context/ThemeContext';
+import RootLayout from './components/layout/RootLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Public & Auth Pages
@@ -19,6 +21,7 @@ import CoordinatorLoginPage from './pages/public/CoordinatorLoginPage';
 import AdminLoginPage from './pages/public/AdminLoginPage';
 import AuthCallbackPage from './pages/public/AuthCallbackPage';
 import VerifyCertificatePage from './pages/public/VerifyCertificatePage';
+import GalleryPage from './pages/public/GalleryPage';
 import ForbiddenPage from './pages/public/ForbiddenPage';
 import NotFoundPage from './pages/public/NotFoundPage';
 
@@ -48,25 +51,39 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import CoordinatorDashboard from './pages/coordinator/CoordinatorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <ToastProvider>
-        <AuthProvider>
-          <Routes>
-            {/* Public Entry Points */}
-            <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
-            <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
-            <Route path="/login/student" element={<PublicLayout><StudentLoginPage /></PublicLayout>} />
-            <Route path="/login/coordinator" element={<PublicLayout><CoordinatorLoginPage /></PublicLayout>} />
-            <Route path="/login/admin" element={<PublicLayout><AdminLoginPage /></PublicLayout>} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/verify" element={<VerifyCertificatePage />} />
-            <Route path="/verify/:code" element={<VerifyCertificatePage />} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <RootLayout>
+                <Routes>
+                  {/* Public Entry Points */}
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/login/student" element={<StudentLoginPage />} />
+                  <Route path="/login/coordinator" element={<CoordinatorLoginPage />} />
+                  <Route path="/login/admin" element={<AdminLoginPage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  <Route path="/verify" element={<VerifyCertificatePage />} />
+                  <Route path="/verify/:code" element={<VerifyCertificatePage />} />
+                  <Route path="/gallery" element={<GalleryPage />} />
 
-            {/* Error Screens */}
-            <Route path="/403" element={<PublicLayout><ForbiddenPage /></PublicLayout>} />
-            <Route path="/unauthorized" element={<PublicLayout><ForbiddenPage /></PublicLayout>} />
+                  {/* Error Screens */}
+                  <Route path="/403" element={<ForbiddenPage />} />
+                  <Route path="/unauthorized" element={<ForbiddenPage />} />
 
             {/* Mandatory Student Profile Completion */}
             <Route
@@ -99,14 +116,7 @@ export default function App() {
             />
 
             {/* Event Explorer & Details */}
-            <Route
-              path="/events"
-              element={
-                <ProtectedRoute>
-                  <EventsExplorerPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/events" element={<EventsExplorerPage />} />
             <Route
               path="/events/:id"
               element={
@@ -300,6 +310,14 @@ export default function App() {
               }
             />
             <Route
+              path="/admin/gallery"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/analytics"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
@@ -340,11 +358,14 @@ export default function App() {
               }
             />
 
-            {/* Catch-all 404 */}
-            <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
-          </Routes>
-        </AuthProvider>
-      </ToastProvider>
-    </BrowserRouter>
+                  {/* Catch-all 404 */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </RootLayout>
+            </AuthProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

@@ -6,6 +6,7 @@ import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Input from '../../components/common/Input';
 import Spinner from '../../components/common/Spinner';
+import { PageEnter } from '../../components/motion';
 import {
   ShieldCheck,
   ShieldAlert,
@@ -61,27 +62,27 @@ export default function VerifyCertificatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
+    <PageEnter className="min-h-screen bg-surface-2 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-8">
         {/* FXEC Institution Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-burgundy flex items-center justify-center text-white shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm">
               <GraduationCap className="w-6 h-6" />
             </div>
             <div className="text-left">
-              <h2 className="text-base font-bold text-neutral-900 group-hover:text-burgundy transition-colors">
+              <h2 className="text-base font-bold text-ink group-hover:text-primary transition-colors">
                 Francis Xavier Engineering College
               </h2>
-              <p className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
+              <p className="text-xs font-medium text-muted uppercase tracking-wider">
                 Autonomous Institution • E-Credential Registry
               </p>
             </div>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight pt-4">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight pt-4">
             Digital Certificate Verification
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 max-w-lg mx-auto">
+          <p className="text-xs sm:text-sm text-muted max-w-lg mx-auto">
             Verify the authenticity of participation certificates issued for guest lectures, seminars, and technical symposia.
           </p>
         </div>
@@ -104,7 +105,7 @@ export default function VerifyCertificatePage() {
         {isLoading && (
           <div className="py-16 text-center space-y-3">
             <Spinner size="lg" />
-            <p className="text-xs text-neutral-500 font-medium">Validating cryptographic credential with database...</p>
+            <p className="text-xs text-muted font-medium">Validating cryptographic credential with database...</p>
           </div>
         )}
 
@@ -128,29 +129,29 @@ export default function VerifyCertificatePage() {
 
                 <CardContent className="p-6 sm:p-8 space-y-6">
                   {/* Student & Department */}
-                  <div className="border-b border-neutral-100 pb-5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Awarded To</span>
-                    <h2 className="text-2xl font-black text-burgundy mt-0.5 tracking-tight uppercase">
+                  <div className="border-b border-line pb-5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted">Awarded To</span>
+                    <h2 className="text-2xl font-black text-primary mt-0.5 tracking-tight uppercase">
                       {certResult.student_name}
                     </h2>
-                    <p className="text-sm text-neutral-600 mt-1 flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-neutral-400" />
+                    <p className="text-sm text-muted mt-1 flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-muted" />
                       Department of {certResult.department || 'Engineering'}
                     </p>
                   </div>
 
                   {/* Event Details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 space-y-1">
-                      <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                    <div className="p-4 rounded-xl bg-surface-2 border border-line space-y-1">
+                      <span className="text-xs font-semibold text-muted uppercase tracking-wider">
                         Lecture / Event
                       </span>
-                      <p className="text-sm font-bold text-neutral-900 leading-snug">
+                      <p className="text-sm font-bold text-ink leading-snug">
                         {certResult.event_title}
                       </p>
                       {certResult.event_date && (
-                        <p className="text-xs text-neutral-500 flex items-center gap-1.5 pt-1">
-                          <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                        <p className="text-xs text-muted flex items-center gap-1.5 pt-1">
+                          <Calendar className="w-3.5 h-3.5 text-muted" />
                           {new Date(certResult.event_date).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'long',
@@ -160,14 +161,14 @@ export default function VerifyCertificatePage() {
                       )}
                     </div>
 
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 space-y-1">
-                      <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                    <div className="p-4 rounded-xl bg-surface-2 border border-line space-y-1">
+                      <span className="text-xs font-semibold text-muted uppercase tracking-wider">
                         Keynote Speaker
                       </span>
-                      <p className="text-sm font-bold text-neutral-900">
+                      <p className="text-sm font-bold text-ink">
                         {certResult.speaker_name || 'Industry Expert'}
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-muted">
                         {certResult.speaker_designation ? `${certResult.speaker_designation}, ` : ''}
                         {certResult.speaker_company || 'Guest Faculty'}
                       </p>
@@ -175,7 +176,7 @@ export default function VerifyCertificatePage() {
                   </div>
 
                   {/* Issuance Meta */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-neutral-100 text-xs text-neutral-500">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-line text-xs text-muted">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       <span>
@@ -189,7 +190,7 @@ export default function VerifyCertificatePage() {
                           : 'Valid Session'}
                       </span>
                     </div>
-                    <span className="font-mono text-[11px] text-neutral-400">
+                    <span className="font-mono text-xs text-muted">
                       ID: {certResult.certificate_code}
                     </span>
                   </div>
@@ -205,11 +206,11 @@ export default function VerifyCertificatePage() {
                   </div>
                 </div>
                 <CardContent className="p-6 sm:p-8 space-y-4 text-center">
-                  <p className="text-sm text-neutral-700">
+                  <p className="text-sm text-ink">
                     {certResult.message || 'The credential code provided does not exist in the Francis Xavier Engineering College verified registry.'}
                   </p>
-                  <p className="text-xs text-neutral-500 max-w-md mx-auto">
-                    Please ensure that the certificate code was copied accurately (format: <code className="font-mono text-neutral-800">FXEC-YYYY-XXXX-XXXX</code>). If you believe this is an error, please contact the event coordinator.
+                  <p className="text-xs text-muted max-w-md mx-auto">
+                    Please ensure that the certificate code was copied accurately (format: <code className="font-mono text-ink">FXEC-YYYY-XXXX-XXXX</code>). If you believe this is an error, please contact the event coordinator.
                   </p>
                 </CardContent>
               </Card>
@@ -219,11 +220,11 @@ export default function VerifyCertificatePage() {
 
         {/* Back Link */}
         <div className="text-center pt-4">
-          <Link to="/" className="text-xs font-semibold text-burgundy hover:underline inline-flex items-center gap-1">
+          <Link to="/" className="text-xs font-semibold text-primary dark:text-primary-hover hover:underline inline-flex items-center gap-1">
             Back to FXEC Campus Connect <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
-    </div>
+    </PageEnter>
   );
 }

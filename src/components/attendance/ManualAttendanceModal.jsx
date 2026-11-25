@@ -67,24 +67,24 @@ export default function ManualAttendanceModal({
       title={willMarkAttended ? 'Manual Attendance Override' : 'Revoke Attendance'}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="rounded-lg bg-neutral-50 border border-neutral-200 p-3.5 space-y-1">
+        <div className="rounded-lg bg-surface-2 border border-line p-3.5 space-y-1">
           <div className="flex items-center gap-2">
             {willMarkAttended ? (
               <UserCheck className="w-5 h-5 text-emerald-600" />
             ) : (
               <UserX className="w-5 h-5 text-red-600" />
             )}
-            <span className="text-sm font-bold text-neutral-900">{student.name}</span>
+            <span className="text-sm font-bold text-ink">{student.name}</span>
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted">
             {student.register_number || 'No Reg No'} • {student.email}
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 flex items-center justify-between">
+          <label className="text-xs font-semibold text-ink flex items-center justify-between">
             <span>Audit Justification (Required)</span>
-            <span className="text-[10px] text-neutral-400">Recorded in activity logs</span>
+            <span className="text-xs text-muted">Recorded in activity logs</span>
           </label>
           <Textarea
             value={reason}
@@ -107,7 +107,7 @@ export default function ManualAttendanceModal({
           </p>
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
           <Button
             type="button"
             variant="outline"

@@ -85,7 +85,7 @@ export default function CoordinatorRequestPage() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-2">
         <Spinner size="lg" />
-        <p className="text-sm text-neutral-500 font-medium">Checking authorization status...</p>
+        <p className="text-sm text-muted font-medium">Checking authorization status...</p>
       </div>
     );
   }
@@ -96,10 +96,10 @@ export default function CoordinatorRequestPage() {
         <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-md">
           <UserCheck className="w-7 h-7" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
+        <h1 className="text-2xl font-bold tracking-tight text-ink">
           Faculty Coordinator Authorization
         </h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted">
           Francis Xavier Engineering College
         </p>
       </div>
@@ -119,12 +119,12 @@ export default function CoordinatorRequestPage() {
               </span>{' '}
               is currently awaiting approval from the system administrator.
             </p>
-            <div className="bg-white p-3 rounded-lg border border-amber-200 text-xs text-neutral-700 space-y-1">
+            <div className="bg-white p-3 rounded-lg border border-amber-200 text-xs text-ink space-y-1">
               <p><span className="font-semibold">Designation:</span> {existingRequest.designation}</p>
               <p><span className="font-semibold">Department:</span> {existingRequest.departments?.name}</p>
               <p><span className="font-semibold">Reason:</span> {existingRequest.reason}</p>
             </div>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted">
               Per Rule 4 & 5, coordinator privileges cannot be self-assigned and must be granted through an administrator review.
             </p>
           </CardContent>
@@ -142,7 +142,7 @@ export default function CoordinatorRequestPage() {
             <p className="text-xs text-red-900 leading-relaxed">
               {existingRequest.rejection_reason || 'Your previous coordinator request was not approved by administration.'}
             </p>
-            <p className="text-xs text-neutral-600 font-medium">
+            <p className="text-xs text-muted font-medium">
               You may submit a revised application below if needed.
             </p>
           </CardContent>
@@ -161,8 +161,8 @@ export default function CoordinatorRequestPage() {
             </CardHeader>
 
             <CardContent className="space-y-4">
-              <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 text-xs text-neutral-600 flex items-start gap-2">
-                <ShieldAlert className="w-4 h-4 text-burgundy shrink-0 mt-0.5" />
+              <div className="bg-surface-2 p-3 rounded-lg border border-line text-xs text-muted flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <span>
                   All requests are recorded in the <code className="font-mono">coordinator_requests</code> ledger and require administrator confirmation via atomic PostgreSQL function.
                 </span>

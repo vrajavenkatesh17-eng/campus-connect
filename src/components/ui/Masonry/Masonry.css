@@ -1,0 +1,21 @@
+.rb-masonry {
+  column-count: 1;
+  column-gap: 20px;
+}
+
+@media (min-width: 640px) {
+  .rb-masonry {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rb-masonry {
+    column-count: 3;
+  }
+}
+
+.rb-masonry__item {
+  break-inside: avoid;
+  margin-bottom: 20px;
+}

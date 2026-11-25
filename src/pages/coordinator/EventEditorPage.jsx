@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { eventService } from '../../services/eventService';
 import { profileService } from '../../services/profileService';
+import { optimizeImageToWebP } from '../../utils/imageOptimizer';
 import { useToast } from '../../context/ToastContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/common/Card';
@@ -41,6 +42,7 @@ export default function EventEditorPage() {
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState(null);
   const [existingPosterUrl, setExistingPosterUrl] = useState(null);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // Speaker State
   const [speakerId, setSpeakerId] = useState(null);
@@ -79,6 +81,7 @@ export default function EventEditorPage() {
             setEventDate(start.toISOString().split('T')[0]);
             setStartTime(start.toTimeString().substring(0, 5));
             setEndTime(end.toTimeString().substring(0, 5));
+            setIsCompleted(evt.status === 'completed' || end <= new Date());
 
             setVenueId(evt.venue_id || '');
             setCustomVenue(evt.custom_venue || '');
@@ -109,21 +112,29 @@ export default function EventEditorPage() {
     return () => { isMounted = false; };
   }, [id, isEditMode, showToast]);
 
-  const handlePosterChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handlePosterChange = async (e) => {
+    const rawFile = e.target.files[0];
+    if (!rawFile) return;
 
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(rawFile.type)) {
       showToast('Poster must be a JPG, PNG, or WebP image.', 'error');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      showToast('Poster image must be smaller than 2MB.', 'error');
-      return;
-    }
 
-    setPosterFile(file);
-    setPosterPreview(URL.createObjectURL(file));
+    try {
+      const { file: optimizedFile } = await optimizeImageToWebP(rawFile, {
+        maxDimension: 1600,
+        quality: 0.82,
+      });
+      if (optimizedFile.size > 2 * 1024 * 1024) {
+        showToast('Optimized poster image must be smaller than 2MB.', 'error');
+        return;
+      }
+      setPosterFile(optimizedFile);
+      setPosterPreview(URL.createObjectURL(optimizedFile));
+    } catch (err) {
+      showToast(err.message || 'Failed to optimize poster image.', 'error');
+    }
   };
 
   const validate = () => {
@@ -232,7 +243,7 @@ export default function EventEditorPage() {
       <DashboardLayout>
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Loading event proposal editor...</p>
+          <p className="text-sm text-muted font-medium">Loading event proposal editor...</p>
         </div>
       </DashboardLayout>
     );
@@ -276,12 +287,20 @@ export default function EventEditorPage() {
               error={errors.description}
             />
 
+            {isCompleted && (
+              <div className="p-3 bg-warning-soft border border-warning/20 rounded-[12px] text-xs text-warning font-medium flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-warning shrink-0" />
+                <span>This event has concluded. Date and time fields are locked and cannot be edited.</span>
+              </div>
+            )}
+
             {/* Date and Time Picker */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input
                 label="Event Date"
                 type="date"
                 required
+                disabled={isCompleted}
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
                 error={errors.eventDate}
@@ -291,6 +310,7 @@ export default function EventEditorPage() {
                 label="Start Time"
                 type="time"
                 required
+                disabled={isCompleted}
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 error={errors.startTime}
@@ -300,6 +320,7 @@ export default function EventEditorPage() {
                 label="End Time"
                 type="time"
                 required
+                disabled={isCompleted}
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 error={errors.endTime}
@@ -348,7 +369,7 @@ export default function EventEditorPage() {
 
             {/* Poster Upload */}
             <div className="pt-2">
-              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+              <label className="block text-sm font-medium text-ink mb-1.5">
                 Session Poster Image (Max 2MB)
               </label>
               <div className="flex items-center gap-4">
@@ -356,10 +377,10 @@ export default function EventEditorPage() {
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   onChange={handlePosterChange}
-                  className="text-xs text-neutral-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-burgundy-50 file:text-burgundy hover:file:bg-burgundy-100 cursor-pointer"
+                  className="text-xs text-muted file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-soft file:text-primary hover:file:bg-primary-100 cursor-pointer"
                 />
                 {(posterPreview || existingPosterUrl) && (
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-neutral-200 shrink-0">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-line shrink-0">
                     <img
                       src={posterPreview || existingPosterUrl}
                       alt="Preview"
@@ -382,18 +403,18 @@ export default function EventEditorPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 bg-neutral-50 cursor-pointer hover:bg-neutral-100/70 transition-colors">
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-line bg-surface-2 cursor-pointer hover:bg-surface-2/70 transition-colors">
               <input
                 type="checkbox"
                 checked={isAllDepartments}
                 onChange={(e) => setIsAllDepartments(e.target.checked)}
-                className="w-4 h-4 text-burgundy rounded border-neutral-300 focus:ring-burgundy"
+                className="w-4 h-4 text-primary rounded border-line focus:ring-burgundy"
               />
               <div>
-                <span className="text-sm font-semibold text-neutral-900">
+                <span className="text-sm font-semibold text-ink">
                   Open to All College Departments
                 </span>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted">
                   Any student across engineering and management departments can register.
                 </p>
               </div>
@@ -401,25 +422,26 @@ export default function EventEditorPage() {
 
             {!isAllDepartments && (
               <div className="space-y-2 pt-2">
-                <p className="text-xs font-semibold text-neutral-700">
+                <p className="text-xs font-semibold text-ink">
                   Select Target Departments:
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {departments.map((dept) => {
                     const isSelected = selectedDeptIds.includes(dept.id);
                     return (
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         key={dept.id}
                         onClick={() => handleDeptToggle(dept.id)}
                         className={`p-2.5 rounded-lg border text-xs text-left font-medium transition-all ${
                           isSelected
-                            ? 'bg-burgundy-50 border-burgundy text-burgundy font-bold shadow-xs'
-                            : 'bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50'
+                            ? 'bg-primary-soft border-burgundy text-primary font-bold shadow-xs'
+                            : 'bg-white border-line text-ink hover:bg-surface-2'
                         }`}
                       >
                         {dept.code} - {dept.name}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -488,7 +510,7 @@ export default function EventEditorPage() {
           </CardContent>
 
           <CardFooter className="flex justify-between items-center">
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-muted">
               New proposals are marked &apos;pending&apos; until Administrator approval.
             </span>
             <Button

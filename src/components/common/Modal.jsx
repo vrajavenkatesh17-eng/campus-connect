@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import AppButton from '../app/AppButton';
 
 export default function Modal({
   isOpen,
@@ -35,7 +36,7 @@ export default function Modal({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-neutral-900/50 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -43,33 +44,34 @@ export default function Modal({
       {/* Modal Dialog */}
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div
-          className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all w-full sm:my-8 ${maxWidth} border border-neutral-200`}
+          className={`relative transform overflow-hidden rounded-[20px] bg-surface text-left shadow-xl transition-all w-full sm:my-8 ${maxWidth} border border-line`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-neutral-100">
+          <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-line/60">
             <div>
               {title && (
-                <h3 className="text-lg font-semibold leading-6 text-neutral-900">
+                <h3 className="text-lg font-semibold leading-6 text-ink">
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="mt-1 text-sm text-neutral-500">{description}</p>
+                <p className="mt-1 text-sm text-muted">{description}</p>
               )}
             </div>
-            <button
-              type="button"
+            <AppButton
+              variant="ghost"
+              size="sm"
               onClick={onClose}
-              className="rounded-lg p-1 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors"
+              className="rounded-lg p-1 text-muted hover:text-ink hover:bg-surface-2 transition-colors"
+              aria-label="Close modal"
             >
               <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </button>
+            </AppButton>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-5">{children}</div>
+          <div className="px-6 py-5 text-ink">{children}</div>
         </div>
       </div>
     </div>

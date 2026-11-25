@@ -8,6 +8,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
+import Select from '../../components/common/Select';
 import Input from '../../components/common/Input';
 import Table from '../../components/common/Table';
 import Spinner from '../../components/common/Spinner';
@@ -126,10 +127,10 @@ export default function EventAttendancePage() {
       key: 'name',
       render: (item) => (
         <div className="space-y-0.5">
-          <p className="font-semibold text-neutral-900 text-xs">
+          <p className="font-semibold text-ink text-xs">
             {item.student?.name || 'Student'}
           </p>
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-xs text-muted">
             {item.student?.email}
           </p>
         </div>
@@ -139,7 +140,7 @@ export default function EventAttendancePage() {
       header: 'Register No',
       key: 'register_number',
       render: (item) => (
-        <span className="font-mono text-xs text-neutral-700">
+        <span className="font-mono text-xs text-ink">
           {item.student?.register_number || '—'}
         </span>
       ),
@@ -148,7 +149,7 @@ export default function EventAttendancePage() {
       header: 'Department',
       key: 'dept',
       render: (item) => (
-        <span className="text-xs text-neutral-600">
+        <span className="text-xs text-muted">
           {item.student?.department?.code || '—'}
         </span>
       ),
@@ -163,7 +164,7 @@ export default function EventAttendancePage() {
             Attended
           </Badge>
         ) : (
-          <Badge variant="neutral" size="sm" className="gap-1 text-neutral-500">
+          <Badge variant="neutral" size="sm" className="gap-1 text-muted">
             <XCircle className="w-3 h-3" />
             Not Verified
           </Badge>
@@ -176,17 +177,17 @@ export default function EventAttendancePage() {
       render: (item) => (
         <div className="text-xs">
           {item.attendanceRecord?.method === 'qr_scan' && (
-            <span className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
               <QrCode className="w-3 h-3" /> QR Scan
             </span>
           )}
           {item.attendanceRecord?.method === 'manual_coordinator' && (
-            <span className="inline-flex items-center gap-1 font-mono text-[11px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">
               <Shield className="w-3 h-3" /> Faculty Override
             </span>
           )}
           {item.attendanceRecord?.method === 'manual_admin' && (
-            <span className="inline-flex items-center gap-1 font-mono text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+            <span className="inline-flex items-center gap-1 font-mono text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
               <Shield className="w-3 h-3" /> Admin Override
             </span>
           )}
@@ -198,7 +199,7 @@ export default function EventAttendancePage() {
       header: 'Verified At',
       key: 'timestamp',
       render: (item) => (
-        <span className="text-xs text-neutral-500 font-mono">
+        <span className="text-xs text-muted font-mono">
           {item.attendanceRecord
             ? new Date(item.attendanceRecord.verified_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             : '—'}
@@ -218,7 +219,7 @@ export default function EventAttendancePage() {
             setManualModalStudent(item.student);
             setManualIsAttended(item.isAttended);
           }}
-          className="text-[11px] py-1 px-2.5"
+          className="text-xs py-1 px-2.5"
         >
           {item.isAttended ? 'Revoke' : 'Mark Manual'}
         </Button>
@@ -278,7 +279,7 @@ export default function EventAttendancePage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500">Loading attendance & feedback dashboard...</p>
+          <p className="text-sm text-muted">Loading attendance & feedback dashboard...</p>
         </div>
       </DashboardLayout>
     );
@@ -314,7 +315,7 @@ export default function EventAttendancePage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to={`/events/${event.id}`}
-            className="inline-flex items-center gap-1.5 text-xs text-neutral-600 hover:text-burgundy px-2.5 py-1.5 rounded-lg border border-neutral-200 bg-white"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-primary px-2.5 py-1.5 rounded-lg border border-line bg-white"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Event Details</span>
@@ -356,14 +357,14 @@ export default function EventAttendancePage() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-500 font-medium">Confirmed Seats</p>
-              <p className="text-2xl font-bold text-neutral-900 mt-1">{totalRegistered}</p>
+              <p className="text-xs text-muted font-medium">Confirmed Seats</p>
+              <p className="text-2xl font-bold text-ink mt-1">{totalRegistered}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-[11px] text-neutral-400 mt-2">
+          <p className="text-xs text-muted mt-2">
             Capacity: {event.seat_capacity} seats
           </p>
         </Card>
@@ -371,14 +372,14 @@ export default function EventAttendancePage() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-500 font-medium">Verified Attendees</p>
+              <p className="text-xs text-muted font-medium">Verified Attendees</p>
               <p className="text-2xl font-bold text-emerald-600 mt-1">{totalAttended}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-1.5 text-[11px] text-neutral-500">
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-muted">
             <span className="font-semibold text-emerald-700">{attendanceRate}%</span> turnout rate
           </div>
         </Card>
@@ -386,14 +387,14 @@ export default function EventAttendancePage() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-500 font-medium">Pending Scans</p>
+              <p className="text-xs text-muted font-medium">Pending Scans</p>
               <p className="text-2xl font-bold text-amber-600 mt-1">{totalRegistered - totalAttended}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <Clock className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-[11px] text-neutral-400 mt-2">
+          <p className="text-xs text-muted mt-2">
             Registered students not yet verified
           </p>
         </Card>
@@ -401,55 +402,59 @@ export default function EventAttendancePage() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-neutral-500 font-medium">Avg Feedback Rating</p>
-              <p className="text-2xl font-bold text-burgundy mt-1">
+              <p className="text-xs text-muted font-medium">Avg Feedback Rating</p>
+              <p className="text-2xl font-bold text-primary mt-1">
                 {feedbackData.stats?.overallScore ? `${feedbackData.stats.overallScore} / 5` : 'N/A'}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-burgundy/10 text-burgundy flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <Star className="w-5 h-5 fill-burgundy" />
             </div>
           </div>
-          <p className="text-[11px] text-neutral-400 mt-2">
+          <p className="text-xs text-muted mt-2">
             {feedbackData.reviews?.length || 0} student reviews submitted
           </p>
         </Card>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-neutral-200 flex items-center gap-4">
-        <button
+      <div className="border-b border-line flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setActiveTab('roster')}
           className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'roster'
-              ? 'border-burgundy text-burgundy'
-              : 'border-transparent text-neutral-500 hover:text-neutral-900'
+              ? 'border-burgundy text-primary'
+              : 'border-transparent text-muted hover:text-ink'
           }`}
         >
           <UserCheck className="w-4 h-4" />
           <span>Attendance Roster ({filteredRoster.length})</span>
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setActiveTab('feedback')}
           className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'feedback'
-              ? 'border-burgundy text-burgundy'
-              : 'border-transparent text-neutral-500 hover:text-neutral-900'
+              ? 'border-burgundy text-primary'
+              : 'border-transparent text-muted hover:text-ink'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
           <span>Feedback Analytics ({feedbackData.reviews?.length || 0})</span>
-        </button>
+        </Button>
       </div>
 
       {/* Tab 1: Attendance Roster */}
       {activeTab === 'roster' && (
         <Card>
-          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line">
             <div>
-              <CardTitle>Session Attendance Register</CardTitle>
-              <p className="text-xs text-neutral-500">
+              <CardTitle>Event Attendance Register</CardTitle>
+              <p className="text-xs text-muted">
                 Live verification via 30s rotating QR scans or manual coordinator audit
               </p>
             </div>
@@ -457,26 +462,26 @@ export default function EventAttendancePage() {
             <div className="flex flex-wrap items-center gap-2">
               {/* Search */}
               <div className="relative w-48 sm:w-60">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search student or reg no..."
-                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-neutral-300 focus:outline-none focus:ring-1 focus:ring-burgundy"
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-line focus:outline-none focus:ring-1 focus:ring-burgundy"
                 />
               </div>
 
               {/* Status filter */}
-              <select
+              <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="py-1.5 px-2.5 text-xs rounded-lg border border-neutral-300 bg-white focus:outline-none focus:ring-1 focus:ring-burgundy"
+                onChange={(e) => setStatusFilter(e.target ? e.target.value : e)}
+                className="text-xs"
               >
                 <option value="all">All Registrations</option>
                 <option value="attended">Attended Only</option>
                 <option value="not_attended">Absent Only</option>
-              </select>
+              </Select>
             </div>
           </CardHeader>
 
@@ -498,44 +503,44 @@ export default function EventAttendancePage() {
           {/* Detailed Feedback Scoring Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card className="p-4 bg-amber-50/40 border-amber-200/60">
-              <p className="text-xs text-neutral-600 font-medium">1. Content Quality</p>
+              <p className="text-xs text-muted font-medium">1. Content Quality</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-2xl font-bold text-neutral-900">
+                <span className="text-2xl font-bold text-ink">
                   {feedbackData.stats?.avgContent || '0.0'}
                 </span>
-                <span className="text-xs text-neutral-500">/ 5.0</span>
+                <span className="text-xs text-muted">/ 5.0</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mt-1">Topic depth & practical relevance</p>
+              <p className="text-xs text-muted mt-1">Topic depth & practical relevance</p>
             </Card>
 
             <Card className="p-4 bg-blue-50/40 border-blue-200/60">
-              <p className="text-xs text-neutral-600 font-medium">2. Speaker Delivery</p>
+              <p className="text-xs text-muted font-medium">2. Speaker Delivery</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-2xl font-bold text-neutral-900">
+                <span className="text-2xl font-bold text-ink">
                   {feedbackData.stats?.avgSpeaker || '0.0'}
                 </span>
-                <span className="text-xs text-neutral-500">/ 5.0</span>
+                <span className="text-xs text-muted">/ 5.0</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mt-1">Clarity & student engagement</p>
+              <p className="text-xs text-muted mt-1">Clarity & student engagement</p>
             </Card>
 
             <Card className="p-4 bg-emerald-50/40 border-emerald-200/60">
-              <p className="text-xs text-neutral-600 font-medium">3. Organization</p>
+              <p className="text-xs text-muted font-medium">3. Organization</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-2xl font-bold text-neutral-900">
+                <span className="text-2xl font-bold text-ink">
                   {feedbackData.stats?.avgOrganization || '0.0'}
                 </span>
-                <span className="text-xs text-neutral-500">/ 5.0</span>
+                <span className="text-xs text-muted">/ 5.0</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mt-1">Venue, AV clarity & schedule adherence</p>
+              <p className="text-xs text-muted mt-1">Venue, AV clarity & schedule adherence</p>
             </Card>
           </div>
 
           {/* Feedback Review Cards List */}
           <Card>
-            <CardHeader className="border-b border-neutral-100">
+            <CardHeader className="border-b border-line">
               <CardTitle>Student Feedback Submissions</CardTitle>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-muted">
                 Real responses submitted by attended students (anonymous identities protected)
               </p>
             </CardHeader>
@@ -551,28 +556,28 @@ export default function EventAttendancePage() {
                   {feedbackData.reviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/50 space-y-3"
+                      className="p-4 rounded-xl border border-line bg-surface-2/50 space-y-3"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           {rev.is_anonymous ? (
-                            <Badge variant="neutral" size="sm" className="font-mono text-[11px] gap-1">
-                              <Shield className="w-3 h-3 text-neutral-500" />
+                            <Badge variant="neutral" size="sm" className="font-mono text-xs gap-1">
+                              <Shield className="w-3 h-3 text-muted" />
                               Anonymous Student
                             </Badge>
                           ) : (
-                            <span className="text-xs font-semibold text-neutral-800">
+                            <span className="text-xs font-semibold text-ink">
                               {rev.student?.name || 'Verified Attendee'}
                               {rev.student?.department?.code && ` (${rev.student.department.code})`}
                             </span>
                           )}
-                          <span className="text-[11px] text-neutral-400">
+                          <span className="text-xs text-muted">
                             {new Date(rev.created_at).toLocaleDateString()}
                           </span>
                         </div>
 
                         {/* Star Badges */}
-                        <div className="flex items-center gap-3 text-xs font-semibold text-neutral-700">
+                        <div className="flex items-center gap-3 text-xs font-semibold text-ink">
                           <span className="flex items-center gap-1">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                             {((rev.rating_content + rev.rating_speaker + rev.rating_organization) / 3).toFixed(1)}
@@ -581,25 +586,25 @@ export default function EventAttendancePage() {
                       </div>
 
                       {/* Ratings Breakdown Pills */}
-                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-500">
-                        <span className="bg-white border border-neutral-200 px-2 py-0.5 rounded">
-                          Content: <strong className="text-neutral-800">{rev.rating_content}/5</strong>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                        <span className="bg-white border border-line px-2 py-0.5 rounded">
+                          Content: <strong className="text-ink">{rev.rating_content}/5</strong>
                         </span>
-                        <span className="bg-white border border-neutral-200 px-2 py-0.5 rounded">
-                          Speaker: <strong className="text-neutral-800">{rev.rating_speaker}/5</strong>
+                        <span className="bg-white border border-line px-2 py-0.5 rounded">
+                          Speaker: <strong className="text-ink">{rev.rating_speaker}/5</strong>
                         </span>
-                        <span className="bg-white border border-neutral-200 px-2 py-0.5 rounded">
-                          Venue: <strong className="text-neutral-800">{rev.rating_organization}/5</strong>
+                        <span className="bg-white border border-line px-2 py-0.5 rounded">
+                          Venue: <strong className="text-ink">{rev.rating_organization}/5</strong>
                         </span>
                       </div>
 
                       {/* Written Comments */}
                       {rev.comments ? (
-                        <p className="text-xs text-neutral-700 italic bg-white p-2.5 rounded-lg border border-neutral-200">
+                        <p className="text-xs text-ink italic bg-white p-2.5 rounded-lg border border-line">
                           "{rev.comments}"
                         </p>
                       ) : (
-                        <p className="text-[11px] text-neutral-400 italic">No written comment provided.</p>
+                        <p className="text-xs text-muted italic">No written comment provided.</p>
                       )}
                     </div>
                   ))}

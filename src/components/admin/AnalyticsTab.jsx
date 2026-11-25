@@ -104,7 +104,7 @@ export default function AnalyticsTab() {
     return (
       <div className="py-16 flex flex-col items-center justify-center gap-3">
         <Spinner size="lg" />
-        <p className="text-xs font-medium text-neutral-500">
+        <p className="text-xs font-medium text-muted">
           Aggregating real institutional analytics across events, attendance, and feedback...
         </p>
       </div>
@@ -121,15 +121,15 @@ export default function AnalyticsTab() {
   return (
     <div className="space-y-8">
       {/* Top Header & Export Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-line">
         <div>
-          <h3 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-ink flex items-center gap-2">
             <span>Institutional Event Analytics</span>
-            <span className="text-[10px] bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full font-mono font-normal">
+            <span className="text-xs bg-surface-2 text-muted px-2 py-0.5 rounded-full font-mono font-normal">
               Live SQL Compute
             </span>
           </h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted">
             Real-time verified metrics computed via security-definer views with strict administrative isolation
           </p>
         </div>
@@ -183,57 +183,57 @@ export default function AnalyticsTab() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <Card className="p-4 border-l-4 border-l-burgundy">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Enrolled Students</p>
-            <GraduationCap className="w-4 h-4 text-burgundy" />
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">Enrolled Students</p>
+            <GraduationCap className="w-4 h-4 text-primary" />
           </div>
-          <p className="text-2xl font-bold text-neutral-900 mt-2 font-mono">
+          <p className="text-2xl font-bold text-ink mt-2 font-mono">
             {summary.total_students ?? 0}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-1">Verified FXEC profiles</p>
+          <p className="text-xs text-muted mt-1">Verified FXEC profiles</p>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-indigo-600">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Faculty Coordinators</p>
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">Faculty Coordinators</p>
             <Users className="w-4 h-4 text-indigo-600" />
           </div>
-          <p className="text-2xl font-bold text-neutral-900 mt-2 font-mono">
+          <p className="text-2xl font-bold text-ink mt-2 font-mono">
             {summary.total_coordinators ?? 0}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-1">Authorized organizers</p>
+          <p className="text-xs text-muted mt-1">Authorized organizers</p>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-amber-500">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Ongoing Sessions</p>
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">Ongoing Sessions</p>
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
           <p className="text-2xl font-bold text-amber-700 mt-2 font-mono">
             {summary.ongoing_events ?? 0}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-1">Active right now</p>
+          <p className="text-xs text-muted mt-1">Active right now</p>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-blue-600">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Upcoming Events</p>
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">Upcoming Events</p>
             <Calendar className="w-4 h-4 text-blue-600" />
           </div>
           <p className="text-2xl font-bold text-blue-800 mt-2 font-mono">
             {summary.upcoming_events ?? 0}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-1">Scheduled & approved</p>
+          <p className="text-xs text-muted mt-1">Scheduled & approved</p>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-emerald-600">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Completed Sessions</p>
+            <p className="text-xs font-semibold text-muted uppercase tracking-wider">Completed Sessions</p>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
           <p className="text-2xl font-bold text-emerald-800 mt-2 font-mono">
             {summary.completed_events ?? 0}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-1">{summary.total_attendance ?? 0} total verified attendees</p>
+          <p className="text-xs text-muted mt-1">{summary.total_attendance ?? 0} total verified attendees</p>
         </Card>
       </div>
 
@@ -241,10 +241,10 @@ export default function AnalyticsTab() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Department Participation Bar Chart */}
         <Card className="p-5">
-          <CardHeader className="p-0 pb-4 border-b border-neutral-100">
+          <CardHeader className="p-0 pb-4 border-b border-line">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold text-neutral-900">
+                <CardTitle className="text-sm font-bold text-ink">
                   Department-wise Participation Matrix
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -256,32 +256,33 @@ export default function AnalyticsTab() {
           </CardHeader>
           <CardContent className="p-0 pt-4">
             {deptParticipation.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-xs text-neutral-400">
+              <div className="h-64 flex items-center justify-center text-xs text-muted">
                 No department participation data available yet.
               </div>
             ) : (
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={deptParticipation} margin={{ top: 10, right: 10, left: -10, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--line))" />
                     <XAxis
                       dataKey="department_code"
-                      tick={{ fontSize: 11, fill: '#64748b' }}
+                      tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }}
                       angle={-25}
                       textAnchor="end"
                     />
-                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                    <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        backgroundColor: 'rgb(var(--surface))',
+                        border: '1px solid rgb(var(--line))',
                         borderRadius: '8px',
                         fontSize: '12px',
+                        color: 'rgb(var(--ink))',
                       }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                    <Bar dataKey="registration_count" name="Registered" fill="#991b1b" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="attendance_count" name="Attended" fill="#059669" radius={[4, 4, 0, 0]} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Bar dataKey="registration_count" name="Registered" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="attendance_count" name="Attended" fill="rgb(var(--success))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -291,10 +292,10 @@ export default function AnalyticsTab() {
 
         {/* Event Attendance Rate Bar Chart */}
         <Card className="p-5">
-          <CardHeader className="p-0 pb-4 border-b border-neutral-100">
+          <CardHeader className="p-0 pb-4 border-b border-line">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold text-neutral-900">
+                <CardTitle className="text-sm font-bold text-ink">
                   Event-Wise Attendance Percentage
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -306,33 +307,34 @@ export default function AnalyticsTab() {
           </CardHeader>
           <CardContent className="p-0 pt-4">
             {eventRates.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-xs text-neutral-400">
+              <div className="h-64 flex items-center justify-center text-xs text-muted">
                 No event attendance records registered yet.
               </div>
             ) : (
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={eventRates} margin={{ top: 10, right: 10, left: -10, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--line))" />
                     <XAxis
                       dataKey="title"
-                      tick={{ fontSize: 10, fill: '#64748b' }}
+                      tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }}
                       tickFormatter={(val) => (val && val.length > 12 ? `${val.slice(0, 10)}...` : val)}
                       angle={-25}
                       textAnchor="end"
                     />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748b' }} unit="%" />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }} unit="%" />
                     <Tooltip
                       formatter={(val) => [`${val}%`, 'Attendance Rate']}
                       labelFormatter={(label) => `Event: ${label}`}
                       contentStyle={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        backgroundColor: 'rgb(var(--surface))',
+                        border: '1px solid rgb(var(--line))',
                         borderRadius: '8px',
                         fontSize: '12px',
+                        color: 'rgb(var(--ink))',
                       }}
                     />
-                    <Bar dataKey="attendance_pct" name="Turnout %" fill="#800020" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="attendance_pct" name="Turnout %" fill='rgb(var(--primary))' radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -345,10 +347,10 @@ export default function AnalyticsTab() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Events & Attendance Trend */}
         <Card className="p-5">
-          <CardHeader className="p-0 pb-4 border-b border-neutral-100">
+          <CardHeader className="p-0 pb-4 border-b border-line">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold text-neutral-900">
+                <CardTitle className="text-sm font-bold text-ink">
                   Monthly Event & Attendance Volume (6 Months)
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -360,7 +362,7 @@ export default function AnalyticsTab() {
           </CardHeader>
           <CardContent className="p-0 pt-4">
             {monthlyTrend.length === 0 ? (
-              <div className="h-64 flex items-center justify-center text-xs text-neutral-400">
+              <div className="h-64 flex items-center justify-center text-xs text-muted">
                 No monthly timeline data accumulated yet.
               </div>
             ) : (
@@ -369,31 +371,32 @@ export default function AnalyticsTab() {
                   <AreaChart data={monthlyTrend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
                       <linearGradient id="eventGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#800020" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#800020" stopOpacity={0} />
+                        <stop offset="5%" stopColor='rgb(var(--primary))' stopOpacity={0.4} />
+                        <stop offset="95%" stopColor='rgb(var(--primary))' stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="attGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                        <stop offset="5%" stopColor="rgb(var(--info))" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="rgb(var(--info))" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="month_label" tick={{ fontSize: 11, fill: '#64748b' }} />
-                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--line))" />
+                    <XAxis dataKey="month_label" tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }} />
+                    <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        backgroundColor: 'rgb(var(--surface))',
+                        border: '1px solid rgb(var(--line))',
                         borderRadius: '8px',
                         fontSize: '12px',
+                        color: 'rgb(var(--ink))',
                       }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                     <Area
                       type="monotone"
                       dataKey="events_count"
                       name="Sessions Hosted"
-                      stroke="#800020"
+                      stroke='rgb(var(--primary))'
                       fillOpacity={1}
                       fill="url(#eventGrad)"
                       strokeWidth={2}
@@ -402,7 +405,7 @@ export default function AnalyticsTab() {
                       type="monotone"
                       dataKey="attendance_count"
                       name="Verified Attendees"
-                      stroke="#2563eb"
+                      stroke="rgb(var(--info))"
                       fillOpacity={1}
                       fill="url(#attGrad)"
                       strokeWidth={2}
@@ -416,10 +419,10 @@ export default function AnalyticsTab() {
 
         {/* Feedback Ratings Distribution & Average */}
         <Card className="p-5">
-          <CardHeader className="p-0 pb-4 border-b border-neutral-100">
+          <CardHeader className="p-0 pb-4 border-b border-line">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-bold text-neutral-900">
+                <CardTitle className="text-sm font-bold text-ink">
                   Student Feedback Rating Distribution
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -429,7 +432,7 @@ export default function AnalyticsTab() {
               <div className="flex items-center gap-1.5 bg-amber-50 text-amber-900 px-2.5 py-1 rounded-lg border border-amber-200">
                 <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                 <span className="font-bold text-sm font-mono">{feedbackSummary.average_rating || '0.0'}</span>
-                <span className="text-[10px] text-amber-700">/ 5.0</span>
+                <span className="text-xs text-amber-700">/ 5.0</span>
               </div>
             </div>
           </CardHeader>
@@ -440,28 +443,29 @@ export default function AnalyticsTab() {
                   data={feedbackSummary.distribution || []}
                   margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--line))" />
                   <XAxis
                     dataKey="rating"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }}
                     tickFormatter={(val) => `${val} Star${val > 1 ? 's' : ''}`}
                   />
-                  <YAxis tick={{ fontSize: 11, fill: '#64748b' }} allowDecimals={false} />
+                  <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--muted))' }} allowDecimals={false} />
                   <Tooltip
                     formatter={(val) => [val, 'Submissions']}
                     labelFormatter={(label) => `${label} Star Reviews`}
                     contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e2e8f0',
+                      backgroundColor: 'rgb(var(--surface))',
+                      border: '1px solid rgb(var(--line))',
                       borderRadius: '8px',
                       fontSize: '12px',
+                      color: 'rgb(var(--ink))',
                     }}
                   />
-                  <Bar dataKey="count" name="Ratings" fill="#eab308" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" name="Ratings" fill="rgb(var(--warning))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-[11px] text-neutral-400 text-center mt-2">
+            <p className="text-xs text-muted text-center mt-2">
               Derived from {feedbackSummary.total_responses || 0} anonymous criterion evaluations
             </p>
           </CardContent>
@@ -470,9 +474,9 @@ export default function AnalyticsTab() {
 
       {/* 4. Most Active Students Leaderboard Card */}
       <Card>
-        <CardHeader className="border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <CardHeader className="border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-base font-bold text-neutral-900 flex items-center gap-2">
+            <CardTitle className="text-base font-bold text-ink flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-500" />
               <span>Most Active Students (Top 10 Institutional Merit)</span>
             </CardTitle>
@@ -492,13 +496,13 @@ export default function AnalyticsTab() {
         </CardHeader>
         <CardContent className="p-0">
           {topStudents.length === 0 ? (
-            <div className="py-12 text-center text-xs text-neutral-400">
+            <div className="py-12 text-center text-xs text-muted">
               No student activity or points recorded yet.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-neutral-50 text-neutral-500 border-b border-neutral-200 uppercase text-[11px] font-semibold tracking-wider">
+                <thead className="bg-surface-2 text-muted border-b border-line uppercase text-xs font-semibold tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Rank</th>
                     <th className="py-3 px-4">Student</th>
@@ -507,16 +511,16 @@ export default function AnalyticsTab() {
                     <th className="py-3 px-4 text-right">Accumulated Points</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100 text-neutral-800">
+                <tbody className="divide-y divide-line text-ink">
                   {topStudents.map((stu, i) => (
-                    <tr key={stu.student_name + i} className="hover:bg-neutral-50/50 transition-colors">
-                      <td className="py-3 px-4 font-bold text-neutral-900">
+                    <tr key={stu.student_name + i} className="hover:bg-surface-2/50 transition-colors">
+                      <td className="py-3 px-4 font-bold text-ink">
                         {i === 0 && <span className="inline-block mr-1">🥇</span>}
                         {i === 1 && <span className="inline-block mr-1">🥈</span>}
                         {i === 2 && <span className="inline-block mr-1">🥉</span>}
                         #{i + 1}
                       </td>
-                      <td className="py-3 px-4 font-semibold text-neutral-900">
+                      <td className="py-3 px-4 font-semibold text-ink">
                         {stu.student_name}
                       </td>
                       <td className="py-3 px-4">
@@ -527,7 +531,7 @@ export default function AnalyticsTab() {
                       <td className="py-3 px-4 text-center font-mono font-medium text-emerald-700">
                         {stu.events_attended} sessions
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-bold text-burgundy">
+                      <td className="py-3 px-4 text-right font-mono font-bold text-primary">
                         {stu.total_points} pts
                       </td>
                     </tr>

@@ -15,6 +15,12 @@ export function AuthProvider({ children }) {
     try {
       const data = await profileService.getProfile(userId);
       setProfile(data);
+      if (data?.full_name) {
+        try {
+          const firstName = data.full_name.trim().split(' ')[0];
+          if (firstName) localStorage.setItem('fxec_user_first_name', firstName);
+        } catch (e) {}
+      }
       return data;
     } catch (err) {
       console.error('Error fetching profile:', err);

@@ -1,3 +1,13 @@
+/**
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
+ *
+ * Events Explorer:
+ * Grid and Calendar view of guest lectures and technical symposiums.
+ * Semantic tokens only, real Supabase data, responsive 360-1280px.
+ */
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { eventService } from '../../services/eventService';
@@ -6,7 +16,8 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import EventCard from '../../components/events/EventCard';
 import EventCalendar from '../../components/events/EventCalendar';
 import Input from '../../components/common/Input';
-import Select from '../../components/common/Select';
+import AppSelect from '../../components/app/AppSelect';
+import AppSegmented from '../../components/app/AppSegmented';
 import EmptyState from '../../components/common/EmptyState';
 import Spinner from '../../components/common/Spinner';
 import Button from '../../components/common/Button';
@@ -19,6 +30,7 @@ export default function EventsExplorerPage() {
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'calendar'
+  const [timingFilter, setTimingFilter] = useState('upcoming'); // 'upcoming' | 'all'
 
   // Filters
   const [search, setSearch] = useState('');
@@ -52,7 +64,14 @@ export default function EventsExplorerPage() {
     setSearch('');
     setDepartmentId('');
     setDate('');
+    setTimingFilter('upcoming');
   };
+
+  const displayedEvents = React.useMemo(() => {
+    if (timingFilter === 'all') return events;
+    const now = new Date();
+    return events.filter((e) => new Date(e.end_time || e.start_time) >= now);
+  }, [events, timingFilter]);
 
   return (
     <DashboardLayout
@@ -61,38 +80,51 @@ export default function EventsExplorerPage() {
       actions={
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="bg-neutral-100 p-1 rounded-lg flex items-center border border-neutral-200">
-            <button
-              type="button"
+          <div className="bg-surface-2 p-1 rounded-[12px] flex items-center border border-line">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setViewMode('grid')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-white text-burgundy shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-surface text-primary shadow-xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>Grid</span>
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors cursor-pointer ${
                 viewMode === 'calendar'
-                  ? 'bg-white text-burgundy shadow-xs'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-surface text-primary shadow-xs'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               <CalendarIcon className="w-3.5 h-3.5" />
               <span>Calendar</span>
-            </button>
+            </Button>
           </div>
         </div>
       }
     >
       <div className="space-y-6">
         {/* Filter Toolbar */}
-        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <AppSegmented
+            options={[
+              { value: 'upcoming', label: 'Upcoming Events' },
+              { value: 'all', label: `All Events (${events.length})` },
+            ]}
+            value={timingFilter}
+            onChange={setTimingFilter}
+          />
+        </div>
+
+        <div className="bg-surface p-4 rounded-[20px] border border-line shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
           <Input
             label="Search Events"
             placeholder="Search by topic or title..."
@@ -101,7 +133,7 @@ export default function EventsExplorerPage() {
             icon={Search}
           />
 
-          <Select
+          <AppSelect
             label="Target Department"
             value={departmentId}
             onChange={(e) => setDepartmentId(e.target.value)}
@@ -136,15 +168,15 @@ export default function EventsExplorerPage() {
 
         {/* Content View */}
         {isLoading ? (
-          <div className="p-16 bg-white border border-neutral-200 rounded-xl flex flex-col items-center justify-center gap-3">
+          <div className="p-16 bg-surface border border-line rounded-[20px] flex flex-col items-center justify-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm font-medium text-neutral-500">
-              Loading sessions matching your department criteria...
+            <p className="text-sm font-medium text-muted">
+              Loading events matching your department criteria...
             </p>
           </div>
         ) : viewMode === 'calendar' ? (
-          <EventCalendar events={events} />
-        ) : events.length === 0 ? (
+          <EventCalendar events={displayedEvents} />
+        ) : displayedEvents.length === 0 ? (
           <EmptyState
             icon={CalendarIcon}
             title="No Events Found"
@@ -158,7 +190,7 @@ export default function EventsExplorerPage() {
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((evt) => (
+            {displayedEvents.map((evt) => (
               <EventCard key={evt.id} event={evt} />
             ))}
           </div>

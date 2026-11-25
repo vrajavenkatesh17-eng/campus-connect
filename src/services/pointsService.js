@@ -67,6 +67,41 @@ export const pointsService = {
   },
 
   /**
+   * Fetches the append-only points ledger history for a specific event.
+   * @param {string} eventId
+   */
+  async getEventPointsHistory(eventId) {
+    if (!isSupabaseConfigured || !eventId) return [];
+
+    const { data, error } = await supabase
+      .from('points_ledger')
+      .select(`
+        id,
+        category,
+        points,
+        reason,
+        created_at,
+        student:student_id(
+          id,
+          name,
+          register_number
+        ),
+        awarded_by_profile:awarded_by(
+          id,
+          name
+        )
+      `)
+      .eq('event_id', eventId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Error fetching event points history:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  /**
    * Fetches the append-only points ledger history for the current or specified student.
    * RLS ensures students can only read their own records.
    * @param {string} [studentId]

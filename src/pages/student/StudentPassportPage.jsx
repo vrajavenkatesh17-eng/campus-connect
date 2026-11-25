@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * Campus Connect — FXEC Autonomous Event Management System
+ * Architected & Patented by Krish & Ihsan. All Rights Reserved.
+ * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
+ *
+ * Student Achievement Passport:
+ * Extracurricular digital transcript powered by MagicBento.
+ * Semantic tokens only, dark/light theme, verified certificates with QR and instant PDF download.
+ */
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useTheme } from '../../context/ThemeContext';
 import { attendanceService } from '../../services/attendanceService';
 import { certificateService } from '../../services/certificateService';
 import { pointsService } from '../../services/pointsService';
@@ -11,6 +22,7 @@ import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
+import MagicBento from '../../components/MagicBento/MagicBento';
 import { QRCodeCanvas } from 'qrcode.react';
 import {
   Sparkles,
@@ -34,6 +46,7 @@ import {
 export default function StudentPassportPage() {
   const { user, profile } = useAuth();
   const { showToast } = useToast();
+  const { resolvedTheme } = useTheme();
 
   const [attendances, setAttendances] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -54,7 +67,7 @@ export default function StudentPassportPage() {
 
         setAttendances(attData || []);
         setCertificates(certData || []);
-        setPointsSummary(ptsData);
+        setPointsSummary(ptsData || { totalPoints: 0, history: [] });
 
         // Find user rank in leaderboard
         const myEntry = (leaderboard || []).find((entry) => entry.student_id === user?.id);
@@ -140,7 +153,7 @@ export default function StudentPassportPage() {
     });
   });
 
-  pointsSummary.history.forEach((p) => {
+  (pointsSummary.history || []).forEach((p) => {
     if (['asked_question', 'answered_question', 'discussion', 'other'].includes(p.category)) {
       timeline.push({
         id: `pts-${p.id}`,
@@ -155,12 +168,119 @@ export default function StudentPassportPage() {
 
   timeline.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
+  const dynamicGlow = resolvedTheme === 'dark' ? 'rgb(var(--primary))' : 'rgb(var(--primary))';
+
+  // MagicBento transcript overview metrics
+  const bentoItems = useMemo(() => [
+    {
+      id: 'passport-hours',
+      title: 'Certified Learning Hours',
+      label: 'Accreditation',
+      colSpan: 2,
+      rowSpan: 1,
+      visual: (
+        <div className="w-full h-full flex items-center justify-between px-3 select-none">
+          <div className="space-y-1">
+            <span className="text-3xl font-extrabold text-primary tabular-nums">
+              {totalLearningHours} hrs
+            </span>
+            <p className="text-xs text-muted font-medium">
+              Verified co-curricular industrial learning across {attendances.length} guest sessions
+            </p>
+          </div>
+          <Badge variant="success" size="sm" className="gap-1">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Verified
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      id: 'passport-lectures',
+      title: 'Lectures Attended',
+      label: 'Engagement',
+      colSpan: 1,
+      rowSpan: 1,
+      visual: (
+        <div className="w-full h-full flex flex-col justify-center px-2 select-none">
+          <span className="text-3xl font-extrabold text-ink tabular-nums">
+            {attendances.length}
+          </span>
+          <p className="text-xs text-muted font-medium mt-1">Sessions completed</p>
+        </div>
+      ),
+    },
+    {
+      id: 'passport-rank',
+      title: 'Campus Rank',
+      label: 'Recognition',
+      colSpan: 1,
+      rowSpan: 1,
+      visual: (
+        <div className="w-full h-full flex flex-col justify-center px-2 select-none">
+          <span className="text-3xl font-extrabold text-ink tabular-nums">
+            {userRank ? `#${userRank}` : '—'}
+          </span>
+          <p className="text-xs text-muted font-medium mt-1">
+            {pointsSummary.totalPoints} total points
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: 'passport-identity',
+      title: 'Student Identity',
+      label: 'Institutional Record',
+      colSpan: 2,
+      rowSpan: 1,
+      visual: (
+        <div className="w-full h-full flex items-center justify-between px-3 select-none">
+          <div className="space-y-1">
+            <span className="text-base font-bold text-ink">
+              {profile?.name || 'Student Name'}
+            </span>
+            <p className="text-xs text-muted">
+              Reg No: <strong className="text-ink font-mono">{profile?.register_number || 'N/A'}</strong> • {profile?.departments?.code || 'Engineering'}
+            </p>
+          </div>
+          <span className="text-xs font-semibold text-muted bg-surface-2 px-2.5 py-1 rounded-[8px] border border-line">
+            FXEC Autonomous
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: 'passport-certs',
+      title: 'Verified Credentials',
+      label: 'Credentials',
+      colSpan: 2,
+      rowSpan: 1,
+      visual: (
+        <div className="w-full h-full flex items-center justify-between px-3 select-none">
+          <div className="space-y-1">
+            <span className="text-3xl font-extrabold text-ink tabular-nums">
+              {certificates.length}
+            </span>
+            <p className="text-xs text-muted font-medium">
+              Tamper-evident certificates with cryptographic QR validation
+            </p>
+          </div>
+          <Link to="/student/certificates">
+            <Button size="xs" variant="outline">
+              Certificates
+            </Button>
+          </Link>
+        </div>
+      ),
+    },
+  ], [totalLearningHours, attendances.length, userRank, pointsSummary.totalPoints, profile, certificates.length]);
+
   if (isLoading) {
     return (
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Assembling your official achievement passport...</p>
+          <p className="text-sm text-muted font-medium">Assembling your official achievement passport...</p>
         </div>
       </DashboardLayout>
     );
@@ -185,97 +305,67 @@ export default function StudentPassportPage() {
           ))}
         </div>
 
-        {/* Passport Profile Header Card */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-burgundy/10 text-burgundy border-2 border-burgundy/30 flex items-center justify-center font-bold text-2xl uppercase shrink-0">
-              {profile?.name ? profile.name[0] : 'S'}
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-neutral-900">{profile?.name || 'Student'}</h2>
-                <Badge variant="success" size="sm" className="gap-1 text-[11px]">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Verified Identity
-                </Badge>
-              </div>
-              <p className="text-xs text-neutral-500">
-                Register No:{' '}
-                <span className="font-mono font-semibold text-neutral-800">
-                  {profile?.register_number || 'N/A'}
-                </span>{' '}
-                • Department of {profile?.departments?.name || profile?.department || 'Engineering'}
-              </p>
-              <p className="text-[11px] text-neutral-400">
-                Francis Xavier Engineering College • Autonomous Institution
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 border-t sm:border-t-0 sm:border-l border-neutral-100 pt-4 sm:pt-0 sm:pl-6 text-center">
-            <div>
-              <p className="text-2xl font-extrabold text-burgundy">{totalLearningHours} hrs</p>
-              <p className="text-[11px] text-neutral-500 font-medium">Certified Hours</p>
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-emerald-600">{attendances.length}</p>
-              <p className="text-[11px] text-neutral-500 font-medium">Lectures Attended</p>
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-amber-500">{pointsSummary.totalPoints}</p>
-              <p className="text-[11px] text-neutral-500 font-medium">Total Points</p>
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-neutral-900">
-                {userRank ? `#${userRank}` : '—'}
-              </p>
-              <p className="text-[11px] text-neutral-500 font-medium">Campus Rank</p>
-            </div>
-          </div>
-        </div>
+        {/* MagicBento Achievement Passport Metrics */}
+        <MagicBento
+          items={bentoItems}
+          columns={4}
+          rowHeight={150}
+          gap={14}
+          radius={20}
+          theme={resolvedTheme || 'light'}
+          glowColor={dynamicGlow}
+          enableBorderGlow={true}
+          enableSpotlight={true}
+          spotlightRadius={300}
+          clickEffect={true}
+          intro={true}
+          enableStars={false}
+          enableTilt={false}
+          enableMagnetism={false}
+        />
 
         {/* Certificates Grid with Instant Download */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-neutral-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-burgundy" />
+          <div className="flex items-center justify-between pb-1 border-b border-line">
+            <h3 className="text-base font-bold text-ink flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
               Verified Certificates ({certificates.length})
             </h3>
-            <Link to="/student/certificates" className="text-xs font-semibold text-burgundy hover:underline">
+            <Link to="/student/certificates" className="text-xs font-semibold text-primary hover:underline">
               View All Certificates →
             </Link>
           </div>
 
           {certificates.length === 0 ? (
-            <Card className="p-6 text-center text-xs text-neutral-500">
+            <Card className="p-8 text-center text-xs text-muted border-line shadow-xs">
               No certificates issued yet. Attend guest lectures and complete reviews to receive official credentials.
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {certificates.map((cert) => (
-                <Card key={cert.id} className="p-4 bg-white flex flex-col justify-between gap-3">
+                <Card key={cert.id} className="p-4 border-line shadow-xs flex flex-col justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10px] font-bold text-burgundy bg-burgundy/10 px-2 py-0.5 rounded">
+                      <span className="font-mono text-xs font-bold text-primary bg-primary-soft px-2 py-0.5 rounded">
                         {cert.certificate_code}
                       </span>
-                      <span className="text-[10px] text-neutral-400">
+                      <span className="text-xs text-muted">
                         {new Date(cert.issued_at).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
                         })}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-neutral-900 line-clamp-1">
+                    <p className="text-xs font-bold text-ink line-clamp-1">
                       {cert.event?.title || 'Session'}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
+                  <div className="flex items-center justify-between pt-2 border-t border-line">
                     <Link
                       to={`/verify/${cert.certificate_code}`}
                       target="_blank"
-                      className="text-[11px] text-neutral-500 hover:text-burgundy flex items-center gap-1"
+                      className="text-xs text-muted hover:text-primary flex items-center gap-1 transition-colors"
                     >
                       Verify <ExternalLink className="w-3 h-3" />
                     </Link>
@@ -296,37 +386,37 @@ export default function StudentPassportPage() {
 
         {/* Keynote Speakers Interacted With */}
         <div className="space-y-4">
-          <h3 className="text-base font-bold text-neutral-900 flex items-center gap-2">
-            <Users className="w-5 h-5 text-burgundy" />
+          <h3 className="text-base font-bold text-ink flex items-center gap-2 pb-1 border-b border-line">
+            <Users className="w-5 h-5 text-primary" />
             Keynote Speakers Interacted With ({uniqueSpeakers.length})
           </h3>
 
           {uniqueSpeakers.length === 0 ? (
-            <Card className="p-6 text-center text-xs text-neutral-500">
+            <Card className="p-8 text-center text-xs text-muted border-line shadow-xs">
               Attend guest lectures to connect with leading industry keynote speakers and faculty experts.
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {uniqueSpeakers.map((sp, idx) => (
-                <Card key={idx} className="p-4 bg-white space-y-2">
+                <Card key={idx} className="p-4 border-line shadow-xs space-y-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-burgundy text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-surface-2 border border-line flex items-center justify-center font-bold text-primary text-sm shrink-0">
                       {sp.name[0]}
                     </div>
-                    <div className="overflow-hidden">
-                      <h4 className="text-xs font-bold text-neutral-900 truncate">{sp.name}</h4>
-                      <p className="text-[11px] text-neutral-500 truncate">
+                    <div className="overflow-hidden min-w-0">
+                      <h4 className="text-xs font-bold text-ink truncate">{sp.name}</h4>
+                      <p className="text-xs text-muted truncate">
                         {sp.designation || 'Speaker'}
                       </p>
                     </div>
                   </div>
                   {sp.company && (
-                    <p className="text-[11px] text-neutral-600 flex items-center gap-1">
-                      <Briefcase className="w-3.5 h-3.5 text-neutral-400" />
+                    <p className="text-xs text-muted flex items-center gap-1 truncate">
+                      <Briefcase className="w-3.5 h-3.5 text-muted shrink-0" />
                       {sp.company}
                     </p>
                   )}
-                  <p className="text-[10px] text-neutral-400 border-t border-neutral-100 pt-1 line-clamp-1">
+                  <p className="text-xs text-muted border-t border-line pt-1 line-clamp-1">
                     Lecture: {sp.eventTitle}
                   </p>
                 </Card>
@@ -337,28 +427,28 @@ export default function StudentPassportPage() {
 
         {/* Activity Timeline */}
         <div className="space-y-4">
-          <h3 className="text-base font-bold text-neutral-900 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-burgundy" />
+          <h3 className="text-base font-bold text-ink flex items-center gap-2 pb-1 border-b border-line">
+            <Clock className="w-5 h-5 text-primary" />
             Verified Activity Timeline
           </h3>
 
           {timeline.length === 0 ? (
-            <Card className="p-6 text-center text-xs text-neutral-500">
+            <Card className="p-8 text-center text-xs text-muted border-line shadow-xs">
               No activity logs recorded yet.
             </Card>
           ) : (
-            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-200">
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-line">
               {timeline.map((item) => (
                 <div key={item.id} className="relative group">
-                  <div className="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-burgundy ring-4 ring-white shrink-0" />
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs space-y-1">
+                  <div className="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-primary ring-4 ring-surface shrink-0" />
+                  <div className="bg-surface p-4 rounded-[16px] border border-line shadow-xs space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-bold text-neutral-900">{item.title}</p>
-                      <Badge variant={item.badgeVariant} size="sm" className="text-[10px]">
+                      <p className="text-xs font-bold text-ink">{item.title}</p>
+                      <Badge variant={item.badgeVariant} size="sm" className="text-xs">
                         {item.badge}
                       </Badge>
                     </div>
-                    <span className="text-[11px] text-neutral-400 block">
+                    <span className="text-xs text-muted block">
                       {new Date(item.timestamp).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',

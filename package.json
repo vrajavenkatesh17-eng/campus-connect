@@ -13,23 +13,34 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:ui": "node scripts/check-ui.js",
+    "test:axe": "playwright test"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
     "@hugeicons/core-free-icons": "^4.4.0",
     "@hugeicons/react": "^1.1.10",
     "@supabase/supabase-js": "^2.43.4",
+    "@tanstack/react-query": "^5.108.0",
     "html5-qrcode": "^2.3.8",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.383.0",
+    "motion": "^14.14.0",
+    "ogl": "^1.0.11",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^7.18.5",
     "recharts": "^3.10.1",
-    "xlsx": "^0.18.5"
+    "three": "^0.187.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",

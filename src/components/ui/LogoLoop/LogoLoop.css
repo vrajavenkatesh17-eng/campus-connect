@@ -1,0 +1,18 @@
+@keyframes logo-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-logo-loop {
+  display: flex;
+  width: max-content;
+  animation: logo-marquee var(--logo-speed, 35s) linear infinite;
+}
+
+.logo-loop-container:hover .animate-logo-loop {
+  animation-play-state: paused;
+}

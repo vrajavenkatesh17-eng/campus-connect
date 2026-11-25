@@ -1,8 +1,7 @@
 <!doctype html>
 <!--
   Campus Connect — FXEC Autonomous Event Management System
-  Architected & Patented by Krish & Ihsan. All Rights Reserved.
-  Patent Token: KRISH-IHSAN-FXEC-PATENT-2026-CC
+  Designed & built by Krish & Ihsan. All Rights Reserved.
 -->
 <html lang="en">
   <head>
@@ -10,15 +9,35 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Krish & Ihsan" />
-    <meta name="copyright" content="Copyright (c) 2026 Krish & Ihsan. Patented & All Rights Reserved." />
+    <meta name="copyright" content="Copyright (c) 2026 Krish & Ihsan. All Rights Reserved." />
     <meta name="creator" content="Krish & Ihsan" />
-    <meta name="patent-id" content="KRISH-IHSAN-FXEC-PATENT-2026-CC" />
     <title>Campus Connect | Francis Xavier Engineering College</title>
+
+    <!-- Immediate Anti-FOUC Theme Initialization (before first paint) -->
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('campus_connect_theme');
+          var theme = stored || 'system';
+          var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          }
+        } catch (e) {
+          // Graceful fallback if localStorage is unavailable
+        }
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-neutral-50 text-neutral-900 antialiased min-h-screen">
+  <body class="bg-background text-foreground antialiased min-h-screen">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

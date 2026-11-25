@@ -1,6 +1,211 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 
+/**
+ * Derives real-time event status using now().
+ * Never trusts stored status if end_time has elapsed.
+ */
+export function deriveEventStatus(event) {
+  if (!event) return event;
+  const now = new Date();
+  let status = event.status || 'pending';
+  if (status !== 'cancelled' && status !== 'rejected') {
+    if (event.end_time && new Date(event.end_time) <= now) {
+      status = 'completed';
+    }
+  }
+  return { ...event, status };
+}
+
 export const eventService = {
+  /**
+   * Fetch aggregate public stats (events hosted, students engaged, certificates issued, guest speakers)
+   */
+  async getPublicStats() {
+    if (!isSupabaseConfigured) {
+      return { events_hosted: 0, students_engaged: 0, certificates_issued: 0, guest_speakers: 0 };
+    }
+    try {
+      const { data, error } = await supabase.rpc('public_stats');
+      if (error) {
+        // Fallback aggregate queries
+        const [eventsRes, certsRes, attRes, spkRes] = await Promise.all([
+          supabase.from('events').select('id', { count: 'exact', head: true }).lte('end_time', new Date().toISOString()),
+          supabase.from('certificates').select('id', { count: 'exact', head: true }),
+          supabase.from('attendance').select('student_id', { count: 'exact', head: true }).eq('status', 'present'),
+          supabase.from('speakers').select('id', { count: 'exact', head: true }),
+        ]);
+        return {
+          events_hosted: eventsRes.count || 0,
+          students_engaged: attRes.count || 0,
+          certificates_issued: certsRes.count || 0,
+          guest_speakers: spkRes.count || 0,
+        };
+      }
+      return data || { events_hosted: 0, students_engaged: 0, certificates_issued: 0, guest_speakers: 0 };
+    } catch (err) {
+      console.warn('Failed to load public stats:', err);
+      return { events_hosted: 0, students_engaged: 0, certificates_issued: 0, guest_speakers: 0 };
+    }
+  },
+
+  /**
+   * Fetch the immediate next upcoming event for hero countdown chip
+   */
+  async getPublicNextEvent() {
+    if (!isSupabaseConfigured) return null;
+    try {
+      const { data, error } = await supabase.rpc('public_next_event');
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data[0];
+      }
+      // Fallback
+      const nowIso = new Date().toISOString();
+      const { data: fbData, error: fbErr } = await supabase
+        .from('events')
+        .select(`
+          id, title, start_time, end_time, poster_url, seat_capacity, registered_count, custom_venue,
+          venues(name),
+          speakers(name, company)
+        `)
+        .eq('status', 'approved')
+        .gt('start_time', nowIso)
+        .order('start_time', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (fbErr || !fbData) return null;
+      return {
+        id: fbData.id,
+        title: fbData.title,
+        start_time: fbData.start_time,
+        end_time: fbData.end_time,
+        venue: fbData.venues?.name || fbData.custom_venue || 'Campus Central',
+        poster_url: fbData.poster_url,
+        speaker_name: fbData.speakers?.name || null,
+        speaker_company: fbData.speakers?.company || null,
+        seat_capacity: fbData.seat_capacity,
+        registered_count: fbData.registered_count,
+      };
+    } catch (err) {
+      console.warn('Failed to load next event:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Fetch approved upcoming events for public landing page (capped at 6)
+   */
+  async getPublicUpcomingEvents(limit = 6) {
+    if (!isSupabaseConfigured) return [];
+    try {
+      const { data, error } = await supabase.rpc('public_upcoming_events', {
+        limit_count: Math.min(Math.max(limit, 1), 12),
+      });
+      if (!error && data) return data;
+
+      // Fallback
+      const nowIso = new Date().toISOString();
+      const { data: fbData, error: fbErr } = await supabase
+        .from('events')
+        .select(`
+          id, title, description, start_time, end_time, poster_url, seat_capacity, registered_count, custom_venue, category,
+          venues(name),
+          speakers(name, company)
+        `)
+        .eq('status', 'approved')
+        .gt('start_time', nowIso)
+        .order('start_time', { ascending: true })
+        .limit(limit);
+
+      if (fbErr) throw fbErr;
+      return (fbData || []).map((e) => ({
+        id: e.id,
+        title: e.title,
+        description: e.description,
+        start_time: e.start_time,
+        end_time: e.end_time,
+        venue: e.venues?.name || e.custom_venue || 'Campus Central',
+        poster_url: e.poster_url,
+        speaker_name: e.speakers?.name || null,
+        speaker_company: e.speakers?.company || null,
+        seat_capacity: e.seat_capacity,
+        registered_count: e.registered_count,
+        category: e.category,
+      }));
+    } catch (err) {
+      console.warn('Failed to load upcoming public events:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Fetch completed events with approved photos and public summary for Moments carousel
+   */
+  async getPublicPastEvents(limit = 20) {
+    if (!isSupabaseConfigured) return [];
+    try {
+      const { data, error } = await supabase.rpc('public_past_events', {
+        limit_count: Math.min(Math.max(limit, 1), 30),
+      });
+      if (!error && data) return data;
+
+      // Fallback
+      const nowIso = new Date().toISOString();
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('events')
+        .select('id, title, event_date, start_time, end_time, poster_url, speakers(name, company)')
+        .or(`status.eq.completed,end_time.lte.${nowIso}`)
+        .neq('status', 'cancelled')
+        .order('start_time', { ascending: false })
+        .limit(Math.min(limit, 20));
+
+      if (fallbackError) throw fallbackError;
+      return (fallbackData || []).map((e) => ({
+        id: e.id,
+        title: e.title,
+        start_time: e.start_time,
+        end_time: e.end_time,
+        event_date: e.event_date || (e.start_time ? e.start_time.split('T')[0] : null),
+        poster_url: e.poster_url,
+        public_summary: e.public_summary || null,
+        speaker_name: e.speakers?.name || null,
+        speaker_company: e.speakers?.company || null,
+        photos: [],
+      }));
+    } catch (err) {
+      console.warn('Failed to load public past events:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Fetch distinct companies of past speakers for Industry Voices LogoLoop
+   */
+  async getPublicSpeakerCompanies() {
+    if (!isSupabaseConfigured) return [];
+    try {
+      const { data, error } = await supabase.rpc('public_speaker_companies');
+      if (!error && Array.isArray(data)) {
+        return data.map((d) => (typeof d === 'string' ? d : d.company)).filter(Boolean);
+      }
+
+      // Fallback
+      const { data: fbData, error: fbErr } = await supabase
+        .from('speakers')
+        .select('company')
+        .not('company', 'is', null)
+        .neq('company', '')
+        .limit(20);
+
+      if (fbErr) throw fbErr;
+      const unique = Array.from(new Set((fbData || []).map((s) => s.company?.trim()).filter(Boolean)));
+      return unique;
+    } catch (err) {
+      console.warn('Failed to load speaker companies:', err);
+      return [];
+    }
+  },
+
   /**
    * Fetch active venues for dropdown
    */
@@ -11,7 +216,7 @@ export const eventService = {
       .select('*')
       .order('name', { ascending: true });
     if (error) throw error;
-    return data || [];
+    return (data || []).map(deriveEventStatus);
   },
 
   /**
@@ -96,7 +301,7 @@ export const eventService = {
       });
     }
 
-    return results;
+    return results.map(deriveEventStatus);
   },
 
   /**
@@ -118,7 +323,7 @@ export const eventService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return deriveEventStatus(data);
   },
 
   /**
@@ -143,7 +348,10 @@ export const eventService = {
       .order('registered_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map((r) => ({
+      ...r,
+      event: deriveEventStatus(r.event),
+    }));
   },
 
   /**
@@ -163,10 +371,10 @@ export const eventService = {
         event_departments(department:department_id(id, code))
       `)
       .eq('coordinator_id', user.id)
-      .order('created_at', { ascending: false });
+      .order('start_time', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(deriveEventStatus);
   },
 
   /**
@@ -188,7 +396,7 @@ export const eventService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(deriveEventStatus);
   },
 
   /**
@@ -209,7 +417,7 @@ export const eventService = {
       .order('start_time', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(deriveEventStatus);
   },
 
   /**
@@ -434,7 +642,7 @@ export const eventService = {
       .limit(20);
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(deriveEventStatus);
   },
 
   /**
@@ -446,6 +654,18 @@ export const eventService = {
       .from('notifications')
       .update({ is_read: true })
       .eq('id', notificationId);
+  },
+
+  /**
+   * Mark all notifications as read for current user
+   */
+  async markAllNotificationsAsRead(userId) {
+    if (!isSupabaseConfigured || !userId) return;
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false);
   },
 
   /**
@@ -550,5 +770,72 @@ export const eventService = {
 
     if (error) throw error;
     return true;
+  },
+
+  /**
+   * Upload an event photo for public gallery / moments carousel.
+   * File is uploaded to public storage bucket 'event-posters' and inserted into public.event_photos.
+   */
+  async uploadEventPhoto({ eventId, file, caption, uploadedBy }) {
+    if (!isSupabaseConfigured) throw new Error('Database is not configured.');
+    if (!file) throw new Error('Please select an image file to upload.');
+
+    const maxBytes = 15 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      throw new Error('Image file size exceeds the 15MB limit.');
+    }
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storagePath = `photos/${eventId}/${Date.now()}-${safeName}`;
+
+    const { error: uploadErr } = await supabase.storage
+      .from('event-posters')
+      .upload(storagePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadErr) {
+      console.error('Storage upload error:', uploadErr);
+      throw new Error(`Photo upload failed: ${uploadErr.message}`);
+    }
+
+    const { data: pubData } = supabase.storage
+      .from('event-posters')
+      .getPublicUrl(storagePath);
+    const publicUrl = pubData?.publicUrl || storagePath;
+
+    const { data, error } = await supabase
+      .from('event_photos')
+      .insert({
+        event_id: eventId,
+        storage_path: publicUrl,
+        caption: caption?.trim() || null,
+        status: 'pending',
+        uploaded_by: uploadedBy,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Get all photos for an event
+   */
+  async getEventPhotos(eventId) {
+    if (!isSupabaseConfigured) return [];
+    const { data, error } = await supabase
+      .from('event_photos')
+      .select('*, profiles:uploaded_by(name, email)')
+      .eq('event_id', eventId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Could not load event photos:', error);
+      return [];
+    }
+    return data || [];
   },
 };

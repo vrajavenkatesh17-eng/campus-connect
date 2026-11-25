@@ -296,18 +296,18 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-neutral-200 overflow-hidden flex flex-col">
+      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-line overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 bg-neutral-50/70">
+        <div className="flex items-center justify-between p-4 border-b border-line bg-surface-2/70">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-burgundy/10 text-burgundy">
+            <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
               <Camera className="w-5 h-5" />
             </span>
             <div>
-              <h2 className="text-base font-bold text-neutral-900 leading-tight">
+              <h2 className="text-base font-bold text-ink leading-tight">
                 Scan Attendance QR
               </h2>
-              <p className="text-xs text-neutral-500 truncate max-w-[220px]">
+              <p className="text-xs text-muted truncate max-w-[220px]">
                 {event.title}
               </p>
             </div>
@@ -315,28 +315,32 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
 
           <div className="flex items-center gap-1.5">
             {cameras.length > 1 && scannerState === 'scanning' && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={switchCamera}
                 title="Switch Camera"
-                className="p-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 text-neutral-600 transition-colors"
+                className="p-1.5 rounded-lg border border-line hover:bg-surface-2 text-muted transition-colors"
               >
                 <SwitchCamera className="w-4 h-4" />
-              </button>
+              </Button>
             )}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 stopScanning();
                 onClose();
               }}
-              className="p-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 text-neutral-600 transition-colors"
+              className="p-1.5 rounded-lg border border-line hover:bg-surface-2 text-muted transition-colors"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Scanner Viewport / States */}
-        <div className="relative p-4 bg-neutral-900 flex flex-col items-center justify-center min-h-[340px]">
+        <div className="relative p-4 bg-surface-2 flex flex-col items-center justify-center min-h-[340px]">
           {/* Camera region div required by html5-qrcode */}
           <div
             id={scannerContainerId}
@@ -351,7 +355,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
               <p className="text-xs font-semibold text-white">
                 Align the rotating QR code inside the camera viewfinder
               </p>
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-xs text-muted">
                 Auto-detects instantly • Code rotates every 30 seconds
               </p>
             </div>
@@ -360,12 +364,12 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
           {/* Verifying Spinner State */}
           {scannerState === 'verifying' && (
             <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
-              <Spinner size="lg" className="text-burgundy" />
+              <Spinner size="lg" className="text-primary" />
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-white">
                   Verifying QR Attendance Token...
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-muted">
                   Validating student registration & 30s cryptographic salt
                 </p>
               </div>
@@ -383,7 +387,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
                 <h3 className="text-lg font-bold text-white">
                   Attendance Verified!
                 </h3>
-                <p className="text-xs text-neutral-300 max-w-xs">
+                <p className="text-xs text-muted max-w-xs">
                   {successData?.message || 'Your presence has been officially recorded.'}
                 </p>
               </div>
@@ -394,12 +398,12 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
                   <Award className="w-4 h-4 text-amber-400" />
                   +50 Reward Points
                 </span>
-                <span className="font-mono text-[11px] text-emerald-400">
+                <span className="font-mono text-xs text-emerald-400">
                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
 
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-xs text-muted">
                 Redirecting to your attendance history in <span className="font-bold text-white">{autoRedirectSeconds}s</span>...
               </p>
 
@@ -425,7 +429,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
                     stopScanning();
                     onClose();
                   }}
-                  className="w-full sm:w-auto text-xs text-neutral-300 border-neutral-700 hover:bg-neutral-800"
+                  className="w-full sm:w-auto text-xs text-muted border-line hover:bg-surface-2"
                 >
                   Stay on Event
                 </Button>
@@ -462,7 +466,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
                     stopScanning();
                     onClose();
                   }}
-                  className="flex-1 text-xs text-neutral-300 border-neutral-700 hover:bg-neutral-800"
+                  className="flex-1 text-xs text-muted border-line hover:bg-surface-2"
                 >
                   Cancel
                 </Button>
@@ -481,7 +485,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
         </div>
 
         {/* Footer Guidance & Screenshot Upload Fallback */}
-        <div className="p-3 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between gap-2">
+        <div className="p-3 bg-surface-2 border-t border-line flex items-center justify-between gap-2">
           <input
             type="file"
             ref={fileInputRef}
@@ -490,7 +494,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
             className="hidden"
           />
 
-          <p className="text-[11px] text-neutral-500">
+          <p className="text-xs text-muted">
             Camera blurry or glare?
           </p>
 
@@ -498,7 +502,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onSuccess }) {
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="text-[11px] py-1 px-2.5 gap-1 border-neutral-300"
+            className="text-xs py-1 px-2.5 gap-1 border-line"
           >
             <Upload className="w-3 h-3" />
             Upload QR Image

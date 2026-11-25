@@ -10,7 +10,7 @@ import Card, { CardHeader, CardTitle, CardContent } from '../../components/commo
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Input from '../../components/common/Input';
-import Select from '../../components/common/Select';
+import AppSelect from '../../components/app/AppSelect';
 import Textarea from '../../components/common/Textarea';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
@@ -36,6 +36,7 @@ export default function CoordinatorRewardsPage() {
   const [sessions, setSessions] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState('');
   const [attendees, setAttendees] = useState([]);
+  const [pointsHistory, setPointsHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAttendeesLoading, setIsAttendeesLoading] = useState(false);
 
@@ -58,8 +59,8 @@ export default function CoordinatorRewardsPage() {
           setSelectedEventId(approved[0].id);
         }
       } catch (err) {
-        console.error('Error loading sessions:', err);
-        showToast('Error loading coordinator sessions.', 'error');
+        console.error('Error loading coordinator events:', err);
+        showToast('Error loading coordinator events.', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -71,13 +72,17 @@ export default function CoordinatorRewardsPage() {
     async function loadAttendees() {
       if (!selectedEventId) {
         setAttendees([]);
+        setPointsHistory([]);
         return;
       }
       setIsAttendeesLoading(true);
       try {
-        // Query verified attendees for this event
-        const attList = await attendanceService.getEventAttendance(selectedEventId);
+        const [attList, historyList] = await Promise.all([
+          attendanceService.getEventAttendance(selectedEventId),
+          pointsService.getEventPointsHistory(selectedEventId),
+        ]);
         setAttendees(attList || []);
+        setPointsHistory(historyList || []);
       } catch (err) {
         console.error('Error loading attendees:', err);
       } finally {
@@ -143,8 +148,8 @@ export default function CoordinatorRewardsPage() {
         const st = row.student || {};
         return (
           <div>
-            <p className="text-xs font-bold text-neutral-900">{st.name || 'Student'}</p>
-            <p className="text-[11px] text-neutral-400">{st.email}</p>
+            <p className="text-xs font-bold text-ink">{st.name || 'Student'}</p>
+            <p className="text-xs text-muted">{st.email}</p>
           </div>
         );
       },
@@ -153,7 +158,7 @@ export default function CoordinatorRewardsPage() {
       header: 'Register Number',
       key: 'reg_no',
       render: (row) => (
-        <span className="font-mono text-xs text-neutral-700">
+        <span className="font-mono text-xs text-ink">
           {row.student?.register_number || 'N/A'}
         </span>
       ),
@@ -162,7 +167,7 @@ export default function CoordinatorRewardsPage() {
       header: 'Department',
       key: 'dept',
       render: (row) => (
-        <span className="text-xs text-neutral-600">
+        <span className="text-xs text-muted">
           {row.student?.departments?.code || 'FXEC'}
         </span>
       ),
@@ -171,7 +176,7 @@ export default function CoordinatorRewardsPage() {
       header: 'Attendance Verified',
       key: 'status',
       render: (row) => (
-        <Badge variant="success" size="sm" className="gap-1 text-[10px]">
+        <Badge variant="success" size="sm" className="gap-1 text-xs">
           <CheckCircle2 className="w-3 h-3" />
           {new Date(row.verified_at).toLocaleTimeString('en-IN', {
             hour: '2-digit',
@@ -201,7 +206,7 @@ export default function CoordinatorRewardsPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500 font-medium">Loading session rewards roster...</p>
+          <p className="text-sm text-muted font-medium">Loading event rewards roster...</p>
         </div>
       </DashboardLayout>
     );
@@ -209,24 +214,24 @@ export default function CoordinatorRewardsPage() {
 
   return (
     <DashboardLayout
-      title="Student Interaction Rewards Hub"
+      title="Reward Points & Recognition"
       subtitle="Award bonus interaction points to verified attendees for questions, answers, and discussions (per-event cap enforced)"
     >
       <div className="space-y-6">
         {/* Top Filter Bar */}
-        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-surface p-5 rounded-[20px] border border-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-bold text-neutral-900">Select Lecture Session</h3>
-            <p className="text-xs text-neutral-500">
+            <h3 className="text-sm font-bold text-ink">Select Event</h3>
+            <p className="text-xs text-muted">
               Only students who have verified attendance can be awarded bonus points.
             </p>
           </div>
 
           <div className="w-full sm:w-80">
             {sessions.length === 0 ? (
-              <span className="text-xs text-neutral-500">No active sessions found.</span>
+              <span className="text-xs text-muted">No active events found.</span>
             ) : (
-              <Select
+              <AppSelect
                 value={selectedEventId}
                 onChange={(e) => setSelectedEventId(e.target.value)}
                 options={sessions.map((s) => ({
@@ -244,47 +249,92 @@ export default function CoordinatorRewardsPage() {
         {/* Attendance & Points Table */}
         {sessions.length === 0 ? (
           <EmptyState
-            title="No Guest Lectures Found"
-            description="Create or coordinate a guest lecture to start awarding student participation points."
-            action={
-              <Link to="/coordinator/events/new">
-                <Button variant="primary" size="sm">
-                  Create Guest Lecture
-                </Button>
-              </Link>
-            }
+            icon={Award}
+            title="No Approved Events Found"
+            description="Propose or coordinate an event to start awarding student participation points."
+            actionLabel="Propose Event"
+            onAction={() => (window.location.href = '/coordinator/events/new')}
           />
         ) : isAttendeesLoading ? (
           <div className="py-16 text-center">
             <Spinner size="md" />
-            <p className="text-xs text-neutral-500 mt-2">Loading verified session attendees...</p>
+            <p className="text-xs text-muted mt-2">Loading verified event attendees...</p>
           </div>
         ) : attendees.length === 0 ? (
           <EmptyState
+            icon={Users}
             title="No Verified Attendees Found"
-            description="Students must scan the 30-second rotating QR token or have manual attendance marked before bonus points can be awarded."
-            action={
-              <Link to={`/coordinator/events/${selectedEventId}/attendance`}>
-                <Button variant="primary" size="sm">
-                  Open Attendance Console
-                </Button>
-              </Link>
-            }
+            description="Students must scan the rotating QR token or have manual attendance marked before bonus points can be awarded."
+            actionLabel="Open Attendance Console"
+            onAction={() => (window.location.href = `/coordinator/events/${selectedEventId}/attendance`)}
           />
         ) : (
-          <Card>
-            <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-neutral-900">
-                  Verified Attendees Eligible for Bonus Points ({attendees.length})
-                </h4>
-                <p className="text-xs text-neutral-500">
-                  Points ledger is append-only with an institutional cap per event.
-                </p>
+          <div className="space-y-6">
+            <Card>
+              <div className="px-6 py-4 border-b border-line flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-ink">
+                    Verified Attendees Eligible for Bonus Points ({attendees.length})
+                  </h4>
+                  <p className="text-xs text-muted">
+                    Points ledger is append-only with an institutional cap per event.
+                  </p>
+                </div>
               </div>
-            </div>
-            <Table columns={columns} data={attendees} keyField="id" />
-          </Card>
+              <Table columns={columns} data={attendees} keyField="id" />
+            </Card>
+
+            {/* Award History Table */}
+            <Card>
+              <div className="px-6 py-4 border-b border-line flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-ink">
+                    Award History ({pointsHistory.length})
+                  </h4>
+                  <p className="text-xs text-muted">
+                    Audit log of bonus points awarded during this event.
+                  </p>
+                </div>
+              </div>
+              <Table
+                columns={[
+                  {
+                    header: 'Student',
+                    key: 'student',
+                    render: (r) => (
+                      <div>
+                        <p className="font-semibold text-ink text-xs">{r.student?.name || 'Student'}</p>
+                        <p className="font-mono text-xs text-muted">{r.student?.register_number || '—'}</p>
+                      </div>
+                    ),
+                  },
+                  {
+                    header: 'Category',
+                    key: 'category',
+                    render: (r) => (
+                      <Badge variant="neutral" size="sm" className="capitalize text-xs">
+                        {String(r.category || 'interaction').replace(/_/g, ' ')}
+                      </Badge>
+                    ),
+                  },
+                  {
+                    header: 'Points',
+                    key: 'points',
+                    render: (r) => <span className="font-bold text-primary tabular-nums">+{r.points}</span>,
+                  },
+                  {
+                    header: 'Reason',
+                    key: 'reason',
+                    render: (r) => <span className="text-xs text-muted line-clamp-2">{r.reason}</span>,
+                  },
+                ]}
+                data={pointsHistory}
+                keyField="id"
+                emptyTitle="No Bonus Points Awarded Yet"
+                emptyDescription="Awarded interaction points will appear in this audit table."
+              />
+            </Card>
+          </div>
         )}
 
         {/* Award Points Modal */}
@@ -297,10 +347,10 @@ export default function CoordinatorRewardsPage() {
           >
             <form onSubmit={handleAwardPoints} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Interaction Category <span className="text-red-500">*</span>
                 </label>
-                <Select
+                <AppSelect
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   options={[
@@ -314,7 +364,7 @@ export default function CoordinatorRewardsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Bonus Points to Award <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -325,13 +375,13 @@ export default function CoordinatorRewardsPage() {
                   onChange={(e) => setPoints(e.target.value)}
                   required
                 />
-                <p className="text-[11px] text-neutral-400 mt-1">
+                <p className="text-xs text-muted mt-1">
                   Institutional cap per event is enforced from system settings.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Mandatory Reason / Justification <span className="text-red-500">*</span>
                 </label>
                 <Textarea
@@ -343,7 +393,7 @@ export default function CoordinatorRewardsPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
+              <div className="flex justify-end gap-2 pt-3 border-t border-line">
                 <Button
                   type="button"
                   variant="outline"

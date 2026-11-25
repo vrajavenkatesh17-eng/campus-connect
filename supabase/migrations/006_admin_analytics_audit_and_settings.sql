@@ -14,6 +14,82 @@
 --              7. Admin Allowlist & Settings Management RPCs
 -- ==============================================================================
 
+-- ==============================================================================
+-- 0. SCHEMA PREREQUISITES (Self-healing & Idempotent Table Guarantees)
+-- Ensures all referenced relations exist even if migrations are executed out-of-order
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.points_ledger (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    event_id UUID REFERENCES public.events(id) ON DELETE SET NULL,
+    awarded_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    category TEXT NOT NULL CHECK (category IN (
+        'attendance', 
+        'feedback', 
+        'asked_question', 
+        'answered_question', 
+        'discussion', 
+        'admin_adjustment', 
+        'other'
+    )),
+    points INT NOT NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.app_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    description TEXT,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+INSERT INTO public.app_settings (key, value, description)
+VALUES 
+    ('points_per_event_cap', '100'::jsonb, 'Maximum bonus interaction points a coordinator can award to one student per event'),
+    ('certificate_requires_feedback', 'true'::jsonb, 'Whether a student must submit event feedback before a certificate can be issued'),
+    ('departments_list', '["CSE", "IT", "AIDS", "CSBS", "ECE", "EEE", "MECH", "CIVIL", "MBA", "MCA"]'::jsonb, 'List of active academic departments')
+ON CONFLICT (key) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS public.activity_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL DEFAULT 'system',
+    entity_id UUID,
+    event_id UUID,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS actor_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS entity_type TEXT NOT NULL DEFAULT 'system';
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS entity_id UUID;
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS event_id UUID;
+ALTER TABLE public.activity_logs ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
+
+CREATE TABLE IF NOT EXISTS public.feedback_submissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    submitted_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    CONSTRAINT uq_event_student_feedback UNIQUE (event_id, student_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.feedback_responses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    student_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    rating_content INT NOT NULL CHECK (rating_content BETWEEN 1 AND 5),
+    rating_speaker INT NOT NULL CHECK (rating_speaker BETWEEN 1 AND 5),
+    rating_organization INT NOT NULL CHECK (rating_organization BETWEEN 1 AND 5),
+    comments TEXT,
+    is_anonymous BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
 -- 1. HIGH-PERFORMANCE ANALYTICS & AUDIT INDEXES
 CREATE INDEX IF NOT EXISTS idx_events_status_start_end ON public.events(status, start_time, end_time);
 CREATE INDEX IF NOT EXISTS idx_events_coordinator ON public.events(coordinator_id);

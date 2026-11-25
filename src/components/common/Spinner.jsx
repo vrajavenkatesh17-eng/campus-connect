@@ -10,9 +10,9 @@ export default function Spinner({ size = 'md', color = 'burgundy', className = '
   };
 
   const colorMap = {
-    burgundy: 'border-burgundy border-t-transparent',
+    burgundy: 'border-primary border-t-transparent',
     white: 'border-white border-t-transparent',
-    neutral: 'border-neutral-400 border-t-transparent',
+    neutral: 'border-muted border-t-transparent',
   };
 
   return (

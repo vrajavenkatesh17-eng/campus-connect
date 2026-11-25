@@ -11,7 +11,8 @@ import Badge from '../../components/common/Badge';
 import Spinner from '../../components/common/Spinner';
 import EmptyState from '../../components/common/EmptyState';
 import Table from '../../components/common/Table';
-import Select from '../../components/common/Select';
+import AppSelect from '../../components/app/AppSelect';
+import AppSegmented from '../../components/app/AppSegmented';
 import {
   Award,
   Sparkles,
@@ -115,7 +116,7 @@ export default function StudentPointsPage() {
       header: 'Date & Time',
       key: 'created_at',
       render: (row) => (
-        <span className="text-xs text-neutral-600">
+        <span className="text-xs text-muted">
           {new Date(row.created_at).toLocaleDateString('en-IN', {
             day: 'numeric',
             month: 'short',
@@ -136,9 +137,9 @@ export default function StudentPointsPage() {
       key: 'reason',
       render: (row) => (
         <div>
-          <p className="text-xs font-semibold text-neutral-900">{row.reason}</p>
+          <p className="text-xs font-semibold text-ink">{row.reason}</p>
           {row.event?.title && (
-            <p className="text-[11px] text-neutral-500 line-clamp-1">{row.event.title}</p>
+            <p className="text-xs text-muted line-clamp-1">{row.event.title}</p>
           )}
         </div>
       ),
@@ -166,8 +167,8 @@ export default function StudentPointsPage() {
         const rank = parseInt(row.leaderboard_rank, 10);
         if (rank === 1) {
           return (
-            <span className="inline-flex items-center gap-1 font-bold text-amber-500 text-sm">
-              <Trophy className="w-4 h-4 fill-amber-400 text-amber-500" /> #1
+            <span className="inline-flex items-center gap-1.5 font-bold text-gold text-xs px-2.5 py-0.5 rounded-full border border-gold/50 bg-gold/10 shadow-xs">
+              <Trophy className="w-3.5 h-3.5 text-gold" /> #1 Rank
             </span>
           );
         }
@@ -185,7 +186,7 @@ export default function StudentPointsPage() {
             </span>
           );
         }
-        return <span className="font-mono text-xs font-medium text-neutral-500">#{rank}</span>;
+        return <span className="font-mono text-xs font-medium text-muted">#{rank}</span>;
       },
     },
     {
@@ -195,11 +196,11 @@ export default function StudentPointsPage() {
         const isMe = row.student_id === user?.id;
         return (
           <div className="flex items-center gap-2">
-            <span className={`text-xs font-bold ${isMe ? 'text-burgundy' : 'text-neutral-900'}`}>
+            <span className={`text-xs font-bold ${isMe ? 'text-primary' : 'text-ink'}`}>
               {row.student_name}
             </span>
             {isMe && (
-              <Badge variant="primary" size="sm" className="text-[10px]">
+              <Badge variant="primary" size="sm" className="text-xs">
                 You
               </Badge>
             )}
@@ -211,7 +212,7 @@ export default function StudentPointsPage() {
       header: 'Department',
       key: 'dept',
       render: (row) => (
-        <span className="font-mono text-xs font-semibold text-neutral-600">
+        <span className="font-mono text-xs font-semibold text-muted">
           {row.department_code || 'FXEC'}
         </span>
       ),
@@ -220,7 +221,7 @@ export default function StudentPointsPage() {
       header: 'Total Points',
       key: 'points',
       render: (row) => (
-        <span className="font-mono font-black text-xs text-burgundy">
+        <span className="font-mono font-black text-xs text-primary">
           {row.total_points} pts
         </span>
       ),
@@ -232,7 +233,7 @@ export default function StudentPointsPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500">Loading your points ledger & milestones...</p>
+          <p className="text-sm text-muted">Loading your points ledger & milestones...</p>
         </div>
       </DashboardLayout>
     );
@@ -263,46 +264,30 @@ export default function StudentPointsPage() {
             <div className="grid grid-cols-3 gap-2 bg-white/10 backdrop-blur-xs rounded-xl p-4 text-center shrink-0">
               <div className="p-2">
                 <p className="text-xl font-bold text-emerald-400">+{summary.categoryBreakdown.attendance}</p>
-                <p className="text-[11px] text-white/70">Attendance</p>
+                <p className="text-xs text-white/70">Attendance</p>
               </div>
               <div className="p-2 border-l border-white/15">
                 <p className="text-xl font-bold text-amber-400">+{summary.categoryBreakdown.feedback}</p>
-                <p className="text-[11px] text-white/70">Reviews</p>
+                <p className="text-xs text-white/70">Reviews</p>
               </div>
               <div className="p-2 border-l border-white/15">
                 <p className="text-xl font-bold text-sky-400">+{summary.categoryBreakdown.interaction}</p>
-                <p className="text-[11px] text-white/70">Bonus Q&A</p>
+                <p className="text-xs text-white/70">Bonus Q&A</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-neutral-200">
-          <button
-            type="button"
-            onClick={() => setActiveTab('ledger')}
-            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === 'ledger'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            <Flame className="w-4 h-4" />
-            My Points Ledger ({summary.history.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('leaderboard')}
-            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
-              activeTab === 'leaderboard'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-900'
-            }`}
-          >
-            <Trophy className="w-4 h-4" />
-            Campus Leaderboard
-          </button>
+        {/* Tab Navigation with AppSegmented */}
+        <div className="flex items-center">
+          <AppSegmented
+            options={[
+              { value: 'ledger', label: `Points Ledger (${summary.history.length})` },
+              { value: 'leaderboard', label: 'Campus Leaderboard' },
+            ]}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
         </div>
 
         {/* Tab 1: Ledger */}
@@ -331,16 +316,16 @@ export default function StudentPointsPage() {
         {/* Tab 2: Leaderboard */}
         {activeTab === 'leaderboard' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface p-4 rounded-[20px] border border-line shadow-xs">
               <div>
-                <h3 className="text-sm font-bold text-neutral-900">Student Ranking</h3>
-                <p className="text-xs text-neutral-500">
-                  Privacy-preserving institutional rankings. Only name, department, and total points are displayed.
+                <h3 className="text-sm font-bold text-ink">Student Academic Ranking</h3>
+                <p className="text-xs text-muted">
+                  Privacy-preserving campus rankings derived from append-only ledger entries.
                 </p>
               </div>
 
               <div className="w-full sm:w-64">
-                <Select
+                <AppSelect
                   value={selectedDeptId}
                   onChange={(e) => setSelectedDeptId(e.target.value)}
                   options={[
@@ -364,9 +349,97 @@ export default function StudentPointsPage() {
                 description="No student points records exist for this department yet."
               />
             ) : (
-              <Card>
-                <Table columns={leaderboardColumns} data={leaderboard} keyField="student_id" />
-              </Card>
+              <div className="space-y-2.5">
+                {leaderboard.map((row) => {
+                  const rank = parseInt(row.leaderboard_rank, 10);
+                  const isRank1 = rank === 1;
+                  const isRank2 = rank === 2;
+                  const isRank3 = rank === 3;
+                  const isMe = row.student_id === user?.id;
+
+                  return (
+                    <div
+                      key={row.student_id}
+                      className={`flex items-center justify-between p-4 rounded-[16px] transition-all ${
+                        isRank1
+                          ? 'border border-gold/60 shadow-[0_0_15px_rgb(var(--gold)/0.15)] bg-surface'
+                          : isMe
+                          ? 'border border-primary/40 bg-primary-soft/30 shadow-xs'
+                          : 'border border-line bg-surface hover:bg-surface-2/60 shadow-2xs'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        {/* Rank Badge */}
+                        <div className="w-10 flex items-center justify-center shrink-0">
+                          {isRank1 ? (
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gold/50 bg-gold/15 text-gold font-bold text-xs shadow-xs">
+                              <Trophy className="w-4 h-4 text-gold" />
+                            </span>
+                          ) : isRank2 ? (
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-line bg-surface-2 text-muted font-bold text-xs">
+                              <Medal className="w-4 h-4 text-muted" />
+                            </span>
+                          ) : isRank3 ? (
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-amber-600/30 bg-amber-600/10 text-amber-700 font-bold text-xs">
+                              <Medal className="w-4 h-4 text-amber-700" />
+                            </span>
+                          ) : (
+                            <span className="font-mono text-xs font-semibold text-muted">
+                              #{rank}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Student Monogram & Info */}
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
+                              isRank1
+                                ? 'bg-gold/20 text-gold border border-gold/40'
+                                : 'bg-primary-soft text-primary'
+                            }`}
+                          >
+                            {(row.student_name || 'S')[0]}
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs font-bold truncate ${
+                                  isRank1 ? 'text-ink font-serif' : 'text-ink'
+                                }`}
+                              >
+                                {row.student_name}
+                              </span>
+                              {isMe && (
+                                <Badge variant="primary" size="sm" className="text-xs">
+                                  You
+                                </Badge>
+                              )}
+                              {isRank1 && (
+                                <span className="text-xs uppercase font-bold text-gold px-1.5 py-0.5 rounded border border-gold/40 bg-gold/10">
+                                  #1 Rank
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted font-mono">
+                              {row.department_code || 'FXEC'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Points Total */}
+                      <div className="text-right shrink-0">
+                        <span className="font-mono font-black text-sm text-primary tabular-nums">
+                          {row.total_points}
+                        </span>
+                        <span className="text-xs text-muted ml-1">pts</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}

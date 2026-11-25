@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import AppButton from '../components/app/AppButton';
 
 const ToastContext = createContext(null);
 
@@ -22,17 +23,17 @@ export function ToastProvider({ children }) {
   }, [removeToast]);
 
   const icons = {
-    success: <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />,
-    error: <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />,
-    warning: <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />,
-    info: <Info className="w-5 h-5 text-blue-500 shrink-0" />,
+    success: <CheckCircle2 className="w-5 h-5 text-success shrink-0" />,
+    error: <AlertCircle className="w-5 h-5 text-danger shrink-0" />,
+    warning: <AlertTriangle className="w-5 h-5 text-warning shrink-0" />,
+    info: <Info className="w-5 h-5 text-info shrink-0" />,
   };
 
   const borders = {
-    success: 'border-emerald-200 bg-white text-neutral-800',
-    error: 'border-red-200 bg-white text-neutral-800',
-    warning: 'border-amber-200 bg-white text-neutral-800',
-    info: 'border-blue-200 bg-white text-neutral-800',
+    success: 'border-success/30 bg-surface text-ink shadow-lg',
+    error: 'border-danger/30 bg-surface text-ink shadow-lg',
+    warning: 'border-warning/30 bg-surface text-ink shadow-lg',
+    info: 'border-info/30 bg-surface text-ink shadow-lg',
   };
 
   return (
@@ -43,7 +44,7 @@ export function ToastProvider({ children }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-lg transition-all animate-in slide-in-from-bottom-2 ${
+            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-[12px] border transition-all animate-in slide-in-from-bottom-2 ${
               borders[toast.type] || borders.info
             }`}
           >
@@ -51,12 +52,15 @@ export function ToastProvider({ children }) {
             <div className="flex-1 text-sm font-medium leading-5">
               {toast.message}
             </div>
-            <button
+            <AppButton
+              variant="ghost"
+              size="sm"
               onClick={() => removeToast(toast.id)}
-              className="text-neutral-400 hover:text-neutral-600 rounded-md p-0.5"
+              className="text-muted hover:text-ink rounded-lg p-0.5 transition-colors"
+              aria-label="Close notification"
             >
               <X className="w-4 h-4" />
-            </button>
+            </AppButton>
           </div>
         ))}
       </div>

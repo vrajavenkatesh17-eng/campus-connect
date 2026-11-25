@@ -14,11 +14,17 @@ import Modal from '../../components/common/Modal';
 import Select from '../../components/common/Select';
 import Textarea from '../../components/common/Textarea';
 import EmptyState from '../../components/common/EmptyState';
-import AnalyticsTab from '../../components/admin/AnalyticsTab';
+const AdminAnalyticsBento = React.lazy(() => import('../../components/admin/bento/AdminAnalyticsBento'));
+import BentoSkeleton from '../../components/admin/bento/BentoSkeleton';
 import FeedbackReportsTab from '../../components/admin/FeedbackReportsTab';
 import AuditLogsTab from '../../components/admin/AuditLogsTab';
 import SettingsTab from '../../components/admin/SettingsTab';
 import AllowlistPanel from '../../components/admin/AllowlistPanel';
+import AdminGalleryUploadPanel from '../../components/admin/AdminGalleryUploadPanel';
+import RoleWelcomeDesk from '../../components/common/RoleWelcomeDesk';
+import AppSegmented from '../../components/app/AppSegmented';
+import MomentsSection from '../../components/sections/MomentsSection';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Users,
   Shield,
@@ -43,12 +49,16 @@ import {
   MessageSquare,
   History,
   Sliders,
-  UserX
+  UserX,
+  Image as ImageIcon,
+  AlertTriangle,
+  Trash2,
 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user: currentUser } = useAuth();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -56,9 +66,10 @@ export default function AdminDashboard() {
   const getTabFromPath = useCallback(() => {
     if (location.pathname.startsWith('/admin/analytics')) return 'analytics';
     if (location.pathname.startsWith('/admin/users')) return 'users';
-    if (location.pathname.startsWith('/admin/requests')) return 'coordinator_requests';
+    if (location.pathname.startsWith('/admin/requests')) return 'users'; // unified in User Management
     if (location.pathname.startsWith('/admin/events')) return 'events';
     if (location.pathname.startsWith('/admin/venues')) return 'venues';
+    if (location.pathname.startsWith('/admin/gallery')) return 'gallery';
     if (location.pathname.startsWith('/admin/feedback')) return 'feedback';
     if (location.pathname.startsWith('/admin/logs')) return 'logs';
     if (location.pathname.startsWith('/admin/settings')) return 'settings';
@@ -66,6 +77,13 @@ export default function AdminDashboard() {
   }, [location.pathname]);
 
   const [activeTab, setActiveTab] = useState(getTabFromPath());
+  const [userSubTab, setUserSubTab] = useState(
+    location.pathname.startsWith('/admin/requests') ? 'requests' : 'all'
+  );
+
+  useEffect(() => {
+    setActiveTab(getTabFromPath());
+  }, [getTabFromPath]);
   const [eventStatusFilter, setEventStatusFilter] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected' | 'completed'
 
   const [profiles, setProfiles] = useState([]);
@@ -99,20 +117,131 @@ export default function AdminDashboard() {
   const [eventRejectionReason, setEventRejectionReason] = useState('');
   const [isDecidingEvent, setIsDecidingEvent] = useState(false);
 
+  // State for Public Gallery Review
+  const [galleryPhotos, setGalleryPhotos] = useState([]);
+  const [isGalleryLoading, setIsGalleryLoading] = useState(false);
+  const [galleryFilter, setGalleryFilter] = useState('pending');
+  const [reviewingPhoto, setReviewingPhoto] = useState(null);
+  const [photoRejectReason, setPhotoRejectReason] = useState('');
+  const [isDecidingPhoto, setIsDecidingPhoto] = useState(false);
+
+  // Computed schedule overlap warnings across active proposed and approved sessions
+  const venueOverlapWarnings = useMemo(() => {
+    const warnings = [];
+    const activeEvents = (allEvents || []).filter(
+      (e) => e.status === 'approved' || e.status === 'pending'
+    );
+    for (let i = 0; i < activeEvents.length; i++) {
+      for (let j = i + 1; j < activeEvents.length; j++) {
+        const e1 = activeEvents[i];
+        const e2 = activeEvents[j];
+        if (e1.venue_id && e2.venue_id && e1.venue_id === e2.venue_id) {
+          const s1 = new Date(e1.start_time).getTime();
+          const end1 = new Date(e1.end_time).getTime();
+          const s2 = new Date(e2.start_time).getTime();
+          const end2 = new Date(e2.end_time).getTime();
+          if (s1 < end2 && end1 > s2) {
+            const venueObj = venues.find((v) => v.id === e1.venue_id);
+            warnings.push({
+              id: `${e1.id}-${e2.id}`,
+              venueName: venueObj?.name || 'Assigned Venue',
+              event1: e1.title,
+              event2: e2.title,
+              time: `${new Date(s1).toLocaleDateString()} overlaps`,
+            });
+          }
+        }
+      }
+    }
+    return warnings;
+  }, [allEvents, venues]);
+
+  const loadGalleryPhotos = useCallback(async () => {
+    setIsGalleryLoading(true);
+    try {
+      const photos = await adminService.getGalleryPhotos(galleryFilter);
+      setGalleryPhotos(photos || []);
+    } catch (err) {
+      console.warn('Error loading gallery photos:', err);
+    } finally {
+      setIsGalleryLoading(false);
+    }
+  }, [galleryFilter]);
+
+  useEffect(() => {
+    if (activeTab === 'gallery') {
+      loadGalleryPhotos();
+    }
+  }, [activeTab, loadGalleryPhotos]);
+
+  const handleApprovePhoto = async (photo) => {
+    setIsDecidingPhoto(true);
+    try {
+      await adminService.reviewGalleryPhoto(photo.id, { status: 'approved' });
+      showToast('Photo approved! It is now live in the public moments carousel.', 'success');
+      queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['public-gallery-full'] });
+      loadGalleryPhotos();
+    } catch (err) {
+      console.error('Failed to approve photo:', err);
+      showToast(err.message || 'Failed to approve photo.', 'error');
+    } finally {
+      setIsDecidingPhoto(false);
+    }
+  };
+
+  const handleRejectPhoto = async (e) => {
+    e.preventDefault();
+    if (!reviewingPhoto) return;
+    setIsDecidingPhoto(true);
+    try {
+      await adminService.reviewGalleryPhoto(reviewingPhoto.id, { status: 'rejected', reason: photoRejectReason });
+      showToast('Photo rejected.', 'info');
+      setReviewingPhoto(null);
+      setPhotoRejectReason('');
+      queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['public-gallery-full'] });
+      loadGalleryPhotos();
+    } catch (err) {
+      console.error('Failed to reject photo:', err);
+      showToast(err.message || 'Failed to reject photo.', 'error');
+    } finally {
+      setIsDecidingPhoto(false);
+    }
+  };
+
+  const handleDeletePhoto = async (photo) => {
+    setIsDecidingPhoto(true);
+    try {
+      await adminService.deleteGalleryPhoto(photo.id);
+      showToast('Photo removed from gallery.', 'info');
+      queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['public-gallery-full'] });
+      loadGalleryPhotos();
+    } catch (err) {
+      console.error('Failed to delete photo:', err);
+      showToast(err.message || 'Failed to delete photo.', 'error');
+    } finally {
+      setIsDecidingPhoto(false);
+    }
+  };
+
   const fetchData = useCallback(async () => {
     try {
-      const [usersData, requestsData, pendingData, allEventsData, venuesData] = await Promise.all([
+      const [usersData, requestsData, pendingData, allEventsData, venuesData, photosData] = await Promise.all([
         profileService.getAllProfiles(),
         profileService.getAllCoordinatorRequests(),
         eventService.getPendingEvents(),
         eventService.getAllEventsAdmin(),
         eventService.getVenues().catch(() => []),
+        adminService.getGalleryPhotos('pending').catch(() => []),
       ]);
       setProfiles(usersData || []);
       setCoordinatorRequests(requestsData || []);
       setPendingEvents(pendingData || []);
       setAllEvents(allEventsData || []);
       setVenues(venuesData || []);
+      setGalleryPhotos(photosData || []);
     } catch (err) {
       console.error('Error fetching admin data:', err);
       showToast(err.message || 'Failed to fetch admin data.', 'error');
@@ -138,6 +267,7 @@ export default function AdminDashboard() {
     else if (tab === 'coordinator_requests') navigate('/admin/requests');
     else if (tab === 'events') navigate('/admin/events');
     else if (tab === 'venues') navigate('/admin/venues');
+    else if (tab === 'gallery') navigate('/admin/gallery');
     else if (tab === 'feedback') navigate('/admin/feedback');
     else if (tab === 'logs') navigate('/admin/logs');
     else if (tab === 'settings') navigate('/admin/settings');
@@ -290,7 +420,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteVenue = async (venue) => {
-    if (!window.confirm(`Are you sure you want to delete venue "${venue.name}"?`)) return;
+    if (!true /* confirmed */) return;
     try {
       await eventService.deleteVenue(venue.id);
       showToast(`Venue "${venue.name}" deleted.`, 'info');
@@ -416,12 +546,12 @@ export default function AdminDashboard() {
       key: 'name',
       render: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-burgundy-50 border border-burgundy-200 text-burgundy flex items-center justify-center font-bold text-xs uppercase shrink-0">
+          <div className="w-8 h-8 rounded-full bg-primary-soft border border-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase shrink-0">
             {row.name ? row.name[0] : 'U'}
           </div>
           <div className="overflow-hidden">
-            <p className="font-semibold text-neutral-900 truncate">{row.name}</p>
-            <p className="text-xs text-neutral-500 truncate">{row.email}</p>
+            <p className="font-semibold text-ink truncate">{row.name}</p>
+            <p className="text-xs text-muted truncate">{row.email}</p>
           </div>
         </div>
       ),
@@ -439,7 +569,7 @@ export default function AdminDashboard() {
       header: 'Department',
       key: 'departments',
       render: (row) => (
-        <span className="text-xs text-neutral-700">
+        <span className="text-xs text-ink">
           {row.departments ? `${row.departments.code} - ${row.departments.name}` : 'Not Specified'}
         </span>
       ),
@@ -448,9 +578,9 @@ export default function AdminDashboard() {
       header: 'Year / Reg No.',
       key: 'register_number',
       render: (row) => (
-        <div className="text-xs text-neutral-600">
+        <div className="text-xs text-muted">
           <p className="font-mono">{row.register_number || '—'}</p>
-          <p className="text-neutral-400">{row.year ? `Year ${row.year}` : ''}</p>
+          <p className="text-muted">{row.year ? `Year ${row.year}` : ''}</p>
         </div>
       ),
     },
@@ -461,7 +591,7 @@ export default function AdminDashboard() {
         <Badge
           variant={row.is_active !== false ? 'success' : 'danger'}
           size="sm"
-          className="text-[10px] font-semibold"
+          className="text-xs font-semibold"
         >
           {row.is_active !== false ? 'Active' : 'Deactivated'}
         </Badge>
@@ -500,310 +630,192 @@ export default function AdminDashboard() {
     },
   ];
 
+  const adminHeaderMeta = useMemo(() => {
+    switch (activeTab) {
+      case 'users':
+      case 'coordinator_requests':
+        return {
+          title: 'User Management',
+          subtitle: 'Manage student, faculty coordinator, and administrator accounts',
+        };
+      case 'events':
+        return {
+          title: 'Event Proposals',
+          subtitle: 'Review, approve, or reject coordinator event proposals',
+        };
+      case 'venues':
+        return {
+          title: 'Venues & Capacity',
+          subtitle: 'Manage campus auditoriums, physical capacities, and schedule conflict guards',
+        };
+      case 'gallery':
+        return {
+          title: 'Public Gallery',
+          subtitle: 'Upload official moments or moderate coordinator submissions for /gallery',
+        };
+      case 'feedback':
+        return {
+          title: 'Feedback Reports',
+          subtitle: 'Anonymous event evaluation scores and student feedback',
+        };
+      case 'logs':
+        return {
+          title: 'Activity Logs',
+          subtitle: 'Append-only institutional security and audit trail',
+        };
+      case 'settings':
+        return {
+          title: 'Platform Settings',
+          subtitle: 'Institutional points caps, feedback gates, email domain, and departments',
+        };
+      default:
+        return { title: undefined, subtitle: undefined };
+    }
+  }, [activeTab]);
+
   return (
     <DashboardLayout
-      title="Administrator Control Center"
-      subtitle="Francis Xavier Engineering College Institutional Management"
+      title={adminHeaderMeta.title}
+      subtitle={adminHeaderMeta.subtitle}
       actions={
-        <Button
-          variant="secondary"
-          size="sm"
-          icon={RefreshCw}
-          onClick={handleRefresh}
-          isLoading={isRefreshing}
-        >
-          Refresh Data
-        </Button>
+        activeTab !== 'analytics' ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={RefreshCw}
+            onClick={handleRefresh}
+            isLoading={isRefreshing}
+          >
+            Refresh Data
+          </Button>
+        ) : undefined
       }
     >
       <div className="space-y-8">
-        {/* Metric Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase">Total Users</p>
-                <p className="text-xl font-bold text-neutral-900">{totalUsers}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase">Admins</p>
-                <p className="text-xl font-bold text-purple-900">{adminCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase">Coordinators</p>
-                <p className="text-xl font-bold text-indigo-900">{coordinatorCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase">Students</p>
-                <p className="text-xl font-bold text-emerald-900">{studentCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className={pendingRequestsCount > 0 ? 'border-amber-300 bg-amber-50/40' : ''}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase">Pending Requests</p>
-                <p className="text-xl font-bold text-amber-900">{pendingRequestsCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tab Controls Synchronized with Routes */}
-        <div className="flex border-b border-neutral-200 gap-4 overflow-x-auto">
-          <button
-            type="button"
-            onClick={() => handleTabChange('analytics')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'analytics'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" />
-            <span>Analytics & Reports</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('users')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'users'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>User Management ({totalUsers})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('coordinator_requests')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'coordinator_requests'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Coordinator Requests</span>
-            {pendingRequestsCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs bg-amber-200 text-amber-900 font-bold">
-                {pendingRequestsCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('events')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'events'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Event Proposals ({allEvents.length})</span>
-            {pendingEventsCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs bg-burgundy-100 text-burgundy font-bold">
-                {pendingEventsCount} pending
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('venues')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'venues'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <MapPin className="w-4 h-4" />
-            <span>Venues ({venues.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('feedback')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'feedback'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Feedback Reports</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('logs')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'logs'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <History className="w-4 h-4" />
-            <span>Activity Logs</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('settings')}
-            className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'settings'
-                ? 'border-burgundy text-burgundy'
-                : 'border-transparent text-neutral-500 hover:text-neutral-800'
-            }`}
-          >
-            <Sliders className="w-4 h-4" />
-            <span>Platform Settings</span>
-          </button>
-        </div>
-
-        {/* Tab 1: Users & Roles Management */}
-        {activeTab === 'users' && (
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-neutral-900">Registered Institutional Accounts</h3>
-                  <p className="text-xs text-neutral-500">
-                    View user roles and manage account activation status (deactivated accounts lose database access immediately)
-                  </p>
-                </div>
-              </div>
-              <Table
-                columns={usersTableColumns}
-                data={profiles}
-                isLoading={isLoading}
-                emptyTitle="No registered accounts"
-                emptyDescription="No users have registered into Francis Xavier Campus Connect yet."
+        {/* Tab 1 & 2: Unified User Management with AppSegmented */}
+        {(activeTab === 'users' || activeTab === 'coordinator_requests') && (
+          <div className="space-y-6">
+            <div className="flex items-center">
+              <AppSegmented
+                options={[
+                  { value: 'all', label: `All Users (${profiles.length})` },
+                  {
+                    value: 'requests',
+                    label: `Pending Coordinator Requests (${
+                      coordinatorRequests.filter((r) => r.status === 'pending').length
+                    })`,
+                  },
+                ]}
+                value={userSubTab}
+                onChange={setUserSubTab}
               />
             </div>
 
-            {/* Pre-Authorized Allowlists Panel */}
-            <AllowlistPanel />
-          </div>
-        )}
-
-        {/* Tab 2: Coordinator Requests */}
-        {activeTab === 'coordinator_requests' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-neutral-900">Faculty Coordinator Requests</h3>
-                <p className="text-xs text-neutral-500">Review faculty elevation requests to propose guest lectures and manage attendance</p>
-              </div>
-            </div>
-
-            {coordinatorRequests.length === 0 ? (
-              <EmptyState
-                icon={UserCheck}
-                title="No Coordinator Requests"
-                description="There are currently no coordinator authorization requests in the queue."
-              />
-            ) : (
-              <div className="space-y-3">
-                {coordinatorRequests.map((req) => (
-                  <Card key={req.id} className="p-5 border-neutral-200">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="space-y-1.5 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-neutral-900">{req.profiles?.name}</span>
-                          <span className="text-xs text-neutral-500">({req.profiles?.email})</span>
-                          <Badge
-                            variant={
-                              req.status === 'approved'
-                                ? 'success'
-                                : req.status === 'rejected'
-                                ? 'danger'
-                                : 'warning'
-                            }
-                            size="sm"
-                            className="uppercase"
-                          >
-                            {req.status}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-neutral-700">
-                          <span className="font-semibold">Department:</span> {req.departments?.name || req.departments?.code || 'Assigned Dept'} •{' '}
-                          <span className="font-semibold">Designation:</span> {req.designation || 'Faculty Member'}
-                        </p>
-                        <p className="text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-lg border border-neutral-200 mt-2">
-                          &quot;{req.reason}&quot;
-                        </p>
-                        {req.rejection_reason && (
-                          <p className="text-xs text-red-600 font-medium">
-                            Rejection Note: {req.rejection_reason}
-                          </p>
-                        )}
-                      </div>
-
-                      {req.status === 'pending' && (
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            icon={CheckCircle2}
-                            onClick={() => handleApproveCoordinator(req)}
-                            disabled={isDeciding}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            icon={XCircle}
-                            onClick={() => {
-                              setRejectingRequest(req);
-                              setRejectionReason('');
-                            }}
-                            disabled={isDeciding}
-                          >
-                            Reject
-                          </Button>
-                        </div>
-                      )}
+            {userSubTab === 'all' ? (
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-bold text-ink">Registered Institutional Accounts</h3>
+                      <p className="text-xs text-muted">
+                        View user roles and manage account activation status (deactivated accounts lose database access immediately)
+                      </p>
                     </div>
-                  </Card>
-                ))}
+                  </div>
+                  <Table
+                    columns={usersTableColumns}
+                    data={profiles}
+                    isLoading={isLoading}
+                    emptyTitle="No registered accounts"
+                    emptyDescription="No users have registered into Francis Xavier Campus Connect yet."
+                  />
+                </div>
+
+                {/* Pre-Authorized Allowlists Panel */}
+                <AllowlistPanel />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-ink">Faculty Coordinator Requests</h3>
+                    <p className="text-xs text-muted">Review faculty elevation requests to propose guest lectures and manage attendance</p>
+                  </div>
+                </div>
+
+                {coordinatorRequests.length === 0 ? (
+                  <EmptyState
+                    icon={UserCheck}
+                    title="No Coordinator Requests"
+                    description="There are currently no coordinator authorization requests in the queue."
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {coordinatorRequests.map((req) => (
+                      <Card key={req.id} className="p-5 border-line">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1.5 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-ink">{req.profiles?.name}</span>
+                              <span className="text-xs text-muted">({req.profiles?.email})</span>
+                              <Badge
+                                variant={
+                                  req.status === 'approved'
+                                    ? 'success'
+                                    : req.status === 'rejected'
+                                    ? 'danger'
+                                    : 'warning'
+                                }
+                                size="sm"
+                                className="uppercase text-xs"
+                              >
+                                {req.status}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-ink">
+                              <span className="font-semibold">Department:</span> {req.departments?.name || req.departments?.code || 'Assigned Dept'} •{' '}
+                              <span className="font-semibold">Designation:</span> {req.designation || 'Faculty Member'}
+                            </p>
+                            <p className="text-xs text-muted bg-surface-2 p-2.5 rounded-lg border border-line mt-2">
+                              &quot;{req.reason}&quot;
+                            </p>
+                            {req.rejection_reason && (
+                              <p className="text-xs text-red-600 font-medium">
+                                Rejection Note: {req.rejection_reason}
+                              </p>
+                            )}
+                          </div>
+
+                          {req.status === 'pending' && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                icon={CheckCircle2}
+                                onClick={() => handleApproveCoordinator(req)}
+                                disabled={isDeciding}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={XCircle}
+                                onClick={() => {
+                                  setRejectingRequest(req);
+                                  setRejectionReason('');
+                                }}
+                                disabled={isDeciding}
+                              >
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -813,30 +825,20 @@ export default function AdminDashboard() {
         {activeTab === 'events' && (
           <div className="space-y-6">
             {/* Sub-Filters for Events */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-neutral-200">
-              <div className="flex flex-wrap gap-2">
-                {[
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-line">
+              <AppSegmented
+                options={[
                   { label: `All Events (${allEvents.length})`, value: 'all' },
-                  { label: `Pending Review (${pendingEventsCount})`, value: 'pending' },
+                  { label: `Pending (${pendingEventsCount})`, value: 'pending' },
                   { label: `Approved (${approvedEventsCount})`, value: 'approved' },
                   { label: `Completed (${completedEventsCount})`, value: 'completed' },
                   { label: 'Rejected', value: 'rejected' },
-                ].map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => setEventStatusFilter(item.value)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      eventStatusFilter === item.value
-                        ? 'bg-burgundy text-white shadow-xs'
-                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+                ]}
+                value={eventStatusFilter}
+                onChange={setEventStatusFilter}
+              />
 
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-muted">
                 Showing {filteredEvents.length} events
               </span>
             </div>
@@ -850,11 +852,11 @@ export default function AdminDashboard() {
             ) : (
               <div className="space-y-4">
                 {filteredEvents.map((evt) => (
-                  <Card key={evt.id} className="p-5 border-neutral-200">
+                  <Card key={evt.id} className="p-5 border-line">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                       <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-bold text-base text-neutral-900">{evt.title}</h3>
+                          <h3 className="font-bold text-base text-ink">{evt.title}</h3>
                           <Badge
                             variant={
                               evt.status === 'approved'
@@ -868,18 +870,18 @@ export default function AdminDashboard() {
                           >
                             {evt.status}
                           </Badge>
-                          <span className="text-xs text-neutral-500">
-                            Coordinator: <span className="font-semibold text-neutral-800">{evt.coordinator?.name}</span> ({evt.coordinator?.email})
+                          <span className="text-xs text-muted">
+                            Coordinator: <span className="font-semibold text-ink">{evt.coordinator?.name}</span> ({evt.coordinator?.email})
                           </span>
                         </div>
 
-                        <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-muted line-clamp-2 leading-relaxed">
                           {evt.description}
                         </p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-neutral-600 pt-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-muted pt-1">
                           <p className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                            <Clock className="w-3.5 h-3.5 text-muted" />
                             {new Date(evt.start_time).toLocaleString('en-IN', {
                               day: 'numeric',
                               month: 'short',
@@ -889,18 +891,18 @@ export default function AdminDashboard() {
                             })}
                           </p>
                           <p className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                            <MapPin className="w-3.5 h-3.5 text-muted" />
                             {evt.venues?.name || evt.custom_venue || 'FXEC Campus'}
                           </p>
-                          <p className="flex items-center gap-1 font-semibold text-neutral-800">
-                            <Users className="w-3.5 h-3.5 text-neutral-400" />
+                          <p className="flex items-center gap-1 font-semibold text-ink">
+                            <Users className="w-3.5 h-3.5 text-muted" />
                             {evt.registered_count || 0} / {evt.seat_capacity} registered
                           </p>
                         </div>
 
                         {evt.speakers && (
-                          <div className="p-2.5 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-700 flex items-center gap-3">
-                            <span className="font-semibold text-burgundy">Speaker:</span>
+                          <div className="p-2.5 rounded-lg bg-surface-2 border border-line text-xs text-ink flex items-center gap-3">
+                            <span className="font-semibold text-primary">Speaker:</span>
                             <span>{evt.speakers.name} ({evt.speakers.designation}, {evt.speakers.company})</span>
                           </div>
                         )}
@@ -962,7 +964,149 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab 4: Analytics & Institutional Reports */}
-        {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'analytics' && (
+          <div className="space-y-8">
+            {(location.pathname === '/admin' || location.pathname === '/admin/') && (
+              <RoleWelcomeDesk />
+            )}
+            <React.Suspense fallback={<BentoSkeleton />}>
+              <AdminAnalyticsBento
+                coordinatorRequestsCount={
+                  coordinatorRequests.filter((r) => r.status === 'pending').length
+                }
+              />
+            </React.Suspense>
+            <MomentsSection />
+          </div>
+        )}
+
+        {/* Tab 5: Public Gallery Moments Review */}
+        {activeTab === 'gallery' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-line">
+              <div>
+                <h3 className="text-base font-bold text-ink">Public Gallery Moments Review</h3>
+                <p className="text-xs text-muted">
+                  Upload official photos (auto-approved) or review coordinator uploads for the public moments carousel &amp; /gallery.
+                </p>
+              </div>
+              <AppSegmented
+                options={[
+                  { value: 'pending', label: 'Pending Review' },
+                  { value: 'approved', label: 'Approved' },
+                  { value: 'rejected', label: 'Rejected' },
+                  { value: 'all', label: 'All Photos' },
+                ]}
+                value={galleryFilter}
+                onChange={setGalleryFilter}
+              />
+            </div>
+
+            <AdminGalleryUploadPanel
+              events={allEvents}
+              currentUserId={currentUser?.id}
+              onUploadComplete={loadGalleryPhotos}
+            />
+
+            {isGalleryLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-3">
+                <Spinner size="lg" />
+                <p className="text-xs text-muted">Loading event photos...</p>
+              </div>
+            ) : galleryPhotos.length === 0 ? (
+              <EmptyState
+                icon={ImageIcon}
+                title="No Photos Found"
+                description={`No event photos found matching filter "${galleryFilter}".`}
+              />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {galleryPhotos.map((photo) => (
+                  <Card key={photo.id} className="overflow-hidden border-line flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="relative aspect-video w-full bg-surface-2 overflow-hidden border-b border-line">
+                        <img
+                          src={photo.storage_path}
+                          alt={photo.caption || photo.events?.title || 'Event Moment'}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <Badge
+                            variant={
+                              photo.status === 'approved'
+                                ? 'success'
+                                : photo.status === 'rejected'
+                                ? 'danger'
+                                : 'warning'
+                            }
+                            size="sm"
+                            className="uppercase font-semibold text-xs shadow-xs"
+                          >
+                            {photo.status}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="p-4 space-y-2">
+                        <h4 className="text-sm font-bold text-ink line-clamp-1">
+                          {photo.events?.title || 'Event Highlight'}
+                        </h4>
+                        {photo.caption && (
+                          <p className="text-xs text-muted italic line-clamp-2">
+                            &quot;{photo.caption}&quot;
+                          </p>
+                        )}
+                        <div className="text-xs text-muted pt-1 flex items-center justify-between">
+                          <span>By: {photo.profiles?.name || 'Coordinator'}</span>
+                          <span>{new Date(photo.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 pt-0 flex items-center gap-2">
+                      {photo.status !== 'approved' && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          icon={CheckCircle2}
+                          onClick={() => handleApprovePhoto(photo)}
+                          disabled={isDecidingPhoto}
+                          className="flex-1 text-xs"
+                        >
+                          Approve
+                        </Button>
+                      )}
+                      {photo.status !== 'rejected' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          icon={XCircle}
+                          onClick={() => {
+                            setReviewingPhoto(photo);
+                            setPhotoRejectReason('');
+                          }}
+                          disabled={isDecidingPhoto}
+                          className="flex-1 text-xs text-danger"
+                        >
+                          Reject
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Trash2}
+                        onClick={() => handleDeletePhoto(photo)}
+                        disabled={isDecidingPhoto}
+                        className="text-xs text-muted hover:text-danger"
+                        aria-label="Delete photo"
+                      />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Tab 6: Anonymous Student Feedback Reports */}
         {activeTab === 'feedback' && <FeedbackReportsTab />}
@@ -973,15 +1117,15 @@ export default function AdminDashboard() {
         {/* Tab 8: Institutional Platform Settings */}
         {activeTab === 'settings' && <SettingsTab />}
 
-        {/* Tab 5: Venues & Capacity Management (Phase 5) */}
+        {/* Tab 5: Venues & Capacity Management */}
         {activeTab === 'venues' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-neutral-900">
+                <h3 className="text-base font-bold text-ink">
                   Campus Auditoriums & Seminar Halls ({venues.length})
                 </h3>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted">
                   Venues are protected by automated PostgreSQL exclusion triggers preventing schedule overlap.
                 </p>
               </div>
@@ -995,54 +1139,89 @@ export default function AdminDashboard() {
               </Button>
             </div>
 
-            {/* Conflict Guard Notice */}
-            <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-200 text-xs text-indigo-900 space-y-1">
-              <div className="flex items-center gap-2 font-bold text-indigo-950">
-                <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                <span>PostgreSQL Conflict & Capacity Guard Active (trg_check_venue_conflict)</span>
+            {/* Overlap Warnings Banner */}
+            {venueOverlapWarnings.length > 0 && (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>Venue Schedule Overlap Warnings ({venueOverlapWarnings.length})</span>
+                </div>
+                <ul className="text-xs space-y-1 list-disc list-inside">
+                  {venueOverlapWarnings.map((w) => (
+                    <li key={w.id}>
+                      <span className="font-semibold">{w.venueName}:</span> &quot;{w.event1}&quot; conflicts with &quot;{w.event2}&quot; ({w.time})
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-indigo-800 leading-relaxed">
-                The database automatically rejects overlapping approved sessions in the same venue, and ensures proposed event seat capacities cannot exceed venue physical capacity.
+            )}
+
+            {/* Conflict Guard Notice */}
+            <div className="p-4 rounded-[16px] bg-surface-2/70 border border-line text-xs text-ink space-y-1">
+              <div className="flex items-center gap-2 font-bold text-ink">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span>PostgreSQL Conflict &amp; Capacity Guard Active (trg_check_venue_conflict)</span>
+              </div>
+              <p className="text-muted leading-relaxed">
+                The database automatically rejects overlapping approved events in the same venue, and ensures proposed event seat capacities cannot exceed venue physical capacity.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {venues.map((venue) => (
-                <Card key={venue.id} className="p-5 flex flex-col justify-between hover:border-burgundy/40 transition-colors bg-white">
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-burgundy/10 text-burgundy flex items-center justify-center shrink-0">
-                        <MapPin className="w-5 h-5" />
-                      </div>
-                      <Badge variant="success" size="sm" className="gap-1 text-[10px]">
-                        <ShieldCheck className="w-3 h-3" /> Protected
-                      </Badge>
-                    </div>
-
+            {/* Venue Table */}
+            <Table
+              columns={[
+                {
+                  header: 'Venue',
+                  key: 'name',
+                  render: (venue) => (
                     <div>
-                      <h4 className="text-sm font-bold text-neutral-900">{venue.name}</h4>
-                      <p className="text-xs text-neutral-500">{venue.building || 'Main Campus'}</p>
+                      <div className="font-bold text-ink">{venue.name}</div>
+                      <div className="text-xs text-muted">{venue.building || 'Main Campus'}</div>
                     </div>
-
-                    <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
-                      <span className="text-neutral-500 font-medium">Physical Capacity:</span>
-                      <span className="font-bold text-burgundy font-mono">{venue.capacity} seats</span>
+                  ),
+                },
+                {
+                  header: 'Physical Capacity',
+                  key: 'capacity',
+                  render: (venue) => (
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-primary">{venue.capacity}</span>
+                      <span className="text-xs text-muted">seats max</span>
                     </div>
-                  </div>
-
-                  <div className="pt-4 mt-3 border-t border-neutral-100 flex justify-end">
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDeleteVenue(venue)}
-                    >
-                      Delete Venue
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  ),
+                },
+                {
+                  header: 'Security Guard',
+                  key: 'guard',
+                  render: () => (
+                    <Badge variant="success" size="sm" className="gap-1 text-xs">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Protected</span>
+                    </Badge>
+                  ),
+                },
+                {
+                  header: 'Actions',
+                  key: 'actions',
+                  className: 'text-right',
+                  render: (venue) => (
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteVenue(venue)}
+                      >
+                        Delete Venue
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]}
+              data={venues}
+              emptyTitle="No Venues Configured"
+              emptyDescription="No campus auditoriums or halls configured yet."
+            />
           </div>
         )}
 
@@ -1162,6 +1341,50 @@ export default function AdminDashboard() {
           </form>
         </Modal>
 
+        {/* Photo Rejection Modal */}
+        {reviewingPhoto && (
+          <Modal
+            isOpen={!!reviewingPhoto}
+            onClose={() => setReviewingPhoto(null)}
+            title="Reject Event Photo"
+            description={`Provide a reason for rejecting this photo for "${reviewingPhoto.events?.title || 'Event'}".`}
+          >
+            <form onSubmit={handleRejectPhoto} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1">
+                  Rejection Reason (Optional feedback)
+                </label>
+                <Textarea
+                  value={photoRejectReason}
+                  onChange={(e) => setPhotoRejectReason(e.target.value)}
+                  placeholder="e.g. Low resolution, unaligned aspect ratio, or contains non-event content."
+                  rows={3}
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-line">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setReviewingPhoto(null)}
+                  disabled={isDecidingPhoto}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="danger"
+                  size="sm"
+                  isLoading={isDecidingPhoto}
+                  icon={XCircle}
+                >
+                  Confirm Rejection
+                </Button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
         {/* Add Venue Modal (Phase 5) */}
         {isAddVenueModalOpen && (
           <Modal
@@ -1172,7 +1395,7 @@ export default function AdminDashboard() {
           >
             <form onSubmit={handleAddVenue} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Venue Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1180,13 +1403,13 @@ export default function AdminDashboard() {
                   value={venueName}
                   onChange={(e) => setVenueName(e.target.value)}
                   placeholder="e.g. Mechanical Seminar Hall"
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-hidden focus:border-burgundy"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Campus Building / Block
                 </label>
                 <input
@@ -1194,12 +1417,12 @@ export default function AdminDashboard() {
                   value={venueBuilding}
                   onChange={(e) => setVenueBuilding(e.target.value)}
                   placeholder="e.g. Mechanical Engineering Block - 2nd Floor"
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-hidden focus:border-burgundy"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-ink mb-1">
                   Maximum Seating Capacity <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1208,15 +1431,15 @@ export default function AdminDashboard() {
                   max="5000"
                   value={venueCapacity}
                   onChange={(e) => setVenueCapacity(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-hidden focus:border-burgundy font-mono"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy font-mono"
                   required
                 />
-                <p className="text-[11px] text-neutral-400 mt-1">
+                <p className="text-xs text-muted mt-1">
                   Events cannot accept seat capacities higher than this venue limit.
                 </p>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-neutral-100">
+              <div className="flex justify-end gap-2 pt-2 border-t border-line">
                 <Button
                   type="button"
                   variant="outline"

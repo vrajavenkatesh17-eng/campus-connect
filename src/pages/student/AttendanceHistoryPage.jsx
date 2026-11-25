@@ -65,7 +65,7 @@ export default function AttendanceHistoryPage() {
       <DashboardLayout>
         <div className="py-24 flex flex-col items-center justify-center gap-3">
           <Spinner size="lg" />
-          <p className="text-sm text-neutral-500">Loading your verified attendance history...</p>
+          <p className="text-sm text-muted">Loading your verified attendance history...</p>
         </div>
       </DashboardLayout>
     );
@@ -121,7 +121,7 @@ export default function AttendanceHistoryPage() {
             const hasSubmittedFeedback = submittedFeedbackMap.get(ev.id);
 
             return (
-              <Card key={item.id} className="p-4 flex flex-col justify-between hover:border-neutral-300 transition-colors">
+              <Card key={item.id} className="p-4 flex flex-col justify-between hover:border-line transition-colors">
                 <div className="space-y-3">
                   {/* Category & Status */}
                   <div className="flex items-center justify-between gap-2">
@@ -136,36 +136,36 @@ export default function AttendanceHistoryPage() {
 
                   {/* Title & Venue */}
                   <div>
-                    <h3 className="text-sm font-bold text-neutral-900 line-clamp-1">
+                    <h3 className="text-sm font-bold text-ink line-clamp-1">
                       {ev.title || 'Untitled Session'}
                     </h3>
-                    <div className="flex items-center gap-2 text-xs text-neutral-500 mt-1">
-                      <MapPin className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
+                    <div className="flex items-center gap-2 text-xs text-muted mt-1">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-muted" />
                       <span className="truncate">{ev.venue?.name || ev.custom_venue || 'FXEC Campus'}</span>
                     </div>
                   </div>
 
                   {/* Verification Info */}
-                  <div className="rounded-lg bg-neutral-50 border border-neutral-200 p-2.5 text-xs text-neutral-600 space-y-1">
+                  <div className="rounded-lg bg-surface-2 border border-line p-2.5 text-xs text-muted space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-neutral-400">Date & Time:</span>
-                      <span className="font-medium text-neutral-800">
+                      <span className="text-xs text-muted">Date & Time:</span>
+                      <span className="font-medium text-ink">
                         {ev.start_time ? new Date(ev.start_time).toLocaleDateString() : 'N/A'}{' '}
                         ({ev.start_time ? new Date(ev.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''} -{' '}
                         {ev.end_time ? new Date(ev.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''})
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-neutral-400">Verified Via:</span>
-                      <span className="font-mono text-[11px] font-semibold text-neutral-800 flex items-center gap-1">
+                      <span className="text-xs text-muted">Verified Via:</span>
+                      <span className="font-mono text-xs font-semibold text-ink flex items-center gap-1">
                         {item.method === 'qr_scan' && <><QrCode className="w-3 h-3 text-emerald-600" /> Live QR Scan</>}
                         {item.method === 'manual_coordinator' && <><Shield className="w-3 h-3 text-indigo-600" /> Coordinator Override</>}
                         {item.method === 'manual_admin' && <><Shield className="w-3 h-3 text-amber-600" /> Admin Override</>}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-neutral-400">Timestamp:</span>
-                      <span className="font-mono text-[11px] text-neutral-500">
+                      <span className="text-xs text-muted">Timestamp:</span>
+                      <span className="font-mono text-xs text-muted">
                         {new Date(item.verified_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -173,10 +173,10 @@ export default function AttendanceHistoryPage() {
                 </div>
 
                 {/* Feedback Action Section */}
-                <div className="pt-3 mt-3 border-t border-neutral-100 flex items-center justify-between gap-2">
+                <div className="pt-3 mt-3 border-t border-line flex items-center justify-between gap-2">
                   <Link
                     to={`/events/${ev.id}`}
-                    className="text-xs font-semibold text-neutral-600 hover:text-burgundy flex items-center gap-1"
+                    className="text-xs font-semibold text-muted hover:text-primary flex items-center gap-1"
                   >
                     <span>View Event</span>
                     <ArrowRight className="w-3 h-3" />
@@ -198,7 +198,7 @@ export default function AttendanceHistoryPage() {
                       Give Feedback
                     </Button>
                   ) : (
-                    <span className="text-[11px] text-neutral-400 italic">
+                    <span className="text-xs text-muted italic">
                       Feedback opens when session concludes
                     </span>
                   )}

@@ -1,8 +1,12 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 
+// Module-level single-shot OAuth lock (prevents duplicate signInWithOAuth calls)
+let oauthInFlight = false;
+
 export const authService = {
   /**
    * Initiates Google OAuth with hosted domain hint for student and coordinator portals.
+   * Guarded by a single-shot lock so double-clicks / StrictMode can never trigger twice.
    * @param {'student' | 'coordinator' | 'admin'} portalType
    */
   async signInWithGoogle(portalType = 'student') {
@@ -12,28 +16,41 @@ export const authService = {
       );
     }
 
-    // Store portal intent in sessionStorage for post-auth routing
-    sessionStorage.setItem('fxec_auth_portal_intent', portalType);
-
-    const queryParams = {
-      prompt: 'select_account',
-    };
-
-    // Include hosted domain hint for student and coordinator portals
-    if (portalType === 'student' || portalType === 'coordinator') {
-      queryParams.hd = 'francisxavier.ac.in';
+    if (oauthInFlight) {
+      return null;
     }
+    oauthInFlight = true;
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams,
-      },
-    });
+    try {
+      // Store portal intent in sessionStorage for post-auth routing
+      sessionStorage.setItem('fxec_auth_portal_intent', portalType);
 
-    if (error) throw error;
-    return data;
+      const queryParams = {
+        prompt: 'select_account',
+      };
+
+      // Include hosted domain hint for student and coordinator portals
+      if (portalType === 'student' || portalType === 'coordinator') {
+        queryParams.hd = 'francisxavier.ac.in';
+      }
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams,
+        },
+      });
+
+      if (error) {
+        oauthInFlight = false;
+        throw error;
+      }
+      return data;
+    } catch (err) {
+      oauthInFlight = false;
+      throw err;
+    }
   },
 
   /**

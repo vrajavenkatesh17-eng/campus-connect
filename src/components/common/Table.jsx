@@ -12,9 +12,9 @@ export default function Table({
 }) {
   if (isLoading) {
     return (
-      <div className="w-full bg-white border border-neutral-200 rounded-xl overflow-hidden p-12 flex flex-col items-center justify-center gap-3">
+      <div className="w-full bg-surface border border-line rounded-[20px] overflow-hidden p-12 flex flex-col items-center justify-center gap-3">
         <Spinner size="lg" />
-        <p className="text-sm text-neutral-500 font-medium">Loading data from database...</p>
+        <p className="text-sm text-muted font-medium">Loading data from database...</p>
       </div>
     );
   }
@@ -29,15 +29,15 @@ export default function Table({
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-neutral-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-neutral-200 text-left text-sm">
-        <thead className="bg-neutral-50">
+    <div className="w-full overflow-x-auto rounded-[20px] border border-line bg-surface shadow-sm dark:shadow-none">
+      <table className="min-w-full divide-y divide-line text-left text-sm">
+        <thead className="bg-surface-2/70">
           <tr>
             {columns.map((col, idx) => (
               <th
                 key={col.key || idx}
                 scope="col"
-                className={`px-6 py-3.5 font-semibold text-neutral-700 text-xs uppercase tracking-wider ${
+                className={`px-6 py-3.5 font-semibold text-muted text-xs uppercase tracking-wider ${
                   col.className || ''
                 }`}
               >
@@ -46,16 +46,16 @@ export default function Table({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-200 bg-white">
+        <tbody className="divide-y divide-line bg-surface">
           {data.map((row, rowIdx) => (
             <tr
               key={row[keyField] || rowIdx}
-              className="hover:bg-neutral-50/70 transition-colors"
+              className="hover:bg-surface-2/50 transition-colors"
             >
               {columns.map((col, colIdx) => (
                 <td
                   key={col.key || colIdx}
-                  className={`px-6 py-4 whitespace-nowrap text-neutral-800 ${
+                  className={`px-6 py-4 whitespace-nowrap text-ink ${
                     col.cellClassName || ''
                   }`}
                 >
