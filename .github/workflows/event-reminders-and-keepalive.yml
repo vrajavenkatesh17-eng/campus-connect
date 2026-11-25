@@ -1,63 +1,120 @@
+
 name: Event Reminders & Free Tier Database Keep-Alive
 
 on:
   schedule:
-    # Runs every hour at minute 0 to check 24h & 1h event reminders and ping free database
     - cron: '0 * * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   reminders-and-keepalive:
     name: Execute Reminders & Ping DB
     runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      REMINDERS_FUNCTION_URL: ${{ secrets.REMINDERS_FUNCTION_URL }}
 
     steps:
-      - name: Ping Supabase Free-Tier DB (Prevent Auto-Pause)
+      - name: Validate configuration
+        shell: bash
         run: |
-          echo "Pinging Supabase Database to maintain active free-tier status..."
-          HTTP_STATUS=$(curl -s -o db_ping_response.json -w "%{http_code}" \
-            -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/app_settings?select=key&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
-          
-          echo "Database Ping Response Code: $HTTP_STATUS"
-          cat db_ping_response.json
-          
-          if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "Warning: Database ping returned HTTP status $HTTP_STATUS"
+          set -e
+
+          for name in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required GitHub secret: $name"
+              exit 1
+            fi
+          done
+
+          if [[ ! "$SUPABASE_URL" =~ ^https://[^/]+/?$ ]]; then
+            echo "::error::SUPABASE_URL is malformed."
+            exit 1
+          fi
+
+          echo "Required configuration is present."
+
+      - name: Ping Supabase Free-Tier DB
+        shell: bash
+        run: |
+          set -e
+
+          echo "Pinging Supabase database..."
+
+          URL="${SUPABASE_URL%/}/rest/v1/app_settings?select=key&limit=1"
+
+          if HTTP_STATUS=$(curl -sS \
+            --connect-timeout 10 \
+            --max-time 30 \
+            -o /dev/null \
+            -w "%{http_code}" \
+            "$URL" \
+            -H "apikey: $SUPABASE_ANON_KEY"); then
+            echo "Database HTTP status: $HTTP_STATUS"
           else
-            echo "Supabase database is active and awake."
+            echo "::error::Database request failed. Check URL and connectivity."
+            exit 1
           fi
 
-      - name: Call send-reminders Supabase Edge Function
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Database ping failed. Check app_settings table, API key and RLS policies."
+            exit 1
+          fi
+
+          echo "Database ping completed successfully."
+
+      - name: Execute event reminders
+        shell: bash
         run: |
-          echo "Invoking send-reminders Edge Function..."
-          FUNCTION_URL="${{ secrets.REMINDERS_FUNCTION_URL }}"
-          if [ -z "$FUNCTION_URL" ]; then
-            FUNCTION_URL="${{ secrets.SUPABASE_URL }}/functions/v1/send-reminders"
-          fi
+          set -e
 
-          echo "Target Function URL: $FUNCTION_URL"
+          FUNCTION_URL="${REMINDERS_FUNCTION_URL:-${SUPABASE_URL%/}/functions/v1/send-reminders}"
 
-          RESP_CODE=$(curl -s -o reminders_output.json -w "%{http_code}" \
+          echo "Invoking event reminder function..."
+
+          if RESP_CODE=$(curl -sS \
+            --connect-timeout 10 \
+            --max-time 60 \
+            -o reminders_output.json \
+            -w "%{http_code}" \
             -X POST "$FUNCTION_URL" \
             -H "Content-Type: application/json" \
-            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
-
-          echo "Edge Function HTTP Code: $RESP_CODE"
-          cat reminders_output.json
-
-          if [ "$RESP_CODE" -ge 200 ] && [ "$RESP_CODE" -lt 300 ]; then
-            echo "Reminders processed and database kept alive successfully!"
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"); then
+            echo "Reminder function HTTP status: $RESP_CODE"
           else
-            echo "Edge Function did not return 2xx (HTTP $RESP_CODE), falling back to direct RPC invocation..."
-            # Resilient fallback: call process_event_reminders RPC directly via Supabase REST
-            RPC_STATUS=$(curl -s -o rpc_output.json -w "%{http_code}" \
-              -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/process_event_reminders" \
+            echo "::warning::Reminder function request failed."
+            RESP_CODE=000
+          fi
+
+          if [[ "$RESP_CODE" =~ ^2[0-9][0-9]$ ]]; then
+            echo "Event reminders executed successfully."
+          else
+            echo "Trying direct RPC fallback..."
+
+            if RPC_STATUS=$(curl -sS \
+              --connect-timeout 10 \
+              --max-time 60 \
+              -o rpc_output.json \
+              -w "%{http_code}" \
+              -X POST "${SUPABASE_URL%/}/rest/v1/rpc/process_event_reminders" \
               -H "Content-Type: application/json" \
-              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
-            echo "Direct RPC HTTP Code: $RPC_STATUS"
-            cat rpc_output.json
+              -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"); then
+              echo "RPC HTTP status: $RPC_STATUS"
+            else
+              echo "::error::RPC request failed."
+              exit 1
+            fi
+
+            if [[ ! "$RPC_STATUS" =~ ^2[0-9][0-9]$ ]]; then
+              echo "::error::Both reminder function and RPC failed."
+              exit 1
+            fi
+
+            echo "Reminder RPC executed successfully."
           fi
