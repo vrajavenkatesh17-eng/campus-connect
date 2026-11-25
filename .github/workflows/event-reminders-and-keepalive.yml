@@ -10,54 +10,94 @@ jobs:
   reminders-and-keepalive:
     name: Execute Reminders & Ping DB
     runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      REMINDERS_FUNCTION_URL: ${{ secrets.REMINDERS_FUNCTION_URL }}
 
     steps:
+      - name: Validate Required Secrets & URL Format
+        run: |
+          set -euo pipefail
+          MISSING=0
+
+          for VAR_NAME in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!VAR_NAME:-}" ]; then
+              echo "::error::Missing required secret: $VAR_NAME (ensure it is configured in the 'production' environment secrets)."
+              MISSING=1
+            fi
+          done
+
+          if [ "$MISSING" -ne 0 ]; then
+            exit 1
+          fi
+
+          if [[ ! "$SUPABASE_URL" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$ ]]; then
+            echo "::error::SUPABASE_URL must be a valid HTTPS URL (e.g. https://<project-ref>.supabase.co)."
+            exit 1
+          fi
+
+          if [ -n "${REMINDERS_FUNCTION_URL:-}" ] && [[ ! "$REMINDERS_FUNCTION_URL" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?(/.*)?$ ]]; then
+            echo "::error::REMINDERS_FUNCTION_URL must be a valid HTTPS URL when provided."
+            exit 1
+          fi
+
+          echo "All required secrets are present and SUPABASE_URL format is valid."
+
       - name: Ping Supabase Free-Tier DB (Prevent Auto-Pause)
         run: |
+          set -euo pipefail
+          BASE_URL="${SUPABASE_URL%/}"
+          PING_URL="${BASE_URL}/rest/v1/app_settings?select=key&limit=1"
+
           echo "Pinging Supabase Database to maintain active free-tier status..."
-          HTTP_STATUS=$(curl -s -o db_ping_response.json -w "%{http_code}" \
-            -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/app_settings?select=key&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
-          
-          echo "Database Ping Response Code: $HTTP_STATUS"
-          cat db_ping_response.json
-          
-          if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "Warning: Database ping returned HTTP status $HTTP_STATUS"
-          else
-            echo "Supabase database is active and awake."
+          HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X GET "$PING_URL" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+
+          echo "Database Ping HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            echo "::warning::Database ping returned HTTP status $HTTP_STATUS"
+            exit 1
           fi
+          echo "Supabase database is active and awake."
 
       - name: Call send-reminders Supabase Edge Function
         run: |
-          echo "Invoking send-reminders Edge Function..."
-          FUNCTION_URL="${{ secrets.REMINDERS_FUNCTION_URL }}"
+          set -euo pipefail
+          BASE_URL="${SUPABASE_URL%/}"
+          FUNCTION_URL="${REMINDERS_FUNCTION_URL:-}"
           if [ -z "$FUNCTION_URL" ]; then
-            FUNCTION_URL="${{ secrets.SUPABASE_URL }}/functions/v1/send-reminders"
+            FUNCTION_URL="${BASE_URL}/functions/v1/send-reminders"
           fi
 
-          echo "Target Function URL: $FUNCTION_URL"
-
-          RESP_CODE=$(curl -s -o reminders_output.json -w "%{http_code}" \
+          echo "Invoking send-reminders Edge Function..."
+          RESP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
             -X POST "$FUNCTION_URL" \
             -H "Content-Type: application/json" \
-            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" || echo "000")
 
-          echo "Edge Function HTTP Code: $RESP_CODE"
-          cat reminders_output.json
+          echo "Edge Function HTTP Status: $RESP_CODE"
 
           if [ "$RESP_CODE" -ge 200 ] && [ "$RESP_CODE" -lt 300 ]; then
-            echo "Reminders processed and database kept alive successfully!"
+            echo "Reminders processed via Edge Function and database kept alive successfully."
           else
-            echo "Edge Function did not return 2xx (HTTP $RESP_CODE), falling back to direct RPC invocation..."
-            # Resilient fallback: call process_event_reminders RPC directly via Supabase REST
-            RPC_STATUS=$(curl -s -o rpc_output.json -w "%{http_code}" \
-              -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/process_event_reminders" \
+            echo "Edge Function returned HTTP $RESP_CODE; falling back to direct process_event_reminders RPC..."
+            RPC_URL="${BASE_URL}/rest/v1/rpc/process_event_reminders"
+            RPC_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+              -X POST "$RPC_URL" \
               -H "Content-Type: application/json" \
-              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
-            echo "Direct RPC HTTP Code: $RPC_STATUS"
-            cat rpc_output.json
+              -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY")
+
+            echo "Direct RPC HTTP Status: $RPC_STATUS"
+            if [ "$RPC_STATUS" -lt 200 ] || [ "$RPC_STATUS" -ge 300 ]; then
+              echo "::error::Fallback RPC process_event_reminders failed with HTTP status $RPC_STATUS"
+              exit 1
+            fi
+            echo "Reminders processed via process_event_reminders RPC fallback."
           fi
