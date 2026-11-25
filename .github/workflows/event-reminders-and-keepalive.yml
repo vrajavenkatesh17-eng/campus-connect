@@ -1,10 +1,10 @@
+
 name: Event Reminders & Free Tier Database Keep-Alive
 
 on:
   schedule:
-    # Runs every hour at minute 0 to check 24h & 1h event reminders and ping free database
     - cron: '0 * * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   reminders-and-keepalive:
@@ -65,7 +65,15 @@ jobs:
           fi
           echo "Supabase database is active and awake."
 
-      - name: Call send-reminders Supabase Edge Function
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Database ping failed. Check app_settings table, API key and RLS policies."
+            exit 1
+          fi
+
+          echo "Database ping completed successfully."
+
+      - name: Execute event reminders
+        shell: bash
         run: |
           set -euo pipefail
           BASE_URL="${SUPABASE_URL%/}"
