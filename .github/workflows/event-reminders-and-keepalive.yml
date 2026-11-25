@@ -106,9 +106,12 @@ jobs:
               -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" || echo "000")
 
             echo "Direct RPC HTTP Status: $RPC_STATUS"
-            if [ "$RPC_STATUS" -lt 200 ] || [ "$RPC_STATUS" -ge 300 ]; then
+            if [ "$RPC_STATUS" -ge 200 ] && [ "$RPC_STATUS" -lt 300 ]; then
+              echo "Reminders processed via process_event_reminders RPC fallback."
+            elif [ "$RPC_STATUS" = "404" ]; then
+              echo "::warning::Both send-reminders Edge Function and process_event_reminders RPC returned 404 (apply migration 005 or deploy send-reminders in Supabase). Database keep-alive succeeded."
+            else
               echo "::error::Fallback RPC process_event_reminders failed with HTTP status $RPC_STATUS"
               exit 1
             fi
-            echo "Reminders processed via process_event_reminders RPC fallback."
           fi
