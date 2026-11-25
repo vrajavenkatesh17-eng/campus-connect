@@ -1,10 +1,10 @@
-
 name: Event Reminders & Free Tier Database Keep-Alive
 
 on:
   schedule:
+    # Runs every hour at minute 0 to check 24h & 1h event reminders and ping free database
     - cron: '0 * * * *'
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
   reminders-and-keepalive:
@@ -50,33 +50,36 @@ jobs:
         run: |
           set -euo pipefail
           BASE_URL="${SUPABASE_URL%/}"
+          BASE_URL="${BASE_URL%/rest/v1}"
           PING_URL="${BASE_URL}/rest/v1/app_settings?select=key&limit=1"
 
           echo "Pinging Supabase Database to maintain active free-tier status..."
           HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
             -X GET "$PING_URL" \
             -H "apikey: $SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" || echo "000")
+
+          if [ "$HTTP_STATUS" = "404" ]; then
+            FALLBACK_PING_URL="${BASE_URL}/rest/v1/events?select=id&limit=1"
+            HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+              -X GET "$FALLBACK_PING_URL" \
+              -H "apikey: $SUPABASE_ANON_KEY" \
+              -H "Authorization: Bearer $SUPABASE_ANON_KEY" || echo "000")
+          fi
 
           echo "Database Ping HTTP Status: $HTTP_STATUS"
           if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
-            echo "::warning::Database ping returned HTTP status $HTTP_STATUS"
+            echo "::error::Database ping failed with HTTP status $HTTP_STATUS"
             exit 1
           fi
           echo "Supabase database is active and awake."
-
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "::error::Database ping failed. Check app_settings table, API key and RLS policies."
-            exit 1
-          fi
-
-          echo "Database ping completed successfully."
 
       - name: Execute event reminders
         shell: bash
         run: |
           set -euo pipefail
           BASE_URL="${SUPABASE_URL%/}"
+          BASE_URL="${BASE_URL%/rest/v1}"
           FUNCTION_URL="${REMINDERS_FUNCTION_URL:-}"
           if [ -z "$FUNCTION_URL" ]; then
             FUNCTION_URL="${BASE_URL}/functions/v1/send-reminders"
@@ -100,7 +103,7 @@ jobs:
               -X POST "$RPC_URL" \
               -H "Content-Type: application/json" \
               -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY")
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" || echo "000")
 
             echo "Direct RPC HTTP Status: $RPC_STATUS"
             if [ "$RPC_STATUS" -lt 200 ] || [ "$RPC_STATUS" -ge 300 ]; then
