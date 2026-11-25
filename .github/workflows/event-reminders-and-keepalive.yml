@@ -15,7 +15,7 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      REMINDERS_FUNCTION_URL: ${{ secrets.REMINDERS_FUNCTION_URL }}
+      REMINDERS_FUNCTION_URL: ${{ secrets['REMINDERS_FUNCTION_URL'] || vars['REMINDERS_FUNCTION_URL'] || '' }}
 
     steps:
       - name: Validate Required Secrets & URL Format
