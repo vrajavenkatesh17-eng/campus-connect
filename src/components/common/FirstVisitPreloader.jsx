@@ -68,7 +68,7 @@ export default function FirstVisitPreloader() {
       <div className="flex flex-col items-center space-y-4 animate-in zoom-in-95 duration-200">
         <div className="w-16 h-16 rounded-full bg-surface p-1.5 border border-line shadow-sm flex items-center justify-center">
           <img
-            src="/fxec-logo.png"
+            src="/brand/fxec-logo.png"
             alt="FXEC"
             className="w-full h-full object-contain"
             width="64"

@@ -148,7 +148,7 @@ export default function AllowlistPanel() {
                 placeholder="faculty@francisxavier.ac.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-primary"
               />
             </div>
 
@@ -181,7 +181,7 @@ export default function AllowlistPanel() {
                 placeholder="e.g. HOD CSE or Dean"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-primary"
               />
             </div>
 

@@ -246,7 +246,7 @@ export default function StudentPointsPage() {
     >
       <div className="space-y-6">
         {/* Top Summary Banner */}
-        <div className="rounded-2xl bg-gradient-to-r from-burgundy via-burgundy-dark to-neutral-900 text-white p-6 sm:p-8 shadow-md">
+        <div className="rounded-2xl bg-gradient-to-r from-navy-deep via-primary to-surface-2 text-white p-6 sm:p-8 shadow-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-xs font-semibold text-amber-300">

@@ -360,7 +360,7 @@ export default function Navbar() {
           >
             <div className="w-10 h-10 rounded-full bg-white dark:bg-surface-2 p-0.5 border border-line shadow-xs transition-transform duration-200 group-hover:scale-105 shrink-0 overflow-hidden flex items-center justify-center">
               <img
-                src="/fxec-logo.png"
+                src="/brand/fxec-logo.png"
                 alt="Francis Xavier Engineering College Logo"
                 className="w-full h-full object-contain"
                 width="40"

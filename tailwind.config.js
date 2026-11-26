@@ -39,9 +39,19 @@ export default {
           foreground: 'rgb(var(--on-primary) / <alpha-value>)',
         },
         'on-primary': 'rgb(var(--on-primary) / <alpha-value>)',
+        'navy-deep': 'rgb(var(--navy-deep) / <alpha-value>)',
         gold: {
           DEFAULT: 'rgb(var(--gold) / <alpha-value>)',
           decor: 'rgb(var(--gold) / <alpha-value>)',
+          ink: 'rgb(var(--gold-ink) / <alpha-value>)',
+        },
+        'gold-ink': 'rgb(var(--gold-ink) / <alpha-value>)',
+        chart: {
+          1: 'rgb(var(--chart-1) / <alpha-value>)',
+          2: 'rgb(var(--chart-2) / <alpha-value>)',
+          3: 'rgb(var(--chart-3) / <alpha-value>)',
+          4: 'rgb(var(--chart-4) / <alpha-value>)',
+          5: 'rgb(var(--chart-5) / <alpha-value>)',
         },
         success: {
           DEFAULT: 'rgb(var(--success) / <alpha-value>)',

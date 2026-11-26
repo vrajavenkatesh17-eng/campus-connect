@@ -4,7 +4,7 @@
  * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
  *
  * Canvas-drawn crisp, vector-quality ID Card Texture for Lanyard 3D component.
- * Theme-aware (Wine & Ivory), gold hairlines, strictly NO fake persons, names, or numbers.
+ * Theme-aware (Navy & Gold), gold hairlines, strictly NO fake persons, names, or numbers.
  * Displays "Welcome back, <first name>" if stored in localStorage, otherwise no name.
  */
 
@@ -19,15 +19,15 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
 
   const isDark = theme === 'dark';
 
-  // Palette from DESIGN_SPEC v2 (Wine & Ivory)
-  const bg = isDark ? '#161012' : '#FFFFFF';
-  const cardSurface = isDark ? '#1F1719' : '#FBF8F5';
-  const winePrimary = isDark ? '#C95D78' : '#7A1230';
-  const wineDark = isDark ? '#2A1519' : '#5F0E26';
-  const gold = isDark ? '#D4B27A' : '#A8803F';
-  const ink = isDark ? '#F6EFEA' : '#1C1417';
-  const muted = isDark ? '#B3A5AA' : '#6B5E63';
-  const line = isDark ? '#33282C' : '#E8DFD8';
+  // Palette from DESIGN_SPEC v2 (Navy & Gold)
+  const bg = '#FFFFFF';
+  const cardSurface = '#FFFFFF';
+  const navyPrimary = isDark ? '#5B93E6' : '#14529E';
+  const navyDeep = isDark ? '#08142E' : '#0B1F44';
+  const gold = '#F1B937';
+  const ink = '#0E1A33';
+  const muted = '#5B6781';
+  const line = '#DCE2EE';
 
   // 1. Base Card Fill with Subtle Texture
   ctx.fillStyle = bg;
@@ -46,8 +46,8 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
   ctx.lineWidth = 1;
   ctx.strokeRect(44, 44, 936, 1352);
 
-  // 3. Top Header Banner (Wine Accent)
-  ctx.fillStyle = winePrimary;
+  // 3. Top Header Banner (Royal Blue Accent)
+  ctx.fillStyle = navyPrimary;
   ctx.fillRect(44, 44, 936, 260);
 
   // Lanyard clip hole punch guide
@@ -90,20 +90,20 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
   ctx.arc(centerX, centerY, 100, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.strokeStyle = isDark ? 'rgba(212, 91, 122, 0.3)' : 'rgba(122, 18, 48, 0.2)';
+  ctx.strokeStyle = isDark ? 'rgba(91, 147, 230, 0.3)' : 'rgba(20, 82, 158, 0.2)';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(centerX, centerY, 114, 0, Math.PI * 2);
   ctx.stroke();
 
   // Inner Crest Fill
-  ctx.fillStyle = isDark ? wineDark : 'rgba(122, 18, 48, 0.06)';
+  ctx.fillStyle = isDark ? navyDeep : 'rgba(20, 82, 158, 0.06)';
   ctx.beginPath();
   ctx.arc(centerX, centerY, 94, 0, Math.PI * 2);
   ctx.fill();
 
   // Graduation Cap Vector Icon
-  ctx.fillStyle = winePrimary;
+  ctx.fillStyle = navyPrimary;
   // Cap Diamond
   ctx.beginPath();
   ctx.moveTo(centerX, centerY - 45);
@@ -142,7 +142,7 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
   ctx.fillText('Institutional Event & Credentials Portal', centerX, 705);
 
   // 6. Badge Pill
-  ctx.fillStyle = winePrimary;
+  ctx.fillStyle = navyPrimary;
   ctx.beginPath();
   ctx.roundRect(centerX - 160, 750, 320, 54, 27);
   ctx.fill();
@@ -155,8 +155,8 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
   // Only printed if a valid returning first name is present
   if (firstName && typeof firstName === 'string' && firstName.trim()) {
     const cleanFirst = firstName.trim().split(' ')[0];
-    ctx.fillStyle = isDark ? 'rgba(212, 91, 122, 0.12)' : 'rgba(122, 18, 48, 0.05)';
-    ctx.strokeStyle = isDark ? 'rgba(212, 91, 122, 0.3)' : 'rgba(122, 18, 48, 0.2)';
+    ctx.fillStyle = isDark ? 'rgba(91, 147, 230, 0.12)' : 'rgba(20, 82, 158, 0.05)';
+    ctx.strokeStyle = isDark ? 'rgba(91, 147, 230, 0.3)' : 'rgba(20, 82, 158, 0.2)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(centerX - 240, 845, 480, 110, 18);
@@ -167,7 +167,7 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
     ctx.font = 'italic 20px "Inter Variable", Inter, sans-serif';
     ctx.fillText('Welcome back,', centerX, 885);
 
-    ctx.fillStyle = winePrimary;
+    ctx.fillStyle = navyPrimary;
     ctx.font = 'bold 36px "Fraunces Variable", Fraunces, Georgia, serif';
     ctx.fillText(cleanFirst, centerX, 930);
   } else {
@@ -186,7 +186,7 @@ export function generateIdCardTexture({ theme = 'light', firstName = '' } = {}) 
   const chipY = 1000;
   ctx.strokeStyle = gold;
   ctx.lineWidth = 2;
-  ctx.fillStyle = isDark ? 'rgba(212, 178, 122, 0.1)' : 'rgba(168, 128, 63, 0.08)';
+  ctx.fillStyle = isDark ? 'rgba(241, 185, 55, 0.1)' : 'rgba(241, 185, 55, 0.08)';
   ctx.beginPath();
   ctx.roundRect(chipX, chipY, 120, 80, 12);
   ctx.fill();
@@ -241,13 +241,13 @@ export function generateIdCardBackTexture({ theme = 'light' } = {}) {
   if (!ctx) return '';
 
   const isDark = theme === 'dark';
-  const bg = isDark ? '#161012' : '#FFFFFF';
-  const cardSurface = isDark ? '#1F1719' : '#FBF8F5';
-  const winePrimary = isDark ? '#C95D78' : '#7A1230';
-  const gold = isDark ? '#D4B27A' : '#A8803F';
-  const ink = isDark ? '#F6EFEA' : '#1C1417';
-  const muted = isDark ? '#B3A5AA' : '#6B5E63';
-  const line = isDark ? '#33282C' : '#E8DFD8';
+  const bg = '#FFFFFF';
+  const cardSurface = '#FFFFFF';
+  const navyPrimary = isDark ? '#5B93E6' : '#14529E';
+  const gold = '#F1B937';
+  const ink = '#0E1A33';
+  const muted = '#5B6781';
+  const line = '#DCE2EE';
 
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1024, 1440);
@@ -263,8 +263,8 @@ export function generateIdCardBackTexture({ theme = 'light' } = {}) {
   ctx.lineWidth = 1;
   ctx.strokeRect(44, 44, 936, 1352);
 
-  // Top Wine Header
-  ctx.fillStyle = winePrimary;
+  // Top Royal Blue Header
+  ctx.fillStyle = navyPrimary;
   ctx.fillRect(44, 44, 936, 180);
 
   ctx.fillStyle = '#FFFFFF';
@@ -298,7 +298,7 @@ export function generateIdCardBackTexture({ theme = 'light' } = {}) {
   ctx.save();
   ctx.strokeStyle = gold;
   ctx.lineWidth = 3;
-  ctx.fillStyle = isDark ? 'rgba(212, 178, 122, 0.05)' : 'rgba(168, 128, 63, 0.05)';
+  ctx.fillStyle = isDark ? 'rgba(241, 185, 55, 0.05)' : 'rgba(241, 185, 55, 0.05)';
   ctx.beginPath();
   ctx.roundRect(512 - 120, 780, 240, 240, 16);
   ctx.fill();
@@ -316,7 +316,7 @@ export function generateIdCardBackTexture({ theme = 'light' } = {}) {
   // Footer
   ctx.textAlign = 'center';
   ctx.font = '600 16px "Inter Variable", Inter, sans-serif';
-  ctx.fillStyle = winePrimary;
+  ctx.fillStyle = navyPrimary;
   ctx.fillText('Francis Xavier Engineering College (Autonomous)', 512, 1240);
 
   ctx.font = '500 14px "Inter Variable", Inter, sans-serif';
@@ -393,15 +393,15 @@ export async function generateUserCardTexture({
 
   const isDark = theme === 'dark';
 
-  // Palette from DESIGN_SPEC v2 (Wine & Ivory)
-  const bg = isDark ? '#161012' : '#FFFFFF';
-  const cardSurface = isDark ? '#1F1719' : '#FBF8F5';
-  const winePrimary = isDark ? '#C95D78' : '#7A1230';
-  const wineDark = isDark ? '#2A1519' : '#5F0E26';
-  const gold = isDark ? '#D4B27A' : '#A8803F';
-  const ink = isDark ? '#F6EFEA' : '#1C1417';
-  const muted = isDark ? '#B3A5AA' : '#6B5E63';
-  const line = isDark ? '#33282C' : '#E8DFD8';
+  // Palette from DESIGN_SPEC v2 (Navy & Gold)
+  const bg = '#FFFFFF';
+  const cardSurface = '#FFFFFF';
+  const navyPrimary = isDark ? '#5B93E6' : '#14529E';
+  const navyDeep = isDark ? '#08142E' : '#0B1F44';
+  const gold = '#F1B937';
+  const ink = '#0E1A33';
+  const muted = '#5B6781';
+  const line = '#DCE2EE';
 
   // 1. Base Card Fill
   ctx.fillStyle = bg;
@@ -421,7 +421,7 @@ export async function generateUserCardTexture({
   ctx.strokeRect(44, 44, 936, 1352);
 
   // 3. Top Header Banner
-  ctx.fillStyle = winePrimary;
+  ctx.fillStyle = navyPrimary;
   ctx.fillRect(44, 44, 936, 250);
 
   // Lanyard clip hole punch guide
@@ -465,7 +465,7 @@ export async function generateUserCardTexture({
   ctx.arc(centerX, avatarY, avatarRadius + 10, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.strokeStyle = isDark ? 'rgba(201, 93, 120, 0.35)' : 'rgba(122, 18, 48, 0.25)';
+  ctx.strokeStyle = isDark ? 'rgba(91, 147, 230, 0.35)' : 'rgba(20, 82, 158, 0.25)';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(centerX, avatarY, avatarRadius + 18, 0, Math.PI * 2);
@@ -504,7 +504,7 @@ export async function generateUserCardTexture({
     );
   } else {
     // Initials Monogram
-    ctx.fillStyle = isDark ? wineDark : 'rgba(122, 18, 48, 0.15)';
+    ctx.fillStyle = isDark ? navyDeep : 'rgba(20, 82, 158, 0.15)';
     ctx.fillRect(centerX - avatarRadius, avatarY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
 
     const initials = (fullName || 'User')
@@ -515,7 +515,7 @@ export async function generateUserCardTexture({
       .join('')
       .toUpperCase() || 'U';
 
-    ctx.fillStyle = winePrimary;
+    ctx.fillStyle = navyPrimary;
     ctx.font = 'bold 72px "Fraunces Variable", Fraunces, Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -552,7 +552,7 @@ export async function generateUserCardTexture({
       ? 'FACULTY COORDINATOR'
       : 'STUDENT PASS';
 
-  ctx.fillStyle = winePrimary;
+  ctx.fillStyle = navyPrimary;
   ctx.beginPath();
   ctx.roundRect(centerX - 180, pillY, 360, 52, 26);
   ctx.fill();
@@ -588,7 +588,7 @@ export async function generateUserCardTexture({
   const chipY = 1010;
   ctx.strokeStyle = gold;
   ctx.lineWidth = 2;
-  ctx.fillStyle = isDark ? 'rgba(212, 178, 122, 0.1)' : 'rgba(168, 128, 63, 0.08)';
+  ctx.fillStyle = isDark ? 'rgba(241, 185, 55, 0.1)' : 'rgba(241, 185, 55, 0.08)';
   ctx.beginPath();
   ctx.roundRect(chipX, chipY, 120, 80, 12);
   ctx.fill();

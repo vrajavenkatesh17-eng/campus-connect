@@ -363,15 +363,15 @@ export default function StudentScanPage() {
           {/* Error States */}
           {scannerState === 'error' && (
             <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white space-y-4 overflow-y-auto">
-              <div className="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-danger/20 text-danger flex items-center justify-center">
                 {errorType === 'already' ? (
                   <CheckCircle2 className="w-8 h-8 text-amber-400" />
                 ) : errorType === 'expired' ? (
                   <Clock className="w-8 h-8 text-amber-400" />
                 ) : errorType === 'not-registered' ? (
-                  <UserX className="w-8 h-8 text-rose-400" />
+                  <UserX className="w-8 h-8 text-danger" />
                 ) : (
-                  <XCircle className="w-8 h-8 text-rose-400" />
+                  <XCircle className="w-8 h-8 text-danger" />
                 )}
               </div>
 

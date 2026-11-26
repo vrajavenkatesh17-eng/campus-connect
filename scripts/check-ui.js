@@ -132,6 +132,15 @@ const VIOLATIONS = [
     name: '@keyframes animation CSS outside src/components/motion/',
     test: (line) => /@keyframes\b/.test(line),
   },
+  {
+    id: 'purged-wine-palette',
+    name: 'Purged Wine/Burgundy/Rose color or keyword (S-T RETHEME: use Navy & Gold tokens)',
+    test: (line) => {
+      const purgedHex = /#(7A1230|5F0E26|F6E9EC|D45B7A|C95D78|DB7A92|E6788F|2A1519|2B141B)\b/i;
+      const purgedWords = /\b(wine|burgundy|rose)\b/i;
+      return purgedHex.test(line) || purgedWords.test(line);
+    },
+  },
 ];
 
 const files = getAllFiles(srcDir);

@@ -4,7 +4,7 @@
  *
  * AppButton: Design System Button Wrapper
  * Enforces DESIGN_SPEC v2 tokens:
- * - Variants: primary (wine solid + ClickSpark), secondary (surface + border line, text ink), ghost, danger
+ * - Variants: primary (primary solid + ClickSpark), secondary (surface + border line, text ink), ghost, danger
  * - Heights: sm (32px), md (40px), lg (48px); touch target min 44px on mobile
  * - Focus ring: 2px primary with 2px offset in both themes
  * - ClickSpark animation active exclusively on primary variant

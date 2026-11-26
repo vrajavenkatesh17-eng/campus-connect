@@ -10,7 +10,7 @@ export default function AppFooter() {
           {/* Institutional Brand */}
           <div className="flex items-center gap-2.5">
             <img
-              src="/fxec-logo.png"
+              src="/brand/fxec-logo.png"
               alt="FXEC"
               className="w-6 h-6 rounded-full object-contain shrink-0"
               width="24"

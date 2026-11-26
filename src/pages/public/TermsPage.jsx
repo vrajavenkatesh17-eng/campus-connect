@@ -6,7 +6,7 @@
  * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
  *
  * S-L.3 /terms: Institutional Terms of Service
- * Formatted with Wine & Ivory tokens, semantic cards, and accessible typography.
+ * Formatted with Navy & Gold tokens, semantic cards, and accessible typography.
  */
 
 import React from 'react';

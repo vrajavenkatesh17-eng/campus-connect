@@ -34,8 +34,8 @@ export default function AppSeatGauge({
         width={width}
         height={height}
         radius={radius}
-        glassColor={isDark ? '#1F1719' : '#F5EFEA'}     // surface-2
-        liquidColor={isDark ? '#C95D78' : '#7A1230'}    // primary wine
+        glassColor={isDark ? '#0E1730' : '#EEF2FB'}     // surface-2
+        liquidColor={isDark ? '#5B93E6' : '#14529E'}    // primary navy
         unit="%"
         ariaLabel={label}
         {...props}

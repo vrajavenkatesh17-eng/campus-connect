@@ -179,8 +179,8 @@ export default function LanyardBadge({
           <LazyLanyard
             frontImage={frontTextureUrl}
             backImage={backTextureUrl}
-            cardColor={resolvedTheme === 'dark' ? '#1F1719' : '#FFFFFF'}
-            strapColor={resolvedTheme === 'dark' ? '#C95D78' : '#7A1230'}
+            cardColor="#FFFFFF"
+            strapColor="#14529E"
             metal={resolvedTheme === 'dark' ? 'gold' : 'gold'}
             size={0.65}
             orientation="portrait"

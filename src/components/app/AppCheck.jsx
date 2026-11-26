@@ -33,8 +33,8 @@ export default function AppCheck({
         defaultChecked={defaultChecked}
         onChange={onChange}
         disabled={disabled}
-        color={isDark ? '#F6EFEA' : '#1C1417'}      // text ink
-        fillColor={isDark ? '#C95D78' : '#7A1230'}  // primary
+        color={isDark ? '#EEF2FB' : '#0E1A33'}      // text ink
+        fillColor={isDark ? '#5B93E6' : '#14529E'}  // primary
         checkColor="#FFFFFF"                        // on-primary
         boxSize={boxSize}
         boxRadius={boxRadius}

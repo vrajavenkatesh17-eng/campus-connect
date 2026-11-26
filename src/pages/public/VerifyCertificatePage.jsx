@@ -9,7 +9,7 @@
  * - Valid: green badge (variant="success"), student name (Fraunces), event title, date, issued date, issuer
  * - Invalid: neutral message "No certificate matches this code" (never reveals why or near-matches)
  * - Strictly enforces >= 12 random characters before querying
- * - Wine & Ivory tokens, zero hardcoded colors, fully accessible
+ * - Navy & Gold tokens, zero hardcoded colors, fully accessible
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -186,7 +186,7 @@ export default function VerifyCertificatePage() {
           <Link to="/" className="inline-flex items-center gap-3 group select-none">
             <div className="w-12 h-12 rounded-full bg-surface p-1 border border-line shadow-xs group-hover:scale-105 transition-transform shrink-0 flex items-center justify-center">
               <img
-                src="/fxec-logo.png"
+                src="/brand/fxec-logo.png"
                 alt="Francis Xavier Engineering College"
                 className="w-full h-full object-contain"
                 width="48"

@@ -35,10 +35,10 @@ export default function AppRating({
         count={count}
         shape={shape}
         labels={labels}
-        activeColor={isDark ? '#D4B27A' : '#A8803F'} // gold token (decoration only)
-        idleColor={isDark ? '#33282C' : '#E8DFD8'}   // line
-        tipColor={isDark ? '#1F1719' : '#F5EFEA'}    // surface-2
-        tipTextColor={isDark ? '#F6EFEA' : '#1C1417'}// ink
+        activeColor={isDark ? '#F1B937' : '#F1B937'} // gold token (decoration only)
+        idleColor={isDark ? '#25325A' : '#DCE2EE'}   // line
+        tipColor={isDark ? '#0E1730' : '#EEF2FB'}    // surface-2
+        tipTextColor={isDark ? '#EEF2FB' : '#0E1A33'}// ink
         size={size}
         readOnly={readOnly}
         disabled={disabled}

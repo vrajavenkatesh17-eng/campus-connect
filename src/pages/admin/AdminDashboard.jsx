@@ -1403,7 +1403,7 @@ export default function AdminDashboard() {
                   value={venueName}
                   onChange={(e) => setVenueName(e.target.value)}
                   placeholder="e.g. Mechanical Seminar Hall"
-                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-primary"
                   required
                 />
               </div>
@@ -1417,7 +1417,7 @@ export default function AdminDashboard() {
                   value={venueBuilding}
                   onChange={(e) => setVenueBuilding(e.target.value)}
                   placeholder="e.g. Mechanical Engineering Block - 2nd Floor"
-                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-primary"
                 />
               </div>
 
@@ -1431,7 +1431,7 @@ export default function AdminDashboard() {
                   max="5000"
                   value={venueCapacity}
                   onChange={(e) => setVenueCapacity(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-burgundy font-mono"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-hidden focus:border-primary font-mono"
                   required
                 />
                 <p className="text-xs text-muted mt-1">

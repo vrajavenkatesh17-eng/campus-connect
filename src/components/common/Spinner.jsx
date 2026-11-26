@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Spinner({ size = 'md', color = 'burgundy', className = '' }) {
+export default function Spinner({ size = 'md', color = 'primary', className = '' }) {
   const sizeMap = {
     xs: 'w-3.5 h-3.5 border-2',
     sm: 'w-4 h-4 border-2',
@@ -10,7 +10,7 @@ export default function Spinner({ size = 'md', color = 'burgundy', className = '
   };
 
   const colorMap = {
-    burgundy: 'border-primary border-t-transparent',
+    primary: 'border-primary border-t-transparent',
     white: 'border-white border-t-transparent',
     neutral: 'border-muted border-t-transparent',
   };
@@ -19,7 +19,7 @@ export default function Spinner({ size = 'md', color = 'burgundy', className = '
     <div
       role="status"
       aria-label="Loading"
-      className={`inline-block animate-spin rounded-full ${sizeMap[size] || sizeMap.md} ${colorMap[color] || colorMap.burgundy} ${className}`}
+      className={`inline-block animate-spin rounded-full ${sizeMap[size] || sizeMap.md} ${colorMap[color] || colorMap.primary} ${className}`}
     >
       <span className="sr-only">Loading...</span>
     </div>

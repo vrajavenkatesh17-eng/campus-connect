@@ -241,7 +241,7 @@ export default function EventAttendeesPage() {
             onClick={() => setActiveTab('registered')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === 'registered'
-                ? 'border-burgundy text-primary'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-muted hover:text-ink'
             }`}
           >
@@ -255,7 +255,7 @@ export default function EventAttendeesPage() {
             onClick={() => setActiveTab('waitlisted')}
             className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === 'waitlisted'
-                ? 'border-burgundy text-primary'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-muted hover:text-ink'
             }`}
           >

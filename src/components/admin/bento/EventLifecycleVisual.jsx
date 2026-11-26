@@ -50,7 +50,7 @@ export default function EventLifecycleVisual({ data = {} }) {
       label: 'Completed & Closed',
       count: lifecycle.completed,
       icon: Tick02Icon,
-      statusClass: 'bg-primary/15 text-primary border-burgundy/30',
+      statusClass: 'bg-primary/15 text-primary border-primary/30',
       active: lifecycle.completed > 0,
     },
   ];

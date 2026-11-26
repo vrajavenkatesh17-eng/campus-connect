@@ -78,10 +78,10 @@ export default function AppSelect({
           placeholder={placeholder}
           size={size}
           radius={radius}
-          surfaceColor={isDark ? '#161012' : '#FFFFFF'} // surface
-          highlightColor={isDark ? '#1F1719' : '#F5EFEA'} // surface-2
-          accentColor={isDark ? '#C95D78' : '#7A1230'} // primary
-          textColor={isDark ? '#F6EFEA' : '#1C1417'} // ink
+          surfaceColor={isDark ? '#070D1C' : '#FFFFFF'} // surface
+          highlightColor={isDark ? '#0E1730' : '#EEF2FB'} // surface-2
+          accentColor={isDark ? '#5B93E6' : '#14529E'} // primary
+          textColor={isDark ? '#EEF2FB' : '#0E1A33'} // ink
           disabled={disabled}
           ariaLabel={label || 'Select option'}
           {...props}

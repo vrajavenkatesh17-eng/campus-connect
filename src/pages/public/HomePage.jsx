@@ -3,7 +3,7 @@
  * Designed & built by Krish & Ihsan. All Rights Reserved.
  *
  * Public Landing Page (Step S-C):
- * 1. HERO: Silk WebGL (burgundy) + Noise + SplitText H1 + GradientText + ShinyText CTA + Next Event countdown chip
+ * 1. HERO: Silk WebGL (navy) + Noise + SplitText H1 + GradientText + ShinyText CTA + Next Event countdown chip
  * 2. LIVE STATS: 4 Counters (events hosted, students engaged, certificates issued, guest speakers) from public_stats()
  * 3. UPCOMING EVENTS: Up to 3 AppSpotlightCards from public_upcoming_events(3)
  * 4. MOMENTS: DOM-based Carousel of admin-approved photos/posters from public_past_events()
@@ -307,7 +307,7 @@ export default function HomePage() {
           {/* Institution Header Tag */}
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface/90 backdrop-blur-md border border-line text-ink text-xs font-semibold tracking-wide uppercase shadow-xs mb-6 select-none">
             <img
-              src="/fxec-logo.png"
+              src="/brand/fxec-logo.png"
               alt="FXEC Emblem"
               className="w-4 h-4 rounded-full object-contain shrink-0"
               width="16"
@@ -718,7 +718,7 @@ export default function HomePage() {
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface border border-line text-xs font-semibold uppercase tracking-wider text-ink select-none shadow-xs">
                 <img
-                  src="/fxec-logo.png"
+                  src="/brand/fxec-logo.png"
                   alt="FXEC Emblem"
                   className="w-4 h-4 rounded-full object-contain shrink-0"
                   width="16"

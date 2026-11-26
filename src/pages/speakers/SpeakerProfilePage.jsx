@@ -89,10 +89,10 @@ export default function SpeakerProfilePage() {
             <img
               src={speaker.photo_url}
               alt={speaker.name}
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 border-burgundy/20 shadow-xs shrink-0"
+              className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 border-primary/20 shadow-xs shrink-0"
             />
           ) : (
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-primary/10 text-primary border-2 border-burgundy/30 flex items-center justify-center font-bold text-4xl uppercase shrink-0">
+            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-primary/10 text-primary border-2 border-primary/30 flex items-center justify-center font-bold text-4xl uppercase shrink-0">
               {speaker.name[0]}
             </div>
           )}
@@ -170,7 +170,7 @@ export default function SpeakerProfilePage() {
               {speaker.events.map((ev) => (
                 <Card
                   key={ev.id}
-                  className="p-5 flex flex-col justify-between hover:border-burgundy/40 transition-colors bg-white shadow-xs"
+                  className="p-5 flex flex-col justify-between hover:border-primary/40 transition-colors bg-white shadow-xs"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">

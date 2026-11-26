@@ -4,7 +4,7 @@
  *
  * CertificateFlipCard: 3D Flippable Certificate Card
  * Conforms to DESIGN_SPEC v2:
- * - Front: Certificate preview (wine & ivory border, gold seal watermark, Fraunces name, event title, date, speaker)
+ * - Front: Certificate preview (navy & gold border, gold seal watermark, Fraunces name, event title, date, speaker)
  * - Back: Verification QR canvas, certificate code, copy URL, Download PDF button
  */
 

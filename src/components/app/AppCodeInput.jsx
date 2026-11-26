@@ -36,10 +36,10 @@ export default function AppCodeInput({
         status={status}
         disabled={disabled}
         autoFocus={autoFocus}
-        slotColor={isDark ? '#1F1719' : '#F5EFEA'}   // surface-2
-        accentColor={isDark ? '#C95D78' : '#7A1230'} // primary
-        inkColor={isDark ? '#F6EFEA' : '#1C1417'}    // ink
-        digitColor={isDark ? '#F6EFEA' : '#1C1417'}  // ink
+        slotColor={isDark ? '#0E1730' : '#EEF2FB'}   // surface-2
+        accentColor={isDark ? '#5B93E6' : '#14529E'} // primary
+        inkColor={isDark ? '#EEF2FB' : '#0E1A33'}    // ink
+        digitColor={isDark ? '#EEF2FB' : '#0E1A33'}  // ink
         dangerColor={isDark ? '#F0776A' : '#C0392B'} // danger
         slotSize={48}
         gap={10}

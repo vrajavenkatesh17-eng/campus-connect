@@ -5,13 +5,13 @@
  *
  * Pre-Login Screen (Step A):
  * Implemented using React Bits:
- * 1. Silk dynamic WebGL background (burgundy in dark mode, soft blush/white-burgundy in light mode, paused when tab hidden)
+ * 1. Silk dynamic WebGL background (brand blue in dark mode, pale primary-soft tint in light mode, paused when tab hidden)
  * 2. Noise film grain overlay at 0.035 opacity
  * 3. Lanyard 3D physics badge on desktop (>=768px) with dynamic canvas texture (no fake names, "Welcome back, <name>" if returning)
  * 4. Sign-in panel with BlurText header, RotatingText tagline, RubberSegment portal selector, and ShinyText Google CTA
  * 5. Past Events DOM-based Carousel showing completed events from Supabase (hidden if 0 events, strictly no mock data)
  *
- * Compliance: DESIGN_SPEC v2 (Wine & Ivory, Fraunces serif, Inter UI, gold hairlines, max 2 WebGL canvases)
+ * Compliance: DESIGN_SPEC v2 (Navy & Gold, Fraunces serif, Inter UI, gold hairlines, max 2 WebGL canvases)
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
@@ -258,7 +258,7 @@ export default function LoginPage() {
               <div className="flex items-center gap-3.5">
                 <div className="w-14 h-14 rounded-full bg-white dark:bg-surface-2 p-1 border border-line shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
                   <img
-                    src="/fxec-logo.png"
+                    src="/brand/fxec-logo.png"
                     alt="Francis Xavier Engineering College Official Seal"
                     className="w-full h-full object-contain"
                     width="56"
@@ -285,7 +285,7 @@ export default function LoginPage() {
                 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-ink leading-[1.15]"
               />
 
-              {/* Tagline with RotatingText in Burgundy */}
+              {/* Tagline with RotatingText in Navy */}
               <div className="flex flex-wrap items-center gap-2 text-base sm:text-lg font-medium text-muted">
                 <span className="font-serif italic text-ink">Campus Connect —</span>
                 <RotatingText

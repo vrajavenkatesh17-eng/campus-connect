@@ -3,7 +3,7 @@
  * Architected & Patented by Krish & Ihsan. All Rights Reserved.
  *
  * TiltedCard: 3D interactive perspective poster card
- * Smooth spring-like cursor tilt with specular wine highlight.
+ * Smooth spring-like cursor tilt with specular primary highlight.
  */
 
 import React, { useRef, useState, useCallback } from 'react';

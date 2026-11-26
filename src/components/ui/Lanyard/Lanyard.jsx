@@ -143,7 +143,7 @@ if (foilStrength > 0.0) {
 
 const METALS = {
   silver: { color: '#d9dce2', roughness: 0.16 },
-  gold: { color: '#e4b965', roughness: 0.2 },
+  gold: { color: '#F1B937', roughness: 0.2 },
   graphite: { color: '#4d4f55', roughness: 0.28 }
 };
 

@@ -631,7 +631,7 @@ export default function EventEditorPage() {
               <CardContent className="space-y-5">
                 {/* Overlap Warning Alert */}
                 {venueOverlapWarning && (
-                  <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5">
+                  <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs flex items-start gap-2.5">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>{venueOverlapWarning}</span>
                   </div>
@@ -721,7 +721,7 @@ export default function EventEditorPage() {
                         })}
                       </div>
                       {errors.departments && (
-                        <p className="text-xs text-rose-500 font-medium">{errors.departments}</p>
+                        <p className="text-xs text-danger font-medium">{errors.departments}</p>
                       )}
                     </div>
                   )}
@@ -857,7 +857,7 @@ export default function EventEditorPage() {
 
                 {/* Validation summary banner */}
                 {Object.keys(validateStep(5)).length > 0 ? (
-                  <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs space-y-1">
+                  <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs space-y-1">
                     <p className="font-bold flex items-center gap-1.5">
                       <AlertCircle className="w-4 h-4" />
                       <span>Missing required fields:</span>

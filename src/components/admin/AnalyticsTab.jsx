@@ -181,7 +181,7 @@ export default function AnalyticsTab() {
 
       {/* 1. Real KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <Card className="p-4 border-l-4 border-l-burgundy">
+        <Card className="p-4 border-l-4 border-l-primary">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-muted uppercase tracking-wider">Enrolled Students</p>
             <GraduationCap className="w-4 h-4 text-primary" />

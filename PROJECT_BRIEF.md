@@ -93,13 +93,13 @@ We should first implement all the essential features and then gradually add adva
 
 ## 6. Design
 
-The final platform should be clean, minimal, responsive, and professional, with a Burgundy and White theme.
+The final platform should be clean, minimal, responsive, and professional, with a Navy and Gold theme.
 
 ## 7. Project Details (added)
 
 - College: Francis Xavier Engineering College
 - Allowed email domain: @francisxavier.ac.in
-- Theme colors: Burgundy (#800020) and White
+- Theme colors: Navy (#14529E) and Gold (#F1B937)
 - Stack: React + Vite, Tailwind CSS, Supabase (free tier only)
 - Build approach: phase by phase, starting with the essentials
 - Data rule: all data must be real and come from the database, with no mock or demo data

@@ -36,8 +36,8 @@ export default function AppSlideConfirm({
         onConfirm={onConfirm}
         onDone={onDone}
         onError={onError}
-        trackColor={isDark ? '#1F1719' : '#F5EFEA'}     // surface-2
-        handleColor={isDark ? '#C95D78' : '#7A1230'}    // primary
+        trackColor={isDark ? '#0E1730' : '#EEF2FB'}     // surface-2
+        handleColor={isDark ? '#5B93E6' : '#14529E'}    // primary
         successColor={isDark ? '#4CC38A' : '#1F8A5B'}   // success
         dangerColor={isDark ? '#F0776A' : '#C0392B'}    // danger
         width={width}

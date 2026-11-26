@@ -113,9 +113,9 @@
   z-index: 0;
   background: linear-gradient(
     to top,
-    rgba(251, 248, 245, 0.95) 0%,
-    rgba(251, 248, 245, 0.78) 35%,
-    rgba(251, 248, 245, 0.3) 65%,
+    rgba(247, 248, 251, 0.95) 0%,
+    rgba(247, 248, 251, 0.78) 35%,
+    rgba(247, 248, 251, 0.3) 65%,
     transparent 100%
   );
   pointer-events: none;
@@ -124,9 +124,9 @@
 .dark .magic-bento__scrim {
   background: linear-gradient(
     to top,
-    rgba(13, 8, 9, 0.95) 0%,
-    rgba(13, 8, 9, 0.72) 35%,
-    rgba(13, 8, 9, 0.25) 65%,
+    rgba(7, 13, 28, 0.95) 0%,
+    rgba(7, 13, 28, 0.72) 35%,
+    rgba(7, 13, 28, 0.25) 65%,
     transparent 100%
   );
 }

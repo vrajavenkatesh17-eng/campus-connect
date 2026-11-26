@@ -70,9 +70,9 @@ for (const file of files) {
   content = content.replace(/['"]#[0-9a-fA-F]{3,8}['"]/g, (match) => {
     // Check if in SVG viewBox or canvas or qrcode
     if (match.toLowerCase() === "'#800020'" || match.toLowerCase() === '"#800020"') return "'rgb(var(--primary))'";
-    if (match.toLowerCase() === "'#7a1230'" || match.toLowerCase() === '"#7a1230"') return "'rgb(var(--primary))'";
+    if (match.toLowerCase() === "'#14529e'" || match.toLowerCase() === '"#14529e"') return "'rgb(var(--primary))'";
     if (match.toLowerCase() === "'#d4546f'" || match.toLowerCase() === '"#d4546f"') return "'rgb(var(--primary))'";
-    if (match.toLowerCase() === "'#c95d78'" || match.toLowerCase() === '"#c95d78"') return "'rgb(var(--primary))'";
+    if (match.toLowerCase() === "'#5b93e6'" || match.toLowerCase() === '"#5b93e6"') return "'rgb(var(--primary))'";
     return match;
   });
 

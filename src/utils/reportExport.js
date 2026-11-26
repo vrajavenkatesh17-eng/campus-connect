@@ -71,9 +71,9 @@ export function exportToPDF({
     creator: 'Campus Connect Autonomous System (KRISH-IHSAN-FXEC-PATENT-2026-CC)',
   });
 
-  // Header Banner (FXEC Burgundy)
-  const burgundy = [128, 0, 32];
-  doc.setFillColor(...burgundy);
+  // Header Banner (FXEC Royal Navy)
+  const navy = [20, 82, 158];
+  doc.setFillColor(...navy);
   doc.rect(0, 0, pageWidth, 24, 'F');
 
   // Institution Title

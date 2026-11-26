@@ -34,9 +34,9 @@ export default function AppToast({
       onAction={onAction}
       open={open}
       onClose={onClose}
-      background={isDark ? '#1F1719' : '#FFFFFF'} // surface
-      color={isDark ? '#F6EFEA' : '#1C1417'}      // ink
-      fuseColor={isDark ? '#C95D78' : '#7A1230'}  // primary
+      background={isDark ? '#0E1730' : '#FFFFFF'} // surface
+      color={isDark ? '#EEF2FB' : '#0E1A33'}      // ink
+      fuseColor={isDark ? '#5B93E6' : '#14529E'}  // primary
       duration={duration}
       radius={16}
       width={360}

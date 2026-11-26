@@ -125,7 +125,7 @@ export default function AttendanceHistoryPage() {
                 <div className="space-y-3">
                   {/* Category & Status */}
                   <div className="flex items-center justify-between gap-2">
-                    <Badge variant="burgundy" size="sm" className="capitalize">
+                    <Badge variant="primary" size="sm" className="capitalize">
                       {ev.category?.replace('_', ' ') || 'Event'}
                     </Badge>
                     <Badge variant="success" size="sm" className="gap-1">

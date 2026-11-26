@@ -408,7 +408,7 @@ export default function EventAttendancePage() {
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-              <Star className="w-5 h-5 fill-burgundy" />
+              <Star className="w-5 h-5 fill-primary" />
             </div>
           </div>
           <p className="text-xs text-muted mt-2">
@@ -425,7 +425,7 @@ export default function EventAttendancePage() {
           onClick={() => setActiveTab('roster')}
           className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'roster'
-              ? 'border-burgundy text-primary'
+              ? 'border-primary text-primary'
               : 'border-transparent text-muted hover:text-ink'
           }`}
         >
@@ -439,7 +439,7 @@ export default function EventAttendancePage() {
           onClick={() => setActiveTab('feedback')}
           className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'feedback'
-              ? 'border-burgundy text-primary'
+              ? 'border-primary text-primary'
               : 'border-transparent text-muted hover:text-ink'
           }`}
         >
@@ -468,7 +468,7 @@ export default function EventAttendancePage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search student or reg no..."
-                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-line focus:outline-none focus:ring-1 focus:ring-burgundy"
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-line focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 

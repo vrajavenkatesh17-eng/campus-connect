@@ -34,9 +34,9 @@ export default function AppSwitch({
         onChange={onChange}
         label=""
         disabled={disabled}
-        trackColor={isDark ? '#33282C' : '#E8DFD8'}  // line
-        trackOnColor={isDark ? '#C95D78' : '#7A1230'} // primary
-        thumbColor={isDark ? '#F6EFEA' : '#FFFFFF'}   // ink/surface
+        trackColor={isDark ? '#25325A' : '#DCE2EE'}  // line
+        trackOnColor={isDark ? '#5B93E6' : '#14529E'} // primary
+        thumbColor={isDark ? '#EEF2FB' : '#FFFFFF'}   // ink/surface
         thumbOnColor="#FFFFFF"                        // on-primary
         width={width}
         height={height}

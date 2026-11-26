@@ -177,7 +177,7 @@ export default function SettingsTab() {
                   step="5"
                   value={pointsCap}
                   onChange={(e) => setPointsCap(Number(e.target.value))}
-                  className="w-32 px-3 py-2 text-sm font-bold font-mono border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
+                  className="w-32 px-3 py-2 text-sm font-bold font-mono border border-line rounded-lg focus:outline-hidden focus:border-primary"
                   required
                 />
                 <span className="text-xs text-muted">points</span>
@@ -248,7 +248,7 @@ export default function SettingsTab() {
                   value={allowedEmailDomain}
                   onChange={(e) => setAllowedEmailDomain(e.target.value.trim())}
                   placeholder="@francisxavier.ac.in"
-                  className="flex-1 px-3 py-2 text-sm font-mono border border-line rounded-lg focus:outline-hidden focus:border-burgundy bg-surface"
+                  className="flex-1 px-3 py-2 text-sm font-mono border border-line rounded-lg focus:outline-hidden focus:border-primary bg-surface"
                   required
                 />
               </div>
@@ -304,7 +304,7 @@ export default function SettingsTab() {
               placeholder="e.g. CYBER or ROBOTICS"
               value={newDeptInput}
               onChange={(e) => setNewDeptInput(e.target.value)}
-              className="flex-1 px-3 py-1.5 text-xs font-mono uppercase border border-line rounded-lg focus:outline-hidden focus:border-burgundy"
+              className="flex-1 px-3 py-1.5 text-xs font-mono uppercase border border-line rounded-lg focus:outline-hidden focus:border-primary"
             />
             <Button
               type="button"

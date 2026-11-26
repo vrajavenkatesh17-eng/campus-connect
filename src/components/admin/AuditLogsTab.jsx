@@ -210,7 +210,7 @@ export default function AuditLogsTab() {
                 placeholder="e.g. John or admin@fxec..."
                 value={actorSearch}
                 onChange={(e) => setActorSearch(e.target.value)}
-                className="w-full text-xs border border-line rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+                className="w-full text-xs border border-line rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-hidden focus:border-primary"
               />
               <Search className="w-3.5 h-3.5 text-muted absolute left-2.5 top-2.5" />
             </div>
@@ -225,7 +225,7 @@ export default function AuditLogsTab() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+              className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-primary"
             />
           </div>
 
@@ -238,7 +238,7 @@ export default function AuditLogsTab() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-burgundy"
+              className="w-full text-xs border border-line rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:border-primary"
             />
           </div>
         </div>

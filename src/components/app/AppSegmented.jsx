@@ -35,10 +35,10 @@ export default function AppSegmented({
       value={value}
       defaultValue={defaultValue}
       onChange={onChange}
-      trackColor={isDark ? '#1F1719' : '#F5EFEA'} // surface-2
-      thumbColor={isDark ? '#C95D78' : '#7A1230'} // primary
-      textColor={isDark ? '#B3A5AA' : '#6B5E63'}  // muted
-      activeTextColor={isDark ? '#1A0A0F' : '#FFFFFF'} // on-primary
+      trackColor={isDark ? '#0E1730' : '#EEF2FB'} // surface-2
+      thumbColor={isDark ? '#5B93E6' : '#14529E'} // primary
+      textColor={isDark ? '#9FADCB' : '#5B6781'}  // muted
+      activeTextColor={isDark ? '#06122B' : '#FFFFFF'} // on-primary
       size={size}
       radius={radius}
       inset={inset}

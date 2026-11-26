@@ -32,8 +32,8 @@ export default function AppHoldButton({
         ? '#F0776A'
         : '#C0392B'
       : isDark
-      ? '#C95D78'
-      : '#7A1230';
+      ? '#5B93E6'
+      : '#14529E';
 
   return (
     <HoldButton
@@ -43,9 +43,9 @@ export default function AppHoldButton({
       onHold={onHold}
       onTap={onTap}
       holdTime={holdTime}
-      backgroundColor={isDark ? '#1F1719' : '#F5EFEA'} // surface-2
+      backgroundColor={isDark ? '#0E1730' : '#EEF2FB'} // surface-2
       fillColor={fillColor}
-      textColor={isDark ? '#F6EFEA' : '#1C1417'}       // ink
+      textColor={isDark ? '#EEF2FB' : '#0E1A33'}       // ink
       fillTextColor="#FFFFFF"                          // on-primary
       size="md"
       radius={12}

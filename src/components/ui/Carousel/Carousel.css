@@ -141,9 +141,9 @@
   pointer-events: none;
   background: linear-gradient(
     to top,
-    rgba(251, 248, 245, 0.95) 0%,
-    rgba(251, 248, 245, 0.78) 45%,
-    rgba(251, 248, 245, 0.3) 75%,
+    rgba(247, 248, 251, 0.95) 0%,
+    rgba(247, 248, 251, 0.78) 45%,
+    rgba(247, 248, 251, 0.3) 75%,
     transparent 100%
   );
 }
@@ -151,18 +151,18 @@
 .dark .carousel-scrim {
   background: linear-gradient(
     to top,
-    rgba(13, 8, 9, 0.95) 0%,
-    rgba(13, 8, 9, 0.72) 45%,
-    rgba(13, 8, 9, 0.25) 75%,
+    rgba(7, 13, 28, 0.95) 0%,
+    rgba(7, 13, 28, 0.72) 45%,
+    rgba(7, 13, 28, 0.25) 75%,
     transparent 100%
   );
 }
 
 .carousel-card.is-round .carousel-scrim {
-  background: rgba(251, 248, 245, 0.78);
+  background: rgba(247, 248, 251, 0.78);
 }
 .dark .carousel-card.is-round .carousel-scrim {
-  background: rgba(13, 8, 9, 0.72);
+  background: rgba(7, 13, 28, 0.72);
 }
 
 .carousel-icon {

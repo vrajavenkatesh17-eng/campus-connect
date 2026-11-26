@@ -4,7 +4,7 @@
  * Patent Reference: KRISH-IHSAN-FXEC-PATENT-2026-CC
  *
  * Tile 4: Users by Role Visual (Demographics)
- * Segmented bar with counts: Admins (Burgundy) / Coordinators (Blue) / Students (Emerald).
+ * Segmented bar with counts: Admins (Navy) / Coordinators (Blue) / Students (Emerald).
  * Fits strictly within container height budget without overflowing title.
  */
 

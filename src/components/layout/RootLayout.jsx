@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
           <Link to="/" className="flex items-center gap-3 text-ink hover:opacity-85 transition-opacity select-none">
             <div className="w-10 h-10 rounded-full bg-white dark:bg-surface-2 p-0.5 border border-line shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
               <img
-                src="/fxec-logo.png"
+                src="/brand/fxec-logo.png"
                 alt="Francis Xavier Engineering College Logo"
                 className="w-full h-full object-contain"
                 width="40"

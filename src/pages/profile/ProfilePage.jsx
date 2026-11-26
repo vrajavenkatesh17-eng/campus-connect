@@ -5,7 +5,7 @@
  *
  * S-J: Profile Digital ID Card powered by ReflectiveCard from React Bits.
  * Layout: Card left (sticky on desktop, max-h 80dvh, fixed aspect ratio 320/480,
- * graphite with faint wine tint in dark mode, silver in light mode; WebGL fallback).
+ * cool steel in dark mode, silver-blue in light mode; WebGL fallback).
  * Form right: 4 clean sections (Personal, Academic, Account, Preferences).
  * Live debounced preview (150ms) and sticky mobile save bar.
  */

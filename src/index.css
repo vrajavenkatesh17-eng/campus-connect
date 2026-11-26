@@ -27,18 +27,18 @@
 
 /* S-A2 Text Visibility Scrim Gradients */
 .scrim-overlay {
-  background: linear-gradient(to top, rgba(251, 248, 245, 0.95) 0%, rgba(251, 248, 245, 0.78) 55%, transparent 100%);
+  background: linear-gradient(to top, rgba(247, 248, 251, 0.95) 0%, rgba(247, 248, 251, 0.78) 55%, transparent 100%);
 }
 .dark .scrim-overlay {
-  background: linear-gradient(to top, rgba(13, 8, 9, 0.95) 0%, rgba(13, 8, 9, 0.72) 55%, transparent 100%);
+  background: linear-gradient(to top, rgba(7, 13, 28, 0.95) 0%, rgba(7, 13, 28, 0.72) 55%, transparent 100%);
 }
 
 .scrim-backdrop {
-  background: rgba(251, 248, 245, 0.78);
+  background: rgba(247, 248, 251, 0.78);
   backdrop-filter: blur(8px);
 }
 .dark .scrim-backdrop {
-  background: rgba(13, 8, 9, 0.72);
+  background: rgba(7, 13, 28, 0.72);
   backdrop-filter: blur(8px);
 }
 
@@ -52,53 +52,71 @@
 }
 
 :root {
-  /* DESIGN_SPEC v2 Tokens (Light: Wine & Ivory) */
-  --bg: 251 248 245; /* #FBF8F5 */
+  /* S-T RETHEME: Navy & Gold (Light) */
+  --bg: 247 248 251; /* #F7F8FB */
   --surface: 255 255 255; /* #FFFFFF */
-  --surface-2: 245 239 234; /* #F5EFEA */
-  --line: 232 223 216; /* #E8DFD8 */
-  --ink: 28 20 23; /* #1C1417 */
-  --muted: 107 94 99; /* #6B5E63 */
-  --primary: 122 18 48; /* #7A1230 */
-  --primary-hover: 95 14 38; /* #5F0E26 */
-  --primary-soft: 246 233 236; /* #F6E9EC */
+  --surface-2: 238 241 247; /* #EEF1F7 */
+  --line: 220 226 238; /* #DCE2EE */
+  --ink: 14 26 51; /* #0E1A33 */
+  --muted: 91 103 129; /* #5B6781 */
+  --primary: 20 82 158; /* #14529E */
+  --primary-hover: 15 63 126; /* #0F3F7E */
+  --primary-soft: 230 238 249; /* #E6EEF9 */
   --on-primary: 255 255 255; /* #FFFFFF */
-  --gold: 168 128 63; /* #A8803F (decor only) */
+  --navy-deep: 11 31 68; /* #0B1F44 */
+  --gold: 241 185 55; /* #F1B937 (decor only) */
+  --gold-ink: 148 103 0; /* #946700 (text) */
 
   /* Semantic status colors (Light) */
   --success: 31 138 91; /* #1F8A5B */
   --success-soft: 236 253 245; /* #ECFDF5 */
-  --warning: 183 121 31; /* #B7791F */
-  --warning-soft: 255 251 235; /* #FFFBEB */
+  --warning: 194 87 12; /* #C2570C */
+  --warning-soft: 254 243 199; /* #FEF3C7 */
   --danger: 192 57 43; /* #C0392B */
   --danger-soft: 254 242 242; /* #FEF2F2 */
-  --info: 47 111 181; /* #2F6FB5 */
-  --info-soft: 239 246 255; /* #EFF6FF */
+  --info: 20 82 158; /* #14529E (info = primary) */
+  --info-soft: 230 238 249; /* #E6EEF9 */
+
+  /* Chart Tokens */
+  --chart-1: 20 82 158; /* #14529E primary */
+  --chart-2: 241 185 55; /* #F1B937 gold */
+  --chart-3: 107 127 168; /* #6B7FA8 */
+  --chart-4: 42 157 143; /* #2A9D8F */
+  --chart-5: 142 154 181; /* #8E9AB5 */
 }
 
 .dark {
-  /* DESIGN_SPEC v2 Foundation Tokens (Dark: Muted Wine-Rose & Dark Ivory) */
-  --bg: 13 8 9; /* #0D0809 */
-  --surface: 22 16 18; /* #161012 */
-  --surface-2: 31 23 25; /* #1F1719 */
-  --line: 51 40 44; /* #33282C */
-  --ink: 246 239 234; /* #F6EFEA */
-  --muted: 179 165 170; /* #B3A5AA */
-  --primary: 201 93 120; /* #C95D78 - muted wine-rose, never hot/saturated pink */
-  --primary-hover: 219 122 146; /* #DB7A92 */
-  --primary-soft: 42 21 25; /* #2A1519 */
-  --on-primary: 26 10 15; /* #1A0A0F */
-  --gold: 212 178 122; /* #D4B27A (decor only) */
+  /* S-T RETHEME: Navy & Gold (Dark) */
+  --bg: 7 13 28; /* #070D1C */
+  --surface: 14 23 48; /* #0E1730 */
+  --surface-2: 21 32 67; /* #152043 */
+  --line: 37 50 90; /* #25325A */
+  --ink: 238 242 251; /* #EEF2FB */
+  --muted: 159 173 203; /* #9FADCB */
+  --primary: 91 147 230; /* #5B93E6 */
+  --primary-hover: 127 170 240; /* #7FAAF0 */
+  --primary-soft: 19 38 79; /* #13264F */
+  --on-primary: 6 18 43; /* #06122B */
+  --navy-deep: 8 20 46; /* #08142E */
+  --gold: 241 185 55; /* #F1B937 (decor only) */
+  --gold-ink: 241 185 55; /* #F1B937 (text) */
 
   /* Semantic status colors (Dark) */
   --success: 76 195 138; /* #4CC38A */
   --success-soft: 6 78 59; /* #064E3B */
-  --warning: 224 168 74; /* #E0A84A */
+  --warning: 245 158 80; /* #F59E50 */
   --warning-soft: 120 53 15; /* #78350F */
   --danger: 240 119 106; /* #F0776A */
   --danger-soft: 127 29 29; /* #7F1D1D */
-  --info: 111 168 232; /* #6FA8E8 */
-  --info-soft: 30 58 138; /* #1E3A8A */
+  --info: 91 147 230; /* #5B93E6 (info = primary) */
+  --info-soft: 19 38 79; /* #13264F */
+
+  /* Chart Tokens */
+  --chart-1: 91 147 230; /* #5B93E6 primary */
+  --chart-2: 241 185 55; /* #F1B937 gold */
+  --chart-3: 107 127 168; /* #6B7FA8 */
+  --chart-4: 42 157 143; /* #2A9D8F */
+  --chart-5: 142 154 181; /* #8E9AB5 */
 }
 
 @layer base {
