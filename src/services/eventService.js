@@ -304,6 +304,43 @@ export const eventService = {
   },
 
   /**
+   * Check LIVE venue overlap for a given time window (S-M 1)
+   * Returns { available: boolean, conflictingEvent?: object }
+   */
+  async checkVenueAvailability(venueId, startTimeIso, endTimeIso, currentEventId = null) {
+    if (!isSupabaseConfigured || !venueId || !startTimeIso || !endTimeIso) {
+      return { available: true };
+    }
+    try {
+      let query = supabase
+        .from('events')
+        .select('id, title, start_time, end_time, status')
+        .eq('venue_id', venueId)
+        .in('status', ['approved', 'pending'])
+        .lt('start_time', endTimeIso)
+        .gt('end_time', startTimeIso);
+
+      if (currentEventId) {
+        query = query.neq('id', currentEventId);
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.warn('Venue availability check query error:', error);
+        return { available: true };
+      }
+
+      if (data && data.length > 0) {
+        return { available: false, conflictingEvent: data[0] };
+      }
+      return { available: true };
+    } catch (err) {
+      console.warn('Venue availability check failed:', err);
+      return { available: true };
+    }
+  },
+
+  /**
    * Upload an event poster to Supabase Storage bucket 'event-posters'
    * Validates file type (jpeg, png, webp) and size (max 2MB)
    */
@@ -554,7 +591,7 @@ export const eventService = {
         end_time: eventPayload.end_time,
         seat_capacity: parseInt(eventPayload.seat_capacity, 10),
         poster_url: posterUrl,
-        status: 'pending',
+        status: eventPayload.status || 'pending',
       })
       .select('*')
       .single();

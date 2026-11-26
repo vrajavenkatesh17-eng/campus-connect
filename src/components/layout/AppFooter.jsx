@@ -41,6 +41,9 @@ export default function AppFooter() {
             <Link to="/contact" className="hover:text-primary transition-colors">
               Contact
             </Link>
+            <Link to="/help" className="hover:text-primary transition-colors">
+              Help
+            </Link>
           </nav>
         </div>
 

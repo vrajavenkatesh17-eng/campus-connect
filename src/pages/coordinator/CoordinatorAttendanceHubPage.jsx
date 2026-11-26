@@ -193,14 +193,25 @@ export default function CoordinatorAttendanceHubPage() {
 
                   {/* Primary Action Buttons */}
                   <div className="pt-4 mt-4 border-t border-line flex flex-col sm:flex-row items-center gap-2">
+                    <Link to={`/coordinator/events/${evt.id}/live`} className="w-full sm:flex-1">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="w-full text-xs gap-1.5 shadow-xs"
+                      >
+                        <QrCode className="w-4 h-4" />
+                        Projector Screen (/live)
+                      </Button>
+                    </Link>
+
                     <Button
-                      variant="primary"
+                      variant="secondary"
                       size="sm"
                       onClick={() => setActiveQrEvent(evt)}
-                      className="w-full sm:flex-1 text-xs gap-1.5 shadow-xs"
+                      className="w-full sm:w-auto text-xs gap-1.5"
                     >
-                      <QrCode className="w-4 h-4" />
-                      Launch Live QR Code
+                      <Radio className="w-3.5 h-3.5" />
+                      Quick Modal
                     </Button>
 
                     <Link to={`/coordinator/events/${evt.id}/attendees`} className="w-full sm:w-auto">

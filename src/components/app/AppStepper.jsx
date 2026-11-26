@@ -8,7 +8,9 @@
 
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import Stepper from '../ui/Stepper/Stepper';
+import Stepper, { Step } from '../ui/Stepper/Stepper';
+
+export { Step };
 
 export default function AppStepper({
   steps = [],

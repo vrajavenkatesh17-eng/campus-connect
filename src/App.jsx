@@ -27,6 +27,7 @@ import GalleryPage from './pages/public/GalleryPage';
 import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
 import TermsPage from './pages/public/TermsPage';
 import ContactPage from './pages/public/ContactPage';
+import HelpPage from './pages/public/HelpPage';
 import ForbiddenPage from './pages/public/ForbiddenPage';
 import NotFoundPage from './pages/public/NotFoundPage';
 
@@ -48,8 +49,10 @@ import StudentPointsPage from './pages/student/StudentPointsPage';
 import StudentCertificatesPage from './pages/student/StudentCertificatesPage';
 import StudentPassportPage from './pages/student/StudentPassportPage';
 import CoordinatorAttendanceHubPage from './pages/coordinator/CoordinatorAttendanceHubPage';
+import LiveProjectorPage from './pages/coordinator/LiveProjectorPage';
 import CoordinatorMaterialsPage from './pages/coordinator/CoordinatorMaterialsPage';
 import CoordinatorRewardsPage from './pages/coordinator/CoordinatorRewardsPage';
+import StudentScanPage from './pages/student/StudentScanPage';
 
 // Role Dashboards
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -90,6 +93,7 @@ export default function App() {
                   <Route path="/privacy" element={<PrivacyPolicyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/help" element={<HelpPage />} />
 
                   {/* Error Screens */}
                   <Route path="/403" element={<ForbiddenPage />} />
@@ -185,8 +189,24 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/coordinator/events/:id/live"
+              element={
+                <ProtectedRoute allowedRoles={['coordinator', 'admin']}>
+                  <LiveProjectorPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Role-Protected Portals - Student */}
+            <Route
+              path="/student/scan"
+              element={
+                <ProtectedRoute allowedRoles={['student', 'coordinator', 'admin']}>
+                  <StudentScanPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/student/events"
               element={

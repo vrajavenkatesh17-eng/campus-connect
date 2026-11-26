@@ -8,6 +8,7 @@ import OAuthErrorBanner from '../auth/OAuthErrorBanner';
 import OfflineBanner from '../common/OfflineBanner';
 import FirstVisitPreloader from '../common/FirstVisitPreloader';
 import SeoHead from '../common/SeoHead';
+import SmoothScroll from './SmoothScroll';
 import { ArrowLeft } from 'lucide-react';
 
 export default function RootLayout({ children }) {
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
     <div className="min-h-dvh flex flex-col bg-bg text-ink transition-colors duration-200">
       <SeoHead />
       <FirstVisitPreloader />
+      <SmoothScroll />
       <ScrollToTop />
       <OfflineBanner />
 
