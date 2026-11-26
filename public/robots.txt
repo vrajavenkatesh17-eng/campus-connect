@@ -1,0 +1,18 @@
+# Campus Connect — FXEC Autonomous Event Management System
+# Robots.txt per S-L.6 Public Pages Specification
+User-agent: *
+Allow: /
+Allow: /events
+Allow: /verify
+Allow: /gallery
+Allow: /privacy
+Allow: /terms
+Allow: /contact
+Allow: /login
+Disallow: /student/
+Disallow: /coordinator/
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /auth/
+
+Sitemap: https://campus-connect-fxec.vercel.app/sitemap.xml

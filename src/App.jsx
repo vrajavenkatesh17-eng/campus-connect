@@ -11,6 +11,8 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
 import RootLayout from './components/layout/RootLayout';
+import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
+import MaintenanceGuard from './components/common/MaintenanceGuard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Public & Auth Pages
@@ -22,6 +24,9 @@ import AdminLoginPage from './pages/public/AdminLoginPage';
 import AuthCallbackPage from './pages/public/AuthCallbackPage';
 import VerifyCertificatePage from './pages/public/VerifyCertificatePage';
 import GalleryPage from './pages/public/GalleryPage';
+import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
+import TermsPage from './pages/public/TermsPage';
+import ContactPage from './pages/public/ContactPage';
 import ForbiddenPage from './pages/public/ForbiddenPage';
 import NotFoundPage from './pages/public/NotFoundPage';
 
@@ -64,12 +69,14 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <RootLayout>
-                <Routes>
+      <GlobalErrorBoundary>
+        <BrowserRouter>
+          <ThemeProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <MaintenanceGuard>
+                  <RootLayout>
+                    <Routes>
                   {/* Public Entry Points */}
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<LoginPage />} />
@@ -80,6 +87,9 @@ export default function App() {
                   <Route path="/verify" element={<VerifyCertificatePage />} />
                   <Route path="/verify/:code" element={<VerifyCertificatePage />} />
                   <Route path="/gallery" element={<GalleryPage />} />
+                  <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
 
                   {/* Error Screens */}
                   <Route path="/403" element={<ForbiddenPage />} />
@@ -362,10 +372,12 @@ export default function App() {
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </RootLayout>
-            </AuthProvider>
-          </ToastProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+            </MaintenanceGuard>
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  </GlobalErrorBoundary>
+</QueryClientProvider>
   );
 }

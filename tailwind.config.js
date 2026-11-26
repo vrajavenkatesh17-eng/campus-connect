@@ -73,9 +73,9 @@ export default {
         card: '20px',
       },
       fontFamily: {
-        sans: ['"Manrope Variable"', 'Manrope', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['"Fraunces Variable"', 'Fraunces', 'Georgia', 'serif'],
-        display: ['"Fraunces Variable"', 'Fraunces', 'Georgia', 'serif'],
+        sans: ['"Manrope Variable"', 'Manrope', '"Manrope-Fallback"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"Fraunces Variable"', 'Fraunces', '"Fraunces-Fallback"', 'Georgia', 'serif'],
+        display: ['"Fraunces Variable"', 'Fraunces', '"Fraunces-Fallback"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono Variable"', 'JetBrains Mono', 'monospace'],
       },
       fontSize: {

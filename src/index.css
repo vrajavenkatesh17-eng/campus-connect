@@ -2,9 +2,54 @@
 @import '@fontsource-variable/manrope';
 @import '@fontsource-variable/jetbrains-mono';
 
+/* Size-Adjusted Fallback Font Stacks (S-A2 Rules: No FOIT, font-display: swap, CLS < 0.05) */
+@font-face {
+  font-family: 'Fraunces-Fallback';
+  src: local('Georgia'), local('Times New Roman'), serif;
+  size-adjust: 104%;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Manrope-Fallback';
+  src: local('system-ui'), local('-apple-system'), local('Arial'), sans-serif;
+  size-adjust: 98%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* S-A2 Text Visibility Scrim Gradients */
+.scrim-overlay {
+  background: linear-gradient(to top, rgba(251, 248, 245, 0.95) 0%, rgba(251, 248, 245, 0.78) 55%, transparent 100%);
+}
+.dark .scrim-overlay {
+  background: linear-gradient(to top, rgba(13, 8, 9, 0.95) 0%, rgba(13, 8, 9, 0.72) 55%, transparent 100%);
+}
+
+.scrim-backdrop {
+  background: rgba(251, 248, 245, 0.78);
+  backdrop-filter: blur(8px);
+}
+.dark .scrim-backdrop {
+  background: rgba(13, 8, 9, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+/* S-A2 Typography Rules: Min weight 400 on dark backgrounds */
+.dark body,
+.dark input,
+.dark select,
+.dark textarea,
+.dark button {
+  font-weight: 400;
+}
 
 :root {
   /* DESIGN_SPEC v2 Tokens (Light: Wine & Ivory) */

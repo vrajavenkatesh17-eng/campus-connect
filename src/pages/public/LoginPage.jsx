@@ -248,8 +248,13 @@ export default function LoginPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
           {/* Left Column: Brand & Sign-in Panel (Col 1 to 7 on lg) */}
           <div className="lg:col-span-7 xl:col-span-6 flex flex-col space-y-6">
-            {/* Institutional Brand Header */}
-            <div className="space-y-4">
+            {/* Institutional Brand Header with Scrim per S-A2.1 */}
+            <div className="relative rounded-[24px] bg-surface/80 dark:bg-surface/85 backdrop-blur-md border border-line/60 p-6 sm:p-7 shadow-xs space-y-4">
+              {/* Ambient Scrim Gradient Layer behind Brand Header per S-A2.1 */}
+              <div
+                className="absolute inset-0 rounded-[24px] pointer-events-none -z-10 scrim-backdrop"
+                aria-hidden="true"
+              />
               <div className="flex items-center gap-3.5">
                 <div className="w-14 h-14 rounded-full bg-white dark:bg-surface-2 p-1 border border-line shadow-sm shrink-0 overflow-hidden flex items-center justify-center">
                   <img

@@ -302,8 +302,8 @@ export default function HomePage() {
           <Noise opacity={0.035} contrast={0.5} colored={false} blendMode="overlay" fixed={true} zIndex={1} />
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+        {/* Hero Content with Scrim Panel Backing per S-A2.1 */}
+        <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
           {/* Institution Header Tag */}
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface/90 backdrop-blur-md border border-line text-ink text-xs font-semibold tracking-wide uppercase shadow-xs mb-6 select-none">
             <img
@@ -316,26 +316,35 @@ export default function HomePage() {
             <span>Francis Xavier Engineering College • Autonomous</span>
           </div>
 
-          {/* H1 Heading with SplitText & GradientText */}
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-ink tracking-tight max-w-4xl leading-[1.15] mb-6">
-            <SplitText
-              text="Connecting Campus, Industry & "
-              delay={35}
-              className="font-serif inline"
+          {/* Frosted/Scrim Backing Container for Hero Text per S-A2.1 */}
+          <div className="relative w-full rounded-[28px] bg-surface/75 dark:bg-surface/85 backdrop-blur-md border border-line/70 p-6 sm:p-10 lg:p-12 shadow-xs mb-8 flex flex-col items-center">
+            {/* Ambient Scrim Gradient Layer behind H1 & Subtitle per S-A2.1 */}
+            <div
+              className="absolute inset-0 rounded-[28px] pointer-events-none -z-10 scrim-backdrop"
+              aria-hidden="true"
             />
-            <GradientText
-              animationSpeed={6}
-              className="font-serif inline"
-            >
-              Student Excellence
-            </GradientText>
-          </h1>
 
-          {/* Static Subtitle */}
-          <p className="text-base sm:text-lg text-muted max-w-2xl leading-relaxed mb-8">
-            The autonomous guest lecture management and experiential learning platform. Built for
-            seamless seat reservations, live rotating QR attendance, earned activity points, and tamper-proof digital credentials.
-          </p>
+            {/* H1 Heading with SplitText & GradientText */}
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-ink tracking-tight max-w-4xl leading-[1.15] mb-6">
+              <SplitText
+                text="Connecting Campus, Industry & "
+                delay={35}
+                className="font-serif inline"
+              />
+              <GradientText
+                animationSpeed={6}
+                className="font-serif inline"
+              >
+                Student Excellence
+              </GradientText>
+            </h1>
+
+            {/* Static Subtitle */}
+            <p className="text-base sm:text-lg text-muted max-w-2xl leading-relaxed">
+              The autonomous guest lecture management and experiential learning platform. Built for
+              seamless seat reservations, live rotating QR attendance, earned activity points, and tamper-proof digital credentials.
+            </p>
+          </div>
 
           {/* Next Event Countdown Chip (Strict Rule: Hide if none) */}
           {nextEvent && nextEvent.start_time && (

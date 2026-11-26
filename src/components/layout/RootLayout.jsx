@@ -5,7 +5,10 @@ import AppFooter from './AppFooter';
 import ScrollToTop from './ScrollToTop';
 import ThemeToggle from '../common/ThemeToggle';
 import OAuthErrorBanner from '../auth/OAuthErrorBanner';
-import { GraduationCap, ArrowLeft } from 'lucide-react';
+import OfflineBanner from '../common/OfflineBanner';
+import FirstVisitPreloader from '../common/FirstVisitPreloader';
+import SeoHead from '../common/SeoHead';
+import { ArrowLeft } from 'lucide-react';
 
 export default function RootLayout({ children }) {
   const location = useLocation();
@@ -13,14 +16,23 @@ export default function RootLayout({ children }) {
 
   return (
     <div className="min-h-dvh flex flex-col bg-bg text-ink transition-colors duration-200">
+      <SeoHead />
+      <FirstVisitPreloader />
       <ScrollToTop />
+      <OfflineBanner />
 
       {/* Header: sticky top-0, z-50 */}
       {isLoginPage ? (
         <header className="sticky top-0 z-50 w-full h-16 bg-surface/90 backdrop-blur-md border-b border-line px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-colors duration-200">
-          <Link to="/" className="flex items-center gap-2.5 text-ink hover:opacity-85 transition-opacity select-none">
-            <div className="w-9 h-9 rounded-[10px] bg-primary text-on-primary flex items-center justify-center font-bold shadow-xs">
-              <GraduationCap className="w-5 h-5" />
+          <Link to="/" className="flex items-center gap-3 text-ink hover:opacity-85 transition-opacity select-none">
+            <div className="w-10 h-10 rounded-full bg-white dark:bg-surface-2 p-0.5 border border-line shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+              <img
+                src="/fxec-logo.png"
+                alt="Francis Xavier Engineering College Logo"
+                className="w-full h-full object-contain"
+                width="40"
+                height="40"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-serif font-bold text-lg text-ink leading-tight">Campus Connect</span>

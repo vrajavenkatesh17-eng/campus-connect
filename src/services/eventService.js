@@ -179,6 +179,90 @@ export const eventService = {
   },
 
   /**
+   * Fetch public paginated events for /events public explorer (12/page)
+   * Supports 'upcoming' and 'past' tabs, text search, offset pagination.
+   */
+  async getPublicPaginatedEvents({ timing = 'upcoming', search = '', page = 1, pageSize = 12 } = {}) {
+    if (!isSupabaseConfigured) {
+      return { events: [], totalCount: 0, totalPages: 1 };
+    }
+
+    const offset = (page - 1) * pageSize;
+    const nowIso = new Date().toISOString();
+
+    try {
+      let query = supabase
+        .from('events')
+        .select(`
+          id,
+          title,
+          description,
+          public_summary,
+          start_time,
+          end_time,
+          event_date,
+          poster_url,
+          seat_capacity,
+          registered_count,
+          custom_venue,
+          category,
+          status,
+          venues(name, building),
+          speakers(name, designation, company, photo_url)
+        `, { count: 'exact' });
+
+      if (timing === 'upcoming') {
+        query = query
+          .eq('status', 'approved')
+          .gt('start_time', nowIso)
+          .order('start_time', { ascending: true });
+      } else {
+        query = query
+          .or(`status.eq.completed,end_time.lte.${nowIso}`)
+          .neq('status', 'cancelled')
+          .neq('status', 'rejected')
+          .order('start_time', { ascending: false });
+      }
+
+      if (search && search.trim()) {
+        query = query.ilike('title', `%${search.trim()}%`);
+      }
+
+      query = query.range(offset, offset + pageSize - 1);
+
+      const { data, count, error } = await query;
+      if (error) throw error;
+
+      const totalCount = count || 0;
+      const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+      const events = (data || []).map((e) => ({
+        id: e.id,
+        title: e.title,
+        description: e.description,
+        public_summary: e.public_summary || e.description || '',
+        start_time: e.start_time,
+        end_time: e.end_time,
+        event_date: e.event_date || (e.start_time ? e.start_time.split('T')[0] : null),
+        poster_url: e.poster_url,
+        seat_capacity: e.seat_capacity || 100,
+        registered_count: e.registered_count || 0,
+        venue: e.venues?.name || e.custom_venue || 'Campus Central',
+        speaker_name: e.speakers?.name || null,
+        speaker_company: e.speakers?.company || null,
+        speaker_designation: e.speakers?.designation || null,
+        category: e.category,
+        status: e.status,
+      }));
+
+      return { events, totalCount, totalPages };
+    } catch (err) {
+      console.warn('Error fetching paginated public events:', err);
+      return { events: [], totalCount: 0, totalPages: 1 };
+    }
+  },
+
+  /**
    * Fetch distinct companies of past speakers for Industry Voices LogoLoop
    */
   async getPublicSpeakerCompanies() {
